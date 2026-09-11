@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
 // Multiple users/devices on the same network all share the same data.
 
 const API = `${window.location.origin}/api`;
+const SESSION_KEY = "frc-scout-session";
 
 async function apiCall(method, path, body) {
   const res = await fetch(`${API}${path}`, {
@@ -50,8 +52,8 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#07090f", bg1:"#0c1120", bg2:"#111827", border:"#1e2d45", accent:"#38bdf8", orange:"#fb923c", green:"#4ade80", red:"#f87171", muted:"#64748b", text:"#e2e8f0", dim:"#94a3b8", purple:"#a78bfa" };
-const MO = "'Roboto Mono',monospace";
+const C = { bg0:"#07090f", bg1:"#0c1120", bg2:"#111827", border:"#283952", accent:"#38bdf8", orange:"#fb923c", green:"#4ade80", red:"#f87171", muted:"#94a3b8", text:"#e2e8f0", dim:"#94a3b8", purple:"#a78bfa" };
+const MO = "'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
   page:   { fontFamily:MO, background:C.bg0, color:C.text, minHeight:"100vh", display:"flex", flexDirection:"column" },
@@ -60,12 +62,12 @@ const sx = {
   main:   { flex:1, overflowY:"auto", padding:"16px 12px", paddingBottom:80 },
   bnav:   { position:"fixed", bottom:0, left:0, right:0, background:C.bg1, borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100, height:60 },
   bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.accent:C.muted, cursor:"pointer", fontFamily:MO, fontSize:9, letterSpacing:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:3, padding:"6px 2px" }),
-  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:10, padding:16, marginBottom:12 },
-  ct:     { fontSize:10, fontWeight:700, color:C.accent, letterSpacing:3, textTransform:"uppercase", marginBottom:12 },
+  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:14, padding:20, marginBottom:16, boxShadow:"0 8px 24px #00000018" },
+  ct:     { fontSize:12, fontWeight:700, color:C.accent, letterSpacing:2, textTransform:"uppercase", marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
   btn:    (c=C.accent) => ({ background:"transparent", border:`1px solid ${c}`, color:c, padding:"14px 20px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, letterSpacing:1, width:"100%", minHeight:48 }),
   sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c}`, color:c, padding:"8px 12px", borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:11, letterSpacing:1, minHeight:36 }),
-  lbl:    { fontSize:10, color:C.muted, letterSpacing:2, textTransform:"uppercase", marginBottom:4, display:"block" },
+  lbl:    { fontSize:12, color:C.muted, letterSpacing:1, textTransform:"uppercase", marginBottom:6, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },
   ok:     { color:C.green, fontSize:12, marginBottom:8 },
   tag:    (c) => ({ background:c+"22", border:`1px solid ${c}44`, color:c, padding:"3px 8px", borderRadius:4, fontSize:10, letterSpacing:1, display:"inline-block" }),
@@ -126,11 +128,26 @@ function exportToCSV(forms, allSubs) {
 
 // ════════════════════════════════════════════════════════════════════════════
 export default function App() {
+  const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
   const [user,    setUser]    = useState(null);
   const [team,    setTeam]    = useState(null);
   const [mem,     setMem]     = useState(null);
   const [tab,     setTab]     = useState("home");
   const [booting, setBooting] = useState(true);
+  const [connected, setConnected] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    async function check() {
+      try {
+        const response = await fetch(`${API}/health`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+        if (active) setConnected(response.ok);
+      } catch { if (active) setConnected(false); }
+    }
+    check();
+    const timer = setInterval(check, 15000);
+    return () => { active = false; clearInterval(timer); };
+  }, []);
 
   // No online/offline sync needed — all data is local
 
@@ -138,7 +155,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const sess = await idbGet("session", "current");
+        const sess = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
         if (sess?.user) {
           setUser(sess.user);
           if (sess.team && sess.mem) {
@@ -158,7 +175,10 @@ export default function App() {
     })();
   }, []);
 
-  async function saveSession(u, t, m) { await idbPut("session", { key:"current", user:u, team:t||null, mem:m||null }); }
+  async function saveSession(u, t, m) {
+    if (u) localStorage.setItem(SESSION_KEY, JSON.stringify({ user:u, team:t||null, mem:m||null }));
+    else localStorage.removeItem(SESSION_KEY);
+  }
   async function checkPending()       { /* no-op: all data is local, no pending queue needed */ }
 
   async function login(u) {
@@ -236,6 +256,8 @@ export default function App() {
 
   return (
     <div style={sx.page}>
+      {!connected && <div className="connection-banner" role="status">Server unavailable. Keep this page open and wait for reconnection before saving.</div>}
+      {needRefresh && <div className="connection-banner" role="status">An app update is ready. Save your work first. <button style={sx.sm()} onClick={() => updateServiceWorker(true)}>Reload app</button></div>}
       <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 
       {user && team && (
@@ -262,9 +284,9 @@ export default function App() {
       </main>
 
       {user && team && (
-        <nav style={sx.bnav}>
+        <nav style={sx.bnav} aria-label="Main navigation">
           {navTabs.map(t => (
-            <button key={t.id} style={sx.bnavBtn(tab===t.id)} onClick={()=>setTab(t.id)}>
+            <button key={t.id} aria-current={tab===t.id ? "page" : undefined} style={sx.bnavBtn(tab===t.id)} onClick={()=>setTab(t.id)}>
               <span style={{fontSize:18}}>{t.icon}</span>
               <span>{t.label}</span>
             </button>
@@ -284,6 +306,7 @@ function AuthScreen({ onLogin }) {
   const [busy,setBusy]=useState(false);
 
   async function submit() {
+    if (busy) return;
     if (!username.trim()||!password.trim()) { setErr("All fields required."); return; }
     setBusy(true); setErr("");
     const ph = hash(password);
@@ -292,12 +315,12 @@ function AuthScreen({ onLogin }) {
         const existing = await fbSelect("users",{username:username.trim()});
         if (existing.length) { setErr("Username already taken."); setBusy(false); return; }
         const nu = {id:uid(),username:username.trim(),password_hash:ph,created_at:tsNow()};
-        await idbPut("users",nu); onLogin(nu);
+        await idbPut("users",nu); await onLogin(nu);
       } else {
         const all = await idbAll("users");
         const user = all.find(u=>u.username===username.trim()&&u.password_hash===ph);
         if (!user) { setErr("Invalid username or password."); setBusy(false); return; }
-        onLogin(user);
+        await onLogin(user);
       }
     } catch { setErr("Login error — please try again."); }
     setBusy(false);
@@ -316,10 +339,10 @@ function AuthScreen({ onLogin }) {
             {m==="login"?"LOGIN":"SIGN UP"}
           </button>)}
         </div>
-        <label style={sx.lbl}>Username</label>
-        <input style={sx.inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="scouter42" autoCapitalize="none" onKeyDown={e=>e.key==="Enter"&&submit()}/>
-        <label style={sx.lbl}>Password</label>
-        <input style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&submit()}/>
+        <label htmlFor="scout-username" style={sx.lbl}>Username</label>
+        <input id="scout-username" autoComplete="username" style={sx.inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="scouter42" autoCapitalize="none" onKeyDown={e=>e.key==="Enter"&&submit()}/>
+        <label htmlFor="scout-password" style={sx.lbl}>Password</label>
+        <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&submit()}/>
         {err && <div style={sx.err}>{err}</div>}
         <button style={sx.btn(C.accent)} onClick={submit} disabled={busy}>{busy?"…":mode==="login"?"LOGIN →":"CREATE ACCOUNT →"}</button>
       </div>

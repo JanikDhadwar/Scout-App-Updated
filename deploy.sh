@@ -1,124 +1,56 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-
-APP_NAME="Scout-App"
-APP_PORT="${APP_PORT:-3001}"
-BRANCH="${DEPLOY_BRANCH:-main}"
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="$SCRIPT_DIR"
-APP_DIR="$REPO_DIR/Clasue-scout-app"
-SERVER_PATH="$APP_DIR/server.cjs"
-LOG_FILE="$REPO_DIR/deploy.log"
-LOCK_FILE="$APP_DIR/deploy.lock"
-PM2_SERVER_PATH="$SERVER_PATH"
-
-export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-export DISPLAY="${DISPLAY:-:0}"
-DEPLOY_USER="$(logname 2>/dev/null || echo "${SUDO_USER:-$USER}")"
-export XAUTHORITY="${XAUTHORITY:-/home/$DEPLOY_USER/.Xauthority}"
-
-mkdir -p "$(dirname "$LOG_FILE")"
-exec > >(tee -a "$LOG_FILE") 2>&1
-
-log() {
-  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S %Z')" "$*"
+# Parse the full deployment before Git updates this script on disk.
+main() {
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ ! -f /etc/scout-app.env ]] || source /etc/scout-app.env
+: "${SCOUT_STATE_DIR:=$HOME/.local/share/scout-app}"
+: "${DEPLOY_BRANCH:=main}"
+: "${APP_PORT:=3001}"
+export GIT_TERMINAL_PROMPT=0
+mkdir -p "$SCOUT_STATE_DIR/releases"
+exec 9>"$SCOUT_STATE_DIR/deploy.lock"
+flock -n 9 || exit 0
+cd "$REPO_DIR"
+git fetch --prune origin "+refs/heads/$DEPLOY_BRANCH:refs/remotes/origin/$DEPLOY_BRANCH"
+revision=$(git rev-parse "refs/remotes/origin/$DEPLOY_BRANCH")
+previous=$(readlink -f "$SCOUT_STATE_DIR/current" || true)
+if [[ -f "$SCOUT_STATE_DIR/deployed-revision" ]] && [[ $(cat "$SCOUT_STATE_DIR/deployed-revision") == "$revision" ]] && [[ "${1:-}" != --force ]]; then
+  exit 0
+fi
+# Never force-reset the checkout: it may contain live data or server edits.
+[[ $(git branch --show-current) == "$DEPLOY_BRANCH" ]] || { echo "Checkout must be on $DEPLOY_BRANCH" >&2; exit 1; }
+git merge --ff-only "refs/remotes/origin/$DEPLOY_BRANCH"
+[[ $(git rev-parse HEAD) == "$revision" ]] || { echo 'Local commits differ from origin; resolve before deploying.' >&2; exit 1; }
+release=$(mktemp -d "$SCOUT_STATE_DIR/releases/$revision.XXXXXX")
+echo "Building $revision in $release"
+git archive "$revision" Clasue-scout-app | tar -x -C "$release"
+cd "$release/Clasue-scout-app"
+npm ci --include=dev --no-audit --no-fund
+npm run build
+node --check server.cjs
+activate() {
+  ln -sfn "$1" "$SCOUT_STATE_DIR/current.next"
+  mv -Tf "$SCOUT_STATE_DIR/current.next" "$SCOUT_STATE_DIR/current"
 }
-
-die() {
-  log "ERROR: $*"
-  exit 1
-}
-
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "Required command not found: $1"
-}
-
-PM2_CWD="$APP_DIR"
-
-pm2_run() {
-  sudo pm2 "$@"
-}
-
-acquire_lock() {
-  if command -v flock >/dev/null 2>&1; then
-    exec 9>"$LOCK_FILE"
-    if ! flock -n 9; then
-      log "Already deploying; exiting."
-      exit 0
-    fi
-    return
-  fi
-
-  if ! mkdir "$LOCK_FILE.d" 2>/dev/null; then
-    log "Already deploying; exiting."
-    exit 0
-  fi
-  trap 'rm -rf "$LOCK_FILE.d"' EXIT
-}
-
-health_check() {
-  local url="http://127.0.0.1:$APP_PORT/"
-  local attempt
-
-  for attempt in {1..20}; do
-    if curl -fsS "$url" >/dev/null 2>&1; then
-      log "Health check passed: $url"
-      return
-    fi
+healthy() {
+  for attempt in {1..30}; do
+    if curl --max-time 2 -fsS "http://127.0.0.1:$APP_PORT/api/health" | grep -Fq "\"release\":\"$(basename "$release")\""; then return 0; fi
     sleep 1
   done
-
-  sudo pm2 logs "$APP_NAME" --lines 80 --nostream || true
-  die "Health check failed: $url"
+  return 1
 }
-
-trap 'log "Deploy failed on line $LINENO."' ERR
-
-require_cmd git
-require_cmd npm
-require_cmd pm2
-require_cmd curl
-require_cmd sudo
-
-acquire_lock
-
-log "--- DEPLOY START ---"
-log "Repo: $REPO_DIR"
-log "App:  $APP_DIR"
-log "Branch: origin/$BRANCH"
-
-cd "$REPO_DIR"
-git fetch origin "$BRANCH"
-git pull --ff-only origin "$BRANCH"
-
-cd "$APP_DIR"
-if [ -f package-lock.json ]; then
-  npm ci
+activate "$release"
+if sudo -n /usr/bin/systemctl restart scout-app.service && healthy; then
+  printf '%s\n' "$revision" > "$SCOUT_STATE_DIR/deployed-revision"
+  echo "Deployed $revision successfully."
 else
-  npm install
+  echo 'New release failed; restoring previous release.' >&2
+  if [[ -n "$previous" && -d "$previous" ]]; then
+    activate "$previous"
+    sudo -n /usr/bin/systemctl restart scout-app.service
+  fi
+  exit 1
 fi
-
-log "--- BUILDING ---"
-npm run build
-
-log "--- RESTARTING $APP_NAME FROM CURRENT BUILD ---"
-if sudo pm2 list | grep -q "$APP_NAME"; then
-  sudo pm2 restart "$APP_NAME" --update-env || (sudo pm2 delete "$APP_NAME" && sudo pm2 start "$PM2_SERVER_PATH" --name "$APP_NAME" --cwd "$PM2_CWD" --update-env)
-else
-  sudo pm2 start "$PM2_SERVER_PATH" --name "$APP_NAME" --cwd "$PM2_CWD" --update-env || true
-fi
-sudo pm2 save
-
-health_check
-
-# Open a new terminal to show logs for 3 seconds, then close
-if command -v gnome-terminal >/dev/null 2>&1; then
-  gnome-terminal -- bash -c "sudo pm2 logs $APP_NAME; sleep 3; exit" &
-elif command -v xterm >/dev/null 2>&1; then
-  xterm -e "sudo pm2 logs $APP_NAME; sleep 3; exit" &
-else
-  log "Warning: No terminal emulator (gnome-terminal or xterm) found to display logs."
-fi
-
-log "--- DEPLOY FINISHED ---"
+}
+main "$@"

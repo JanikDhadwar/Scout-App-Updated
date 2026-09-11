@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test server.test.cjs",
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",

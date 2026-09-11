@@ -4,13 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
 server: {
+    proxy: { '/api': 'http://127.0.0.1:3001' },
     host: '0.0.0.0',
     allowedHosts: ['6390scout.tailc4582.ts.net']
   },
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       manifest: {
         name: 'FRC Scout',
         short_name: 'FRCScout',
@@ -24,6 +25,7 @@ server: {
         ]
       },
       workbox: {
+        navigateFallbackDenylist: [/^\/api\//],
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {

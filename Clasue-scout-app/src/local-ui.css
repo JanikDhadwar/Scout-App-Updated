@@ -1,0 +1,27 @@
+:root { color-scheme: dark; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: #07090f; }
+button, input, select, textarea { font: inherit; }
+button { transition: background .15s, border-color .15s, transform .15s; }
+button:hover:not(:disabled) { background-color: #38bdf817 !important; }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: .5; cursor: wait !important; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #7dd3fc !important; outline-offset: 3px;
+}
+input, textarea, select { scroll-margin: 90px; }
+main { width: 100%; max-width: 1120px; margin: 0 auto; }
+header { gap: 12px; }
+nav[aria-label="Main navigation"] { padding-bottom: env(safe-area-inset-bottom); height: calc(68px + env(safe-area-inset-bottom)) !important; }
+nav button[aria-current="page"] { background: #38bdf810 !important; box-shadow: inset 0 3px #38bdf8; }
+.connection-banner { padding: 10px 16px; background: #422719; color: #fed7aa; text-align: center; font-size: 13px; }
+@media (max-width: 600px) {
+  header { height: auto !important; min-height: 64px; flex-wrap: wrap; padding: 10px 12px !important; }
+  input, select, textarea { font-size: 16px !important; }
+  main { padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; }
+}
+@media (min-width: 900px) {
+  main { padding: 28px 32px 100px !important; }
+  nav[aria-label="Main navigation"] { padding-inline: max(24px, calc((100vw - 1056px) / 2)); }
+}
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
