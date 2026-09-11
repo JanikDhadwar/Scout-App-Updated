@@ -1,21 +1,56 @@
 :root { color-scheme: dark; font-synthesis: none; }
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #07090f; }
+body { margin: 0; min-width: 320px; background: #141414; }
 button, input, select, textarea { font: inherit; }
 button { transition: background .15s, border-color .15s, transform .15s; }
-button:hover:not(:disabled) { background-color: #38bdf817 !important; }
+button:hover:not(:disabled) { filter: brightness(1.18); }
 button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { opacity: .5; cursor: wait !important; }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid #7dd3fc !important; outline-offset: 3px;
+  outline: 2px solid #f16b70 !important; outline-offset: 3px;
 }
 input, textarea, select { scroll-margin: 90px; }
 main { width: 100%; max-width: 1120px; margin: 0 auto; }
 header { gap: 12px; }
 nav[aria-label="Main navigation"] { padding-bottom: env(safe-area-inset-bottom); height: calc(68px + env(safe-area-inset-bottom)) !important; }
-nav button[aria-current="page"] { background: #38bdf810 !important; box-shadow: inset 0 3px #38bdf8; }
+nav button[aria-current="page"] { background: #ba273212 !important; box-shadow: inset 0 3px #d83a45; }
+input[type="checkbox"], input[type="radio"] { accent-color: #c8323d; }
+.team-mark { display: inline-flex; align-items: center; justify-content: center; background: #ba2732; color: white; border-radius: 5px; min-width: 58px; height: 36px; font-weight: 800; font-size: 19px; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.team-mark-large { width: 84px; height: 52px; font-size: 29px; margin-bottom: 22px; }
+.header-team { color: #a3a3a3; font-size: 13px; font-weight: 400; margin-left: 8px; }
+.auth-brand { width: 100%; max-width: 400px; margin-bottom: 24px; }
+.auth-brand h1 { margin: 0; font-size: 34px; font-weight: 650; line-height: 1.16; letter-spacing: -1px; }
+.auth-brand p { color: #a3a3a3; font-size: 14px; line-height: 1.6; max-width: 300px; margin: 16px 0 0; }
+.team-overview { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 10px 0 28px; margin-bottom: 24px; border-bottom: 1px solid #353535; }
+.team-overview h1 { margin: 8px 0; font-size: clamp(26px, 4vw, 38px); font-weight: 650; letter-spacing: -.8px; }
+.team-overview p, .page-subtitle { color: #a3a3a3; font-size: 14px; line-height: 1.5; margin: 6px 0 0; }
+.eyebrow { color: #d78085; font-size: 13px; }
+.team-number { color: #f16b70; font-size: clamp(38px, 7vw, 76px); font-weight: 800; letter-spacing: -4px; opacity: .7; }
+.page-title { font-size: 26px; font-weight: 650; margin: 0; letter-spacing: -.5px; }
+.condition-editor { border-top: 1px solid #353535; margin-top: 16px; padding-top: 18px; }
+.condition-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.condition-heading strong { font-size: 13px; font-weight: 600; }
+.condition-heading p, .field-help { color: #a3a3a3; font-size: 12px; margin: 6px 0; line-height: 1.5; }
+.condition-row { display: flex; gap: 8px; align-items: start; margin-top: 12px; padding: 12px; border-radius: 6px; background: #141414; }
+.condition-row select, .condition-row input { flex: 1; min-width: 0; margin-bottom: 0 !important; }
+.condition-row button { flex-shrink: 0; }
+.condition-mode { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 14px; }
+.condition-mode select { color: #f2f0ed; background: #262626; border: 1px solid #353535; padding: 7px; border-radius: 4px; }
+.form-progress { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; color: #b9b6b2; padding: 12px 0; margin-bottom: 10px; }
+.form-progress span { color: #a3a3a3; }
+.rating-options { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.rating-options button { padding: 10px 2px !important; }
+details[open] summary { margin-bottom: 20px; }
 .connection-banner { padding: 10px 16px; background: #422719; color: #fed7aa; text-align: center; font-size: 13px; }
 @media (max-width: 600px) {
+  .header-team { display: none; }
+  .condition-heading { align-items: start; }
+  .condition-heading button { flex-shrink: 0; }
+  .condition-row { flex-direction: column; }
+  .condition-row select, .condition-row input { width: 100%; flex: auto; }
+  .rating-options { grid-template-columns: repeat(5, 1fr); }
+  .team-number { display: none; }
+  nav[aria-label="Main navigation"] button { font-size: 10px !important; }
   header { height: auto !important; min-height: 64px; flex-wrap: wrap; padding: 10px 12px !important; }
   input, select, textarea { font-size: 16px !important; }
   main { padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; }

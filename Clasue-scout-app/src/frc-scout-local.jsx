@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { conditionOperators, hasAnswer, visibleQuestions, visibleAnswers, validateConditions } from './form-conditions.js';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
@@ -52,22 +53,22 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#07090f", bg1:"#0c1120", bg2:"#111827", border:"#283952", accent:"#38bdf8", orange:"#fb923c", green:"#4ade80", red:"#f87171", muted:"#94a3b8", text:"#e2e8f0", dim:"#94a3b8", purple:"#a78bfa" };
+const C = { bg0:"#141414", bg1:"#1c1c1c", bg2:"#262626", border:"#353535", accent:"#f16b70", orange:"#e9b777", green:"#82c99a", red:"#f16b70", muted:"#a3a3a3", text:"#f2f0ed", dim:"#b9b6b2", purple:"#b7a3d5" };
 const MO = "'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
   page:   { fontFamily:MO, background:C.bg0, color:C.text, minHeight:"100vh", display:"flex", flexDirection:"column" },
-  hdr:    { background:C.bg1, borderBottom:`1px solid ${C.border}`, padding:"0 12px", display:"flex", alignItems:"center", justifyContent:"space-between", height:48, flexShrink:0, position:"sticky", top:0, zIndex:100 },
-  logo:   { display:"flex", alignItems:"center", gap:6, fontWeight:700, fontSize:14, color:C.accent, letterSpacing:2 },
+  hdr:    { background:C.bg1, borderBottom:`1px solid ${C.border}`, padding:"0 24px", display:"flex", alignItems:"center", justifyContent:"space-between", height:72, flexShrink:0, position:"sticky", top:0, zIndex:100 },
+  logo:   { display:"flex", alignItems:"center", gap:12, fontWeight:650, fontSize:17, color:C.text },
   main:   { flex:1, overflowY:"auto", padding:"16px 12px", paddingBottom:80 },
   bnav:   { position:"fixed", bottom:0, left:0, right:0, background:C.bg1, borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100, height:60 },
-  bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.accent:C.muted, cursor:"pointer", fontFamily:MO, fontSize:9, letterSpacing:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:3, padding:"6px 2px" }),
-  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:14, padding:20, marginBottom:16, boxShadow:"0 8px 24px #00000018" },
-  ct:     { fontSize:12, fontWeight:700, color:C.accent, letterSpacing:2, textTransform:"uppercase", marginBottom:16 },
+  bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.text:C.muted, cursor:"pointer", fontFamily:MO, fontSize:12, fontWeight:on?650:450, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:5, padding:"8px 2px" }),
+  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:10, padding:22, marginBottom:16 },
+  ct:     { fontSize:15, fontWeight:650, color:C.text, marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
-  btn:    (c=C.accent) => ({ background:"transparent", border:`1px solid ${c}`, color:c, padding:"14px 20px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, letterSpacing:1, width:"100%", minHeight:48 }),
-  sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c}`, color:c, padding:"8px 12px", borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:11, letterSpacing:1, minHeight:36 }),
-  lbl:    { fontSize:12, color:C.muted, letterSpacing:1, textTransform:"uppercase", marginBottom:6, display:"block" },
+  btn:    (c=C.accent) => ({ background:c===C.accent?"#ba2732":"transparent", border:`1px solid ${c===C.accent?"#ba2732":c}`, color:c===C.accent?"#fff":c, padding:"14px 20px", borderRadius:7, cursor:"pointer", fontFamily:MO, fontSize:15, fontWeight:600, width:"100%", minHeight:48 }),
+  sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c===C.accent?C.border:c+'66'}`, color:c, padding:"9px 13px", borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:38 }),
+  lbl:    { fontSize:13, fontWeight:550, color:C.dim, marginBottom:8, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },
   ok:     { color:C.green, fontSize:12, marginBottom:8 },
   tag:    (c) => ({ background:c+"22", border:`1px solid ${c}44`, color:c, padding:"3px 8px", borderRadius:4, fontSize:10, letterSpacing:1, display:"inline-block" }),
@@ -82,14 +83,27 @@ const RC = { owner:C.orange, admin:C.accent, member:C.muted };
 
 function getNavTabs(role) {
   return [
-    { id:"home",     icon:"🏠", label:"HOME" },
-    { id:"announce", icon:"📢", label:"NEWS" },
-    { id:"forms",    icon:"📋", label:"FORMS" },
-    { id:"event",    icon:"🏆", label:"EVENT" },
-    { id:"myteam",   icon:"⭐", label:"MY TEAM" },
-    ...(role==="owner"||role==="admin" ? [{ id:"data", icon:"📊", label:"DATA" }] : []),
-    ...(role==="owner"                 ? [{ id:"manage", icon:"⚙️", label:"MANAGE" }] : []),
+    { id:"home", label:"Home" },
+    { id:"announce", label:"News" },
+    { id:"forms", label:"Forms" },
+    { id:"event", label:"Event" },
+    { id:"myteam", label:"My team" },
+    ...(role==="owner"||role==="admin" ? [{ id:"data", label:"Data" }] : []),
+    ...(role==="owner"                 ? [{ id:"manage", label:"Manage" }] : []),
   ];
+}
+
+function NavIcon({ name }) {
+  const paths = {
+    home: 'M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9',
+    announce: 'M4 10v5h4l10 5V5L8 10H4m4 5 2 6M21 9v7',
+    forms: 'M8 4H5v17h14V4h-3M8 3h8v4H8zM8 12h8M8 16h6',
+    event: 'M5 5h14v16H5zM8 3v4m8-4v4M5 10h14M9 14h2m2 3h2',
+    myteam: 'M16 21v-3a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v3M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 1a4 4 0 0 1 0 7m1 4a4 4 0 0 1 3 4v2',
+    data: 'M4 3v18h17M8 17v-5m5 5V7m5 10V4',
+    manage: 'M4 7h16M4 17h16M8 4v6m8 4v6',
+  };
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]}/></svg>;
 }
 
 // ─── TBA helpers ──────────────────────────────────────────────────────────────
@@ -246,7 +260,6 @@ export default function App() {
 
   if (booting) return (
     <div style={{ ...sx.page, alignItems:"center", justifyContent:"center" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet"/>
       <div style={{ color:C.accent, letterSpacing:4, fontSize:13 }}>LOADING…</div>
     </div>
   );
@@ -258,15 +271,14 @@ export default function App() {
     <div style={sx.page}>
       {!connected && <div className="connection-banner" role="status">Server unavailable. Keep this page open and wait for reconnection before saving.</div>}
       {needRefresh && <div className="connection-banner" role="status">An app update is ready. Save your work first. <button style={sx.sm()} onClick={() => updateServiceWorker(true)}>Reload app</button></div>}
-      <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 
       {user && team && (
         <header style={sx.hdr}>
-          <div style={sx.logo}><span style={{color:C.orange}}>⚡</span>FRC·SCOUT <span style={{color:C.muted, fontSize:11, fontWeight:400}}>#{team.number}</span></div>
+          <div style={sx.logo}><span className="team-mark">6390</span><span>Scout <span className="header-team">/ Team {team.number}</span></span></div>
           <div style={{display:"flex", alignItems:"center", gap:8}}>
             <span style={sx.tag(RC[role]||C.muted)}>{role.toUpperCase()}</span>
             <span style={{fontSize:11, color:C.dim}}>{user.username}</span>
-            <button style={{...sx.sm(C.red), padding:"6px 10px"}} onClick={logout}>EXIT</button>
+            <button style={{...sx.sm(C.muted), padding:"6px 10px"}} onClick={logout}>Sign out</button>
           </div>
         </header>
       )}
@@ -287,7 +299,7 @@ export default function App() {
         <nav style={sx.bnav} aria-label="Main navigation">
           {navTabs.map(t => (
             <button key={t.id} aria-current={tab===t.id ? "page" : undefined} style={sx.bnavBtn(tab===t.id)} onClick={()=>setTab(t.id)}>
-              <span style={{fontSize:18}}>{t.icon}</span>
+              <NavIcon name={t.id}/>
               <span>{t.label}</span>
             </button>
           ))}
@@ -328,15 +340,15 @@ function AuthScreen({ onLogin }) {
 
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"90vh",padding:"0 4px"}}>
-      <div style={{textAlign:"center",marginBottom:28}}>
-        <div style={{fontSize:48,marginBottom:8}}>🤖</div>
-        <div style={{fontSize:24,fontWeight:700,color:C.accent,letterSpacing:4}}>FRC<span style={{color:C.orange}}>·</span>SCOUT</div>
-        <div style={{fontSize:11,color:C.muted,letterSpacing:3,marginTop:4}}>FIELD SCOUTING PLATFORM</div>
+      <div className="auth-brand">
+        <div className="team-mark team-mark-large">6390</div>
+        <h1>Team 6390<br/>Scouting workspace</h1>
+        <p>Your team's match notes, pit reports, and event data.</p>
       </div>
       <div style={{...sx.card,width:"100%",maxWidth:400}}>
         <div style={{display:"flex",gap:8,marginBottom:18}}>
           {["login","signup"].map(m=><button key={m} style={{...sx.nb(mode===m),flex:1,padding:"10px 0"}} onClick={()=>{setMode(m);setErr("");}}>
-            {m==="login"?"LOGIN":"SIGN UP"}
+            {m==="login"?"Sign in":"Create account"}
           </button>)}
         </div>
         <label htmlFor="scout-username" style={sx.lbl}>Username</label>
@@ -344,7 +356,7 @@ function AuthScreen({ onLogin }) {
         <label htmlFor="scout-password" style={sx.lbl}>Password</label>
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&submit()}/>
         {err && <div style={sx.err}>{err}</div>}
-        <button style={sx.btn(C.accent)} onClick={submit} disabled={busy}>{busy?"…":mode==="login"?"LOGIN →":"CREATE ACCOUNT →"}</button>
+        <button style={sx.btn(C.accent)} onClick={submit} disabled={busy}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}</button>
       </div>
     </div>
   );
@@ -505,10 +517,10 @@ function HomeTab({ team, user, role, mem, onDeleteAccount, onDeleteTeam, onLeave
 
   return (
     <div>
-      <div style={sx.card}>
-        <div style={{fontSize:10,color:C.muted,letterSpacing:3,marginBottom:2}}>TEAM #{team.number}</div>
-        <div style={{fontSize:22,fontWeight:700,color:C.accent}}>{team.name}</div>
-        <div style={{marginTop:6}}><span style={sx.tag(RC[role]||C.muted)}>{role.toUpperCase()}</span></div>
+      <div className="team-overview">
+        <div><div className="eyebrow">Team {team.number} / Scouting workspace</div>
+        <h1>{team.name}</h1><p>Welcome back, {user.username}. You're ready for the next match.</p></div>
+        <span className="team-number">{team.number}</span>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
@@ -524,7 +536,7 @@ function HomeTab({ team, user, role, mem, onDeleteAccount, onDeleteTeam, onLeave
 
       {announcements.length>0&&(
         <div style={sx.card}>
-          <div style={sx.ct}>📢 Recent News</div>
+          <div style={sx.ct}>Latest team news</div>
           {announcements.map(a=>(
             <div key={a.id} style={{padding:"10px 0",borderBottom:`1px solid ${C.border}`}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2}}>
@@ -549,14 +561,14 @@ function HomeTab({ team, user, role, mem, onDeleteAccount, onDeleteTeam, onLeave
         ))}
       </div>
 
-      <div style={{...sx.card,border:`1px solid ${C.red}44`}}>
-        <div style={{...sx.ct,color:C.red}}>Danger Zone</div>
+      <details style={{...sx.card,border:`1px solid ${C.border}`}}>
+        <summary style={{...sx.ct,color:C.muted,cursor:'pointer'}}>Account and team settings</summary>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {canLeave && <button style={sx.btn(C.orange)} onClick={onLeaveTeam}>🚪 LEAVE TEAM</button>}
           <button style={sx.btn(C.red)} onClick={onDeleteAccount}>🗑 DELETE MY ACCOUNT</button>
           {role==="owner"&&<button style={sx.btn(C.red)} onClick={onDeleteTeam}>💥 DELETE TEAM</button>}
         </div>
-      </div>
+      </details>
     </div>
   );
 }
@@ -666,8 +678,8 @@ function FormsTab({ team, user, role, onPending }) {
   return (
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-        <div style={{fontSize:16,fontWeight:700,color:C.accent,letterSpacing:2}}>📋 FORMS</div>
-        {(role==="owner"||role==="admin")&&<button style={{...sx.sm(C.accent),padding:"8px 14px"}} onClick={()=>setView("create")}>+ CREATE</button>}
+        <div><h1 className="page-title">Scouting forms</h1><p className="page-subtitle">Match and pit reports for your team.</p></div>
+        {(role==="owner"||role==="admin")&&<button style={{...sx.btn(),width:'auto'}} onClick={()=>setView("create")}>New form</button>}
       </div>
       {forms.length===0&&(
         <div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>
@@ -687,7 +699,7 @@ function FormsTab({ team, user, role, onPending }) {
               </div>
             </div>
             <div style={{display:"flex",gap:8,marginLeft:8}}>
-              <button style={sx.sm(C.accent)} onClick={()=>{setActive(f);setView("fill");}}>FILL</button>
+              <button style={sx.sm(C.accent)} onClick={()=>{setActive(f);setView("fill");}}>Open form</button>
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.orange)} onClick={e=>{e.stopPropagation();setActive(f);setView("edit");}}>✎</button>}
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.red)} onClick={e=>deleteForm(f,e)}>🗑</button>}
             </div>
@@ -717,6 +729,8 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
     if (!title.trim())              { setErr("Title required."); return; }
     if (!qs.length)                 { setErr("Add at least one question."); return; }
     if (qs.some(q=>!q.text.trim())){ setErr("All questions need text."); return; }
+    const conditionError = validateConditions(qs);
+    if (conditionError) { setErr(conditionError); return; }
     setBusy(true); setErr("");
     const form={
       id: editing?.id||uid(),
@@ -738,7 +752,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
     <div>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
         <button style={sx.sm()} onClick={onCancel}>← BACK</button>
-        <div style={{fontSize:14,fontWeight:700,color:C.accent,letterSpacing:2}}>{editing?"EDIT FORM":"CREATE FORM"}</div>
+        <div style={{fontSize:20,fontWeight:650,color:C.text}}>{editing?"Edit form":"New form"}</div>
       </div>
       <div style={sx.card}>
         <label style={sx.lbl}>Form Title</label>
@@ -766,7 +780,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
             </div>
             <div style={{display:"flex",gap:6,alignItems:"center"}}>
               <label style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:C.muted,cursor:"pointer"}}>
-                <input type="checkbox" checked={q.required} onChange={e=>upd(i,"required",e.target.checked)}/> Req
+                <input type="checkbox" checked={q.required} onChange={e=>upd(i,"required",e.target.checked)}/> Required
               </label>
               <button style={sx.sm(C.red)} onClick={()=>del(i)}>✕</button>
             </div>
@@ -785,13 +799,51 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
             <label style={sx.lbl}>Background image URL (optional)</label>
             <input style={sx.inp} placeholder="https://… or blank for default field" value={q.imageUrl||""} onChange={e=>upd(i,"imageUrl",e.target.value)}/>
           </>}
+          <ConditionEditor question={q} earlier={qs.slice(0,i)} onChange={value=>upd(i,"visibility",value)}/>
         </div>
       ))}
-      <button style={{...sx.btn(C.muted),marginBottom:10}} onClick={addQ}>+ ADD QUESTION</button>
+      <button style={{...sx.btn(C.muted),marginBottom:10}} onClick={addQ}>Add question</button>
       {err&&<div style={sx.err}>{err}</div>}
-      <button style={sx.btn(C.green)} onClick={save} disabled={busy}>{busy?"SAVING…":"SAVE FORM →"}</button>
+      <button style={sx.btn()} onClick={save} disabled={busy}>{busy?"Saving…":"Save form"}</button>
     </div>
   );
+}
+
+function ConditionEditor({ question, earlier, onChange }) {
+  const visibility = question.visibility || { mode: 'all', rules: [] };
+  const rules = visibility.rules || [];
+  function update(index, patch) {
+    onChange({ ...visibility, rules: rules.map((rule, i) => i === index ? { ...rule, ...patch } : rule) });
+  }
+  return <section className="condition-editor" aria-label="Question visibility">
+    <div className="condition-heading"><div><strong>When to show this question</strong>
+      <p>{rules.length ? 'Only show it when these conditions match.' : 'Always visible to the scouter.'}</p></div>
+      <button type="button" style={sx.sm()} disabled={!earlier.length} onClick={()=>onChange({ ...visibility, rules:[...rules, { questionId:earlier[0].id, operator:'answered', value:'' }] })}>Add condition</button>
+    </div>
+    {!earlier.length && <p className="field-help">Conditions can use questions above this one.</p>}
+    {rules.length > 1 && <label className="condition-mode">Show when <select aria-label="Combine conditions" value={visibility.mode || 'all'} onChange={e=>onChange({...visibility, mode:e.target.value})}>
+      <option value="all">all conditions match</option><option value="any">any condition matches</option>
+    </select></label>}
+    {rules.map((rule,index)=>{
+      const source = earlier.find(q=>q.id===rule.questionId);
+      const needsValue = !['answered','unanswered'].includes(rule.operator);
+      const choices = source?.type === 'boolean' ? ['Yes','No'] : source?.type === 'select' ? (source.options||[]).filter(o=>o.trim()) : null;
+      return <div key={index} className="condition-row">
+        <select aria-label={`Condition ${index+1} source question`} style={sx.inp} value={rule.questionId} onChange={e=>update(index,{questionId:e.target.value,operator:'answered',value:''})}>
+          {!source && <option value={rule.questionId}>Choose a question above</option>}
+          {earlier.map((q,i)=><option key={q.id} value={q.id}>{i+1}. {q.text || 'Untitled question'}</option>)}
+        </select>
+        <select aria-label={`Condition ${index+1} comparison`} style={sx.inp} value={rule.operator} onChange={e=>update(index,{operator:e.target.value,value:''})}>
+          {!conditionOperators(source?.type).some(([id])=>id===rule.operator) && <option value={rule.operator}>Choose a comparison</option>}
+          {conditionOperators(source?.type).map(([id,label])=><option key={id} value={id}>{label}</option>)}
+        </select>
+        {needsValue && (choices ? <select aria-label={`Condition ${index+1} answer`} style={sx.inp} value={rule.value ?? ''} onChange={e=>update(index,{value:e.target.value})}>
+          <option value="">Choose an answer</option>{choices.map(choice=><option key={choice} value={choice}>{choice}</option>)}
+        </select> : <input aria-label={`Condition ${index+1} value`} style={sx.inp} type={['number','scale'].includes(source?.type)?'number':'text'} step="any" placeholder="Value to match" value={rule.value ?? ''} onChange={e=>update(index,{value:e.target.value})}/>)}
+        <button type="button" style={sx.sm(C.muted)} aria-label={`Remove condition ${index+1}`} onClick={()=>onChange({...visibility,rules:rules.filter((_,i)=>i!==index)})}>Remove</button>
+      </div>;
+    })}
+  </section>;
 }
 
 // ─── Form Filler ──────────────────────────────────────────────────────────────
@@ -824,18 +876,20 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
     })();
   },[]);
 
-  function set(id,v){ setAns(a=>({...a,[id]:v})); }
+  const shownQuestions = visibleQuestions(form.questions, ans);
+  function set(id,v){ setAns(a=>visibleAnswers(form.questions, {...a,[id]:v})); setErr(''); }
 
   async function submit() {
+    if (busy) return;
     if (form.allow_team_select && !scoutedTeam) { setErr("Please select the team you are scouting."); return; }
     if (form.max_submissions_per_team && scoutedTeam) {
       const count = subCounts[scoutedTeam]||0;
       if (count >= form.max_submissions_per_team) { setErr(`Team #${scoutedTeam} has already been scouted ${count} times (max: ${form.max_submissions_per_team}).`); return; }
     }
-    const missing=form.questions.filter(q=>q.required&&(ans[q.id]==null||ans[q.id]==="")&&ans[q.id]!==0&&ans[q.id]!==false);
+    const missing=shownQuestions.filter(q=>q.required&&!hasAnswer(ans[q.id]));
     if (missing.length){ setErr(`Required: ${missing.map(q=>q.text).join(", ")}`); return; }
     setBusy(true); setErr("");
-    const sub={id:uid(),form_id:form.id,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,answers:ans,created_at:tsNow()};
+    const sub={id:uid(),form_id:form.id,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,answers:visibleAnswers(form.questions,ans),created_at:tsNow()};
     try {
       await idbPut("submissions",sub);
       setDone(true);
@@ -880,14 +934,15 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
         </div>
       )}
 
-      {form.questions.map((q,i)=>(
+      <div className="form-progress">{shownQuestions.filter(q=>hasAnswer(ans[q.id])).length} of {shownQuestions.length} questions answered <span>Required questions are marked *</span></div>
+      {shownQuestions.map((q,i)=>(
         <div key={q.id} style={sx.card}>
           <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>{i+1}. {q.text}{q.required&&<span style={{color:C.red,marginLeft:4}}>*</span>}</div>
           <QInput q={q} value={ans[q.id]} onChange={v=>set(q.id,v)}/>
         </div>
       ))}
       {err&&<div style={{...sx.err,marginBottom:10}}>{err}</div>}
-      <button style={sx.btn(C.green)} onClick={submit} disabled={busy}>{busy?"SUBMITTING…":"SUBMIT →"}</button>
+      <button style={sx.btn()} onClick={submit} disabled={busy}>{busy?"Submitting…":"Submit scouting report"}</button>
     </div>
   );
 }
@@ -1028,7 +1083,7 @@ function DrawInput({ q, onChange }) {
 // ─── Question Input ───────────────────────────────────────────────────────────
 function QInput({ q, value, onChange }) {
   if (q.type==="text")    return <textarea style={{...sx.inp,height:80,resize:"vertical",marginBottom:0}} value={value||""} onChange={e=>onChange(e.target.value)} placeholder="Type your answer…"/>;
-  if (q.type==="number")  return <input style={{...sx.inp,marginBottom:0}} type="number" inputMode="decimal" value={value??""} onChange={e=>onChange(Number(e.target.value))}/>;
+  if (q.type==="number")  return <input aria-label={q.text} style={{...sx.inp,marginBottom:0}} type="number" step="any" inputMode="decimal" value={value??""} onChange={e=>onChange(e.target.value === '' ? '' : Number(e.target.value))}/>;
   if (q.type==="boolean") return (
     <div style={{display:"flex",gap:10}}>
       {["Yes","No"].map(o=><button key={o} style={{...sx.sm(value===o?C.accent:C.muted),flex:1,padding:14,fontSize:14}} onClick={()=>onChange(o)}>{o}</button>)}
@@ -1036,8 +1091,8 @@ function QInput({ q, value, onChange }) {
   );
   if (q.type==="scale") return (
     <div>
-      <div style={{textAlign:"center",fontSize:24,fontWeight:700,color:C.accent,marginBottom:8}}>{value||5}</div>
-      <input type="range" min={1} max={10} step={1} value={value||5} onChange={e=>onChange(Number(e.target.value))} style={{width:"100%",accentColor:C.accent,height:32}}/>
+      <div style={{textAlign:"center",fontSize:24,fontWeight:700,color:C.accent,marginBottom:8}}>{value ?? 'Choose a rating'}</div>
+      <div className="rating-options">{Array.from({length:10},(_,i)=>i+1).map(n=><button key={n} aria-pressed={value===n} style={sx.sm(value===n?C.accent:C.muted)} onClick={()=>onChange(n)}>{n}</button>)}</div>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.muted,marginTop:4}}>
         <span>1 — Poor</span><span>10 — Excellent</span>
       </div>

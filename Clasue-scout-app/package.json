@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
-    "test": "node --test server.test.cjs",
+    "test": "node --test server.test.cjs src/form-conditions.test.js",
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",

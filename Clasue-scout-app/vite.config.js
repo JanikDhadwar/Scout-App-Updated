@@ -16,8 +16,8 @@ server: {
         name: 'FRC Scout',
         short_name: 'FRCScout',
         description: 'FRC Field Scouting Platform',
-        theme_color: '#38bdf8',
-        background_color: '#07090f',
+        theme_color: '#ba2732',
+        background_color: '#141414',
         display: 'standalone',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
