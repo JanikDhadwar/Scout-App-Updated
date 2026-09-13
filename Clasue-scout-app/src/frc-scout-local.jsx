@@ -1,23 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { conditionOperators, hasAnswer, visibleQuestions, visibleAnswers, validateConditions } from './form-conditions.js';
+import { offline, deviceStore, draftKey } from './offline.js';
+import { HomeDashboard, SyncPanel } from './workspace-ui.jsx';
+import { useReportDraft } from './use-report-draft.js';
+import { ReportDrawing, ReportPhoto } from './report-media.jsx';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
 // Multiple users/devices on the same network all share the same data.
 
-const API = `${window.location.origin}/api`;
 const SESSION_KEY = "frc-scout-session";
 
-async function apiCall(method, path, body) {
-  const res = await fetch(`${API}${path}`, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${res.status}`);
-  return res.json();
-}
+const apiCall = (method,path,body) => offline.api(method,path,body);
 
 async function fbSelect(col, filters = {}) {
   const params = new URLSearchParams(filters).toString();
@@ -39,7 +34,7 @@ async function fbDelete(col, filters) {
 async function fbDeleteById(col, id) { await apiCall("DELETE", `/${col}/${id}`); }
 
 // ─── Thin wrappers used directly in the app (session, etc.) ──────────────────
-async function idbGet(store, key) { try { return await apiCall("GET", `/${store}/${key}`); } catch { return null; } }
+async function idbGet(store, key) { return apiCall("GET", `/${store}/${key}`); }
 async function idbPut(store, val) { return apiCall("POST",   `/${store}`, val); }
 async function idbAll(store)      { return apiCall("GET",    `/${store}`); }
 async function idbDel(store, key) { return apiCall("DELETE", `/${store}/${key}`); }
@@ -53,7 +48,7 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#141414", bg1:"#1c1c1c", bg2:"#262626", border:"#353535", accent:"#f16b70", orange:"#e9b777", green:"#82c99a", red:"#f16b70", muted:"#a3a3a3", text:"#f2f0ed", dim:"#b9b6b2", purple:"#b7a3d5" };
+const C = { bg0:"#111214", bg1:"#191b1e", bg2:"#22252a", border:"#33363c", accent:"#f07880", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#a3a7af", text:"#f4f3f1", dim:"#c1c3c8", purple:"#b7a3d5" };
 const MO = "'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
@@ -63,11 +58,11 @@ const sx = {
   main:   { flex:1, overflowY:"auto", padding:"16px 12px", paddingBottom:80 },
   bnav:   { position:"fixed", bottom:0, left:0, right:0, background:C.bg1, borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100, height:60 },
   bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.text:C.muted, cursor:"pointer", fontFamily:MO, fontSize:12, fontWeight:on?650:450, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:5, padding:"8px 2px" }),
-  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:10, padding:22, marginBottom:16 },
+  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:14, padding:"clamp(16px, 2vw, 24px)", marginBottom:16 },
   ct:     { fontSize:15, fontWeight:650, color:C.text, marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
   btn:    (c=C.accent) => ({ background:c===C.accent?"#ba2732":"transparent", border:`1px solid ${c===C.accent?"#ba2732":c}`, color:c===C.accent?"#fff":c, padding:"14px 20px", borderRadius:7, cursor:"pointer", fontFamily:MO, fontSize:15, fontWeight:600, width:"100%", minHeight:48 }),
-  sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c===C.accent?C.border:c+'66'}`, color:c, padding:"9px 13px", borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:38 }),
+  sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c===C.accent?'#9d3b44':c+'66'}`, color:c, padding:"9px 13px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:44 }),
   lbl:    { fontSize:13, fontWeight:550, color:C.dim, marginBottom:8, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },
   ok:     { color:C.green, fontSize:12, marginBottom:8 },
@@ -102,6 +97,8 @@ function NavIcon({ name }) {
     myteam: 'M16 21v-3a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v3M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 1a4 4 0 0 1 0 7m1 4a4 4 0 0 1 3 4v2',
     data: 'M4 3v18h17M8 17v-5m5 5V7m5 10V4',
     manage: 'M4 7h16M4 17h16M8 4v6m8 4v6',
+    more: 'M4 12h2m5 0h2m5 0h2',
+    sync: 'M20 8a8 8 0 0 0-14-3L3 8m0-5v5h5M4 16a8 8 0 0 0 14 3l3-3m0 5v-5h-5',
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]}/></svg>;
 }
@@ -148,22 +145,40 @@ export default function App() {
   const [mem,     setMem]     = useState(null);
   const [tab,     setTab]     = useState("home");
   const [booting, setBooting] = useState(true);
-  const [connected, setConnected] = useState(true);
+  const [syncState,setSyncState] = useState(offline.getState());
+  const [showSync,setShowSync] = useState(false);
+  const [showMore,setShowMore] = useState(false);
+  const [shellReady,setShellReady] = useState(!!navigator.serviceWorker?.controller);
 
   useEffect(() => {
-    let active = true;
-    async function check() {
-      try {
-        const response = await fetch(`${API}/health`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
-        if (active) setConnected(response.ok);
-      } catch { if (active) setConnected(false); }
-    }
-    check();
-    const timer = setInterval(check, 15000);
-    return () => { active = false; clearInterval(timer); };
+    const listener = event => setSyncState(event.detail);
+    const ready = () => setShellReady(!!navigator.serviceWorker?.controller);
+    window.addEventListener('scout-sync',listener);
+    navigator.serviceWorker?.addEventListener('controllerchange',ready);
+    return () => { window.removeEventListener('scout-sync',listener); navigator.serviceWorker?.removeEventListener('controllerchange',ready); };
   }, []);
 
-  // No online/offline sync needed — all data is local
+  useEffect(()=>{
+    if (!user || !team) return;
+    let stopped=false, running=false, lastPrepared=0;
+    const check=async()=>{
+      if(stopped || running) return;
+      running=true;
+      try {
+        await offline.setScope({userId:user.id,teamId:team.id});
+        await offline.sync();
+        if (offline.getState().connection==='online' && Date.now()-lastPrepared>60000) {
+          await offline.prepare(); lastPrepared=Date.now();
+        }
+      } catch(error) { if(!stopped) setSyncState(s=>({...s,error:error.message})); }
+      finally { running=false; }
+    };
+    check();
+    const timer=setInterval(check,15000);
+    window.addEventListener('online',check);
+    document.addEventListener('visibilitychange',check);
+    return ()=>{stopped=true;clearInterval(timer);window.removeEventListener('online',check);document.removeEventListener('visibilitychange',check);};
+  },[user?.id,team?.id]);
 
   // Boot: restore session
   useEffect(() => {
@@ -171,9 +186,12 @@ export default function App() {
       try {
         const sess = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
         if (sess?.user) {
+          await offline.setScope({userId:sess.user.id,teamId:sess.team?.id});
           setUser(sess.user);
           if (sess.team && sess.mem) {
-            const mem = await idbGet("memberships", sess.mem.id);
+            let mem;
+            try { mem = await idbGet("memberships", sess.mem.id); }
+            catch(error) { if(error.status && error.status<500) throw error; mem=sess.mem; }
             if (mem) {
               setTeam(sess.team); setMem(mem);
             } else {
@@ -193,7 +211,7 @@ export default function App() {
     if (u) localStorage.setItem(SESSION_KEY, JSON.stringify({ user:u, team:t||null, mem:m||null }));
     else localStorage.removeItem(SESSION_KEY);
   }
-  async function checkPending()       { /* no-op: all data is local, no pending queue needed */ }
+  async function checkPending() { await offline.refresh(); }
 
   async function login(u) {
     // After login, check if user has a cached membership — if so, auto-restore team
@@ -213,7 +231,7 @@ export default function App() {
     setUser(u); await saveSession(u, null, null);
   }
   async function joinTeam(t, m) { setTeam(t); setMem(m); setTab("home"); await saveSession(user, t, m); }
-  async function logout()       { await saveSession(null, null, null); setUser(null); setTeam(null); setMem(null); setTab("home"); }
+  async function logout() { await saveSession(null,null,null); await offline.setScope(null); setUser(null);setTeam(null);setMem(null);setTab('home');setShowSync(false); }
 
   async function leaveTeam() {
     const allMems = await fbSelect("memberships", { team_id: team.id });
@@ -266,29 +284,31 @@ export default function App() {
 
   const role = mem?.role || "member";
   const navTabs = getNavTabs(role);
+  const navigate = id => {setTab(id);setShowMore(false);window.scrollTo({top:0,behavior:'instant'});};
+  const statusLabel = syncState.syncing ? 'Syncing' : syncState.pending ? `${syncState.pending} to upload` : syncState.connection==='offline' ? 'Offline' : syncState.connection==='checking' ? 'Connecting' : 'All synced';
 
   return (
-    <div style={sx.page}>
-      {!connected && <div className="connection-banner" role="status">Server unavailable. Keep this page open and wait for reconnection before saving.</div>}
-      {needRefresh && <div className="connection-banner" role="status">An app update is ready. Save your work first. <button style={sx.sm()} onClick={() => updateServiceWorker(true)}>Reload app</button></div>}
+    <div className={user&&team?'scout-shell':'scout-auth-shell'} style={sx.page}>
 
       {user && team && (
-        <header style={sx.hdr}>
-          <div style={sx.logo}><span className="team-mark">6390</span><span>Scout <span className="header-team">/ Team {team.number}</span></span></div>
-          <div style={{display:"flex", alignItems:"center", gap:8}}>
-            <span style={sx.tag(RC[role]||C.muted)}>{role.toUpperCase()}</span>
-            <span style={{fontSize:11, color:C.dim}}>{user.username}</span>
-            <button style={{...sx.sm(C.muted), padding:"6px 10px"}} onClick={logout}>Sign out</button>
+        <header className="workspace-header">
+          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaestus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Scout'}</strong></div></div>
+          <div className="header-actions">
+            <button className={`sync-pill ${syncState.connection==='offline'?'is-offline':''}`} onClick={()=>setShowSync(s=>!s)} aria-expanded={showSync}><span className={syncState.syncing?'status-dot is-syncing':'status-dot'}/>{statusLabel}</button>
+            <span className="user-chip" title={user.username}>{user.username?.slice(0,2).toUpperCase()}</span>
           </div>
         </header>
       )}
 
-      <main style={sx.main}>
+      <main className="workspace-main" style={sx.main}>
+        {needRefresh && <div className="notice" role="status">An update is ready. Finish saving before reloading. <button style={sx.sm()} onClick={()=>updateServiceWorker(true)}>Reload app</button></div>}
+        {user&&team&&syncState.error&&<div className="notice notice-error" role="alert">{syncState.error} <button style={sx.sm()} onClick={()=>setShowSync(true)}>View sync details</button></div>}
+        {showSync&&user&&team&&<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>setShowSync(false)}/>}
         {!user                          && <AuthScreen onLogin={login}/>}
         {user && !team                  && <TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}
-        {user && team && tab==="home"     && <HomeTab team={team} user={user} role={role} mem={mem} onDeleteAccount={handleDeleteAccount} onDeleteTeam={handleDeleteTeam} onLeaveTeam={leaveTeam}/>}
+        {user && team && tab==="home"     && <HomeDashboard api={apiCall} team={team} user={user} role={role} mem={mem} onNavigate={navigate} syncState={syncState} shellReady={shellReady} onShowSync={()=>setShowSync(true)} onDeleteAccount={handleDeleteAccount} onDeleteTeam={handleDeleteTeam} onLeaveTeam={leaveTeam}/>}
         {user && team && tab==="announce" && <AnnouncementsTab team={team} user={user} role={role}/>}
-        {user && team && tab==="forms"    && <FormsTab team={team} user={user} role={role} onPending={checkPending}/>}
+        {user && team && tab==="forms"    && <FormsTab team={team} user={user} role={role} syncState={syncState} onPending={checkPending}/>}
         {user && team && tab==="event"    && <EventTab team={team} user={user} role={role}/>}
         {user && team && tab==="myteam"   && <MyTeamTab team={team} user={user} role={role}/>}
         {user && team && tab==="data" && (role==="owner"||role==="admin") && <DataTab team={team} user={user} role={role}/>}
@@ -296,15 +316,20 @@ export default function App() {
       </main>
 
       {user && team && (
-        <nav style={sx.bnav} aria-label="Main navigation">
+        <nav className="workspace-nav" aria-label="Main navigation">
+          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Scout</strong><span>Hephaestus</span></div></div>
+          <div className="nav-section-label">Workspace</div>
           {navTabs.map(t => (
-            <button key={t.id} aria-current={tab===t.id ? "page" : undefined} style={sx.bnavBtn(tab===t.id)} onClick={()=>setTab(t.id)}>
+            <button key={t.id} className={`nav-link ${['myteam','data','manage'].includes(t.id)?'nav-secondary':''}`} aria-current={tab===t.id ? "page" : undefined} onClick={()=>navigate(t.id)}>
               <NavIcon name={t.id}/>
               <span>{t.label}</span>
             </button>
           ))}
+          <button className="nav-link mobile-more" aria-expanded={showMore} aria-current={['myteam','data','manage'].includes(tab)?'page':undefined} onClick={()=>setShowMore(s=>!s)}><NavIcon name="more"/><span>More</span></button>
+          <div className="nav-footer"><div><span style={sx.avatar()}>{user.username?.[0]?.toUpperCase()}</span><span><strong>{user.username}</strong><small>{role}</small></span></div><button onClick={logout}>Sign out</button></div>
         </nav>
       )}
+      {showMore&&<div className="mobile-menu"><div className="section-heading"><strong>More in Scout</strong><button style={sx.sm(C.muted)} onClick={()=>setShowMore(false)}>Close</button></div>{navTabs.filter(t=>['myteam','data','manage'].includes(t.id)).map(t=><button key={t.id} onClick={()=>navigate(t.id)}><NavIcon name={t.id}/>{t.label}</button>)}<button onClick={logout}>Sign out</button></div>}
     </div>
   );
 }
@@ -494,84 +519,6 @@ function TeamScreen({ user, onJoin, onLogout }) {
 }
 
 // ─── Home Tab ─────────────────────────────────────────────────────────────────
-function HomeTab({ team, user, role, mem, onDeleteAccount, onDeleteTeam, onLeaveTeam }) {
-  const [members,setMembers]=useState([]);
-  const [announcements,setAnnouncements]=useState([]);
-
-  useEffect(()=>{
-    (async()=>{
-      try {
-        const rows=await fbSelect("memberships",{team_id:team.id});
-        setMembers(rows);
-      } catch {}
-
-      try {
-        const anns=await fbSelect("announcements",{team_id:team.id});
-        anns.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-        setAnnouncements(anns.slice(0,3));
-      } catch {}
-    })();
-  },[]);
-
-  const canLeave = mem?.role !== "owner" && members.length > 1;
-
-  return (
-    <div>
-      <div className="team-overview">
-        <div><div className="eyebrow">Team {team.number} / Scouting workspace</div>
-        <h1>{team.name}</h1><p>Welcome back, {user.username}. You're ready for the next match.</p></div>
-        <span className="team-number">{team.number}</span>
-      </div>
-
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
-        <div style={sx.sc}>
-          <div style={{fontSize:28,fontWeight:700,color:C.accent}}>{members.length}</div>
-          <div style={{fontSize:10,color:C.muted,letterSpacing:2}}>MEMBERS</div>
-        </div>
-        <div style={sx.sc}>
-          <div style={{fontSize:16,fontWeight:700,color:RC[role]||C.muted}}>{role.toUpperCase()}</div>
-          <div style={{fontSize:10,color:C.muted,letterSpacing:2}}>YOUR ROLE</div>
-        </div>
-      </div>
-
-      {announcements.length>0&&(
-        <div style={sx.card}>
-          <div style={sx.ct}>Latest team news</div>
-          {announcements.map(a=>(
-            <div key={a.id} style={{padding:"10px 0",borderBottom:`1px solid ${C.border}`}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2}}>
-                <span style={{fontSize:13,fontWeight:700,color:C.orange}}>{a.title}</span>
-                <span style={{fontSize:10,color:C.muted}}>{fmtTs(a.created_at)}</span>
-              </div>
-              <div style={{fontSize:12,color:C.dim,lineHeight:1.5}}>{a.body}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={sx.card}>
-        <div style={sx.ct}>Roster</div>
-        {members.length===0&&<div style={{color:C.muted,fontSize:13}}>Loading…</div>}
-        {members.map(m=>(
-          <div key={m.id} style={sx.row}>
-            <div style={sx.avatar(RC[m.role]||C.muted)}>{m.username?.[0]?.toUpperCase()}</div>
-            <div style={{flex:1,fontSize:13}}>{m.username}</div>
-            <span style={sx.tag(RC[m.role]||C.muted)}>{m.role?.toUpperCase()}</span>
-          </div>
-        ))}
-      </div>
-
-      <details style={{...sx.card,border:`1px solid ${C.border}`}}>
-        <summary style={{...sx.ct,color:C.muted,cursor:'pointer'}}>Account and team settings</summary>
-        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-          {canLeave && <button style={sx.btn(C.orange)} onClick={onLeaveTeam}>🚪 LEAVE TEAM</button>}
-          <button style={sx.btn(C.red)} onClick={onDeleteAccount}>🗑 DELETE MY ACCOUNT</button>
-          {role==="owner"&&<button style={sx.btn(C.red)} onClick={onDeleteTeam}>💥 DELETE TEAM</button>}
-        </div>
-      </details>
-    </div>
-  );
-}
 
 // ─── Announcements Tab (offline-aware) ───────────────────────────────────────
 function AnnouncementsTab({ team, user, role }) {
@@ -653,15 +600,21 @@ function AnnouncementsTab({ team, user, role }) {
 }
 
 // ─── Forms Tab ────────────────────────────────────────────────────────────────
-function FormsTab({ team, user, role, onPending }) {
+function FormsTab({ team, user, role, syncState, onPending }) {
   const [forms,setForms]=useState([]);
   const [view,setView]=useState("list"); // list | create | fill | edit
   const [active,setActive]=useState(null);
+  const [search,setSearch]=useState('');
+  const [drafts,setDrafts]=useState([]);
+  const [loadError,setLoadError]=useState('');
+  const [loading,setLoading]=useState(true);
+  const canEdit=syncState.connection==='online';
 
   useEffect(()=>{load();},[]);
   async function load() {
-    try { const r=await fbSelect("forms",{team_id:team.id}); setForms(r); }
-    catch {}
+    try { const r=await fbSelect("forms",{team_id:team.id}); setForms(r);setLoadError('');setDrafts(await deviceStore.all('drafts')); }
+    catch(error) { setLoadError(error.message); }
+    finally{setLoading(false);}
   }
 
   async function deleteForm(f,e) {
@@ -673,39 +626,47 @@ function FormsTab({ team, user, role, onPending }) {
 
   if (view==="create") return <FormBuilder team={team} user={user} onSave={()=>{setView("list");load();}} onCancel={()=>setView("list")}/>;
   if (view==="edit"&&active) return <FormBuilder team={team} user={user} editing={active} onSave={()=>{setView("list");load();}} onCancel={()=>setView("list")}/>;
-  if (view==="fill"&&active) return <FormFiller form={active} user={user} team={team} onDone={()=>{setView("list");onPending();}} onCancel={()=>setView("list")}/>;
+  if (view==="fill"&&active) return <FormFiller key={active.id} form={active} user={user} team={team} onDone={()=>{setView("list");load();onPending();}} onCancel={()=>{setView("list");load();}}/>;
 
   return (
-    <div>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+    <div className="page-enter">
+      <div className="section-heading page-heading">
         <div><h1 className="page-title">Scouting forms</h1><p className="page-subtitle">Match and pit reports for your team.</p></div>
-        {(role==="owner"||role==="admin")&&<button style={{...sx.btn(),width:'auto'}} onClick={()=>setView("create")}>New form</button>}
+        {(role==="owner"||role==="admin")&&<button style={{...sx.btn(),width:'auto'}} disabled={!canEdit} onClick={()=>setView("create")}>New form</button>}
       </div>
-      {forms.length===0&&(
+      <div className="forms-toolbar"><input aria-label="Search forms" placeholder="Find a scouting form…" value={search} onChange={e=>setSearch(e.target.value)}/><span className="outline-tag">{forms.length} forms on this device</span></div>
+      {!canEdit&&<div className="notice">Downloaded forms are ready to fill out offline. Creating and editing form templates needs a server connection.</div>}
+      {loadError&&<div className="notice notice-error" role="alert">{loadError}</div>}
+      {loading&&<div className="panel" role="status">Loading your team’s forms…</div>}
+      {!loading&&forms.length===0&&(
         <div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>
           <div style={{fontSize:40,marginBottom:8}}>📋</div>
           <div>{(role==="owner"||role==="admin")?"No forms yet. Create one above.":"No forms yet. Ask an admin."}</div>
         </div>
       )}
-      {forms.map(f=>(
-        <div key={f.id} style={sx.card}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <div className="forms-grid">
+      {forms.filter(f=>f.title.toLowerCase().includes(search.toLowerCase())).map(f=>(
+        <div key={f.id} className="form-tile" style={sx.card}>
+          <div className="form-tile-content">
             <div style={{flex:1,cursor:"pointer"}} onClick={()=>{setActive(f);setView("fill");}}>
-              <div style={{fontSize:15,fontWeight:700,marginBottom:2}}>{f.title}</div>
+              <div className="form-type"><NavIcon name="forms"/><span>{f.allow_team_select?'Team scouting':'Scouting report'}</span></div>
+              <h2>{f.title}</h2>
               <div style={{fontSize:11,color:C.muted}}>
                 {f.questions?.length||0} questions · {f.created_by}
                 {f.allow_team_select&&<span style={{marginLeft:6,...sx.tag(C.purple)}}>TEAM SELECT</span>}
                 {f.max_submissions_per_team&&<span style={{marginLeft:6,...sx.tag(C.orange)}}>MAX {f.max_submissions_per_team}/team</span>}
               </div>
             </div>
-            <div style={{display:"flex",gap:8,marginLeft:8}}>
-              <button style={sx.sm(C.accent)} onClick={()=>{setActive(f);setView("fill");}}>Open form</button>
-              {(role==="owner"||role==="admin")&&<button style={sx.sm(C.orange)} onClick={e=>{e.stopPropagation();setActive(f);setView("edit");}}>✎</button>}
-              {(role==="owner"||role==="admin")&&<button style={sx.sm(C.red)} onClick={e=>deleteForm(f,e)}>🗑</button>}
+            <div className="form-tile-actions">
+              <button style={sx.sm(C.accent)} onClick={()=>{setActive(f);setView("fill");}}>{drafts.some(d=>d.key===draftKey(user.id,team.id,f.id))?'Resume draft':'Open form'} →</button>
+              {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit} aria-label={`Edit ${f.title}`} onClick={e=>{e.stopPropagation();setActive(f);setView("edit");}}>Edit</button>}
+              {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit} aria-label={`Delete ${f.title}`} onClick={e=>deleteForm(f,e)}>×</button>}
             </div>
           </div>
         </div>
       ))}
+      </div>
+      {forms.length>0&&!forms.some(f=>f.title.toLowerCase().includes(search.toLowerCase()))&&<div className="panel empty-state">No forms match “{search}”. Try another name.</div>}
     </div>
   );
 }
@@ -749,7 +710,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
   }
 
   return (
-    <div>
+    <div className="form-builder page-enter">
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
         <button style={sx.sm()} onClick={onCancel}>← BACK</button>
         <div style={{fontSize:20,fontWeight:650,color:C.text}}>{editing?"Edit form":"New form"}</div>
@@ -848,10 +809,13 @@ function ConditionEditor({ question, earlier, onChange }) {
 
 // ─── Form Filler ──────────────────────────────────────────────────────────────
 function FormFiller({ form, user, team, onDone, onCancel }) {
-  const [ans,setAns]=useState({});
+  const localDraftKey=draftKey(user.id,team.id,form.id);
+  const draft=useReportDraft(localDraftKey,()=>({id:uid(),answers:{},scoutedTeam:''}));
+  const ans=draft.value.answers;
   const [err,setErr]=useState(""); const [busy,setBusy]=useState(false);
   const [done,setDone]=useState(false);
-  const [scoutedTeam,setScoutedTeam]=useState("");
+  const scoutedTeam=draft.value.scoutedTeam;
+  const setScoutedTeam=value=>draft.change(current=>({...current,scoutedTeam:value}));
   const [eventTeams,setEventTeams]=useState([]);
   const [subCounts,setSubCounts]=useState({}); // team_number -> count
 
@@ -877,7 +841,7 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
   },[]);
 
   const shownQuestions = visibleQuestions(form.questions, ans);
-  function set(id,v){ setAns(a=>visibleAnswers(form.questions, {...a,[id]:v})); setErr(''); }
+  function set(id,v){ draft.change(current=>({...current,answers:visibleAnswers(form.questions,{...current.answers,[id]:v})}));setErr(''); }
 
   async function submit() {
     if (busy) return;
@@ -889,29 +853,32 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
     const missing=shownQuestions.filter(q=>q.required&&!hasAnswer(ans[q.id]));
     if (missing.length){ setErr(`Required: ${missing.map(q=>q.text).join(", ")}`); return; }
     setBusy(true); setErr("");
-    const sub={id:uid(),form_id:form.id,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,answers:visibleAnswers(form.questions,ans),created_at:tsNow()};
+    const sub={id:draft.value.id,form_id:form.id,form_title:form.title,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,answers:visibleAnswers(form.questions,ans),created_at:tsNow()};
     try {
-      await idbPut("submissions",sub);
+      await draft.flush();
+      await offline.enqueue(sub,localDraftKey);
       setDone(true);
-    } catch { setErr("Failed to save."); }
+    } catch(error) { setErr(error.message || 'Could not save this report. Keep the page open and try again.'); }
     setBusy(false);
   }
 
   if (done) return (
-    <div style={{...sx.card,textAlign:"center",marginTop:40}}>
-      <div style={{fontSize:48,marginBottom:8}}>✅</div>
-      <div style={{fontSize:18,fontWeight:700,color:C.green,marginBottom:8}}>Submitted!</div>
-      <div style={{fontSize:13,color:C.muted,marginBottom:16}}>Saved locally.</div>
+    <div className="panel success-panel">
+      <div className="success-mark" aria-hidden="true">✓</div>
+      <h1>Report saved.</h1>
+      <p>Saved on this device. Scout uploads it automatically when the server is reachable. Check the sync indicator for its upload status.</p>
       <button style={sx.btn(C.accent)} onClick={onDone}>BACK TO FORMS</button>
     </div>
   );
 
+  if(!draft.ready)return <div className="panel" role="status">Opening your saved draft…</div>;
+
   return (
-    <div>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-        <button style={sx.sm()} onClick={onCancel}>← BACK</button>
-        <div style={{fontSize:14,fontWeight:700,color:C.accent}}>{form.title}</div>
-      </div>
+    <div className="report-layout page-enter">
+      <div className="report-heading"><button style={sx.sm()} onClick={onCancel}>← Back</button><div><span className="eyebrow">Scouting report</span><h1>{form.title}</h1></div></div>
+      <aside className="report-summary panel"><span className="eyebrow">Your progress</span><strong className="progress-count">{shownQuestions.filter(q=>hasAnswer(ans[q.id])).length}<small> / {shownQuestions.length}</small></strong><progress value={shownQuestions.filter(q=>hasAnswer(ans[q.id])).length} max={Math.max(1,shownQuestions.length)}/><p>{draft.saving?'Saving draft…':draft.error?'Draft needs attention':'Draft saved as you go'}</p><p className="muted">You can leave this form and return later. Submit when you're finished to add it to the upload queue.</p><span className="outline-tag">Offline saving enabled</span></aside>
+      <div className="report-questions">
+      {draft.error&&<div className="notice notice-error" role="alert">{draft.error}</div>}
 
       {/* Team selector */}
       {form.allow_team_select&&(
@@ -936,157 +903,27 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
 
       <div className="form-progress">{shownQuestions.filter(q=>hasAnswer(ans[q.id])).length} of {shownQuestions.length} questions answered <span>Required questions are marked *</span></div>
       {shownQuestions.map((q,i)=>(
-        <div key={q.id} style={sx.card}>
+        <div key={q.id} className="question-card" style={sx.card}>
           <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>{i+1}. {q.text}{q.required&&<span style={{color:C.red,marginLeft:4}}>*</span>}</div>
           <QInput q={q} value={ans[q.id]} onChange={v=>set(q.id,v)}/>
         </div>
       ))}
       {err&&<div style={{...sx.err,marginBottom:10}}>{err}</div>}
-      <button style={sx.btn()} onClick={submit} disabled={busy}>{busy?"Submitting…":"Submit scouting report"}</button>
+      <button style={sx.btn()} onClick={submit} disabled={busy}>{busy?"Saving report…":"Submit scouting report"}</button>
+      </div>
     </div>
   );
 }
 
 // ─── Draw Input (own component so hooks run unconditionally) ─────────────────
-function DrawInput({ q, onChange }) {
-  const cvRef    = useRef(null);   // visible canvas
-  const drawing  = useRef(false);
-  // Strokes stored as path segments so we can re-render without needing toDataURL on a tainted canvas.
-  // Each stroke is an array of {x,y} points.
-  const strokes  = useRef([]);
-  const bgLoaded = useRef(null);   // the loaded bg Image element (may be tainted — only used for drawImage, not export)
-
-  const W = 560, H = 280;
-
-  // ── redraw the visible canvas: bg + all strokes ──
-  const redraw = () => {
-    const canvas = cvRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, W, H);
-    if (bgLoaded.current) {
-      ctx.drawImage(bgLoaded.current, 0, 0, W, H);
-    } else {
-      drawField(ctx, W, H);
-    }
-    paintStrokes(ctx, strokes.current);
-  };
-
-  // ── paint strokes onto any ctx ──
-  const paintStrokes = (ctx, allStrokes) => {
-    ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    for (const stroke of allStrokes) {
-      if (stroke.length < 2) continue;
-      ctx.beginPath();
-      ctx.moveTo(stroke[0].x, stroke[0].y);
-      for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
-      ctx.stroke();
-    }
-  };
-
-  // ── export: composite bg + strokes on a fresh offscreen canvas ──
-  // Background is re-drawn via drawField (always clean) or fetched with crossOrigin.
-  // Strokes are re-painted from path data — no tainted canvas issue.
-  const exportImage = () => {
-    const off = document.createElement("canvas");
-    off.width = W; off.height = H;
-    const ctx = off.getContext("2d");
-    const url = q.imageUrl?.trim();
-    if (url) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, W, H);
-        paintStrokes(ctx, strokes.current);
-        onChange(off.toDataURL());
-      };
-      img.onerror = () => {
-        // CORS blocked — export just the strokes on the default field background
-        drawField(ctx, W, H);
-        paintStrokes(ctx, strokes.current);
-        onChange(off.toDataURL());
-      };
-      img.src = url;
-    } else {
-      drawField(ctx, W, H);
-      paintStrokes(ctx, strokes.current);
-      onChange(off.toDataURL());
-    }
-  };
-
-  // ── load background image on mount / url change ──
-  useEffect(() => {
-    const url = q.imageUrl?.trim();
-    if (url) {
-      // Load without crossOrigin so it displays on any host (may taint, but we never call toDataURL on this canvas)
-      const img = new Image();
-      img.onload = () => { bgLoaded.current = img; redraw(); };
-      img.onerror = () => { bgLoaded.current = null; redraw(); };
-      img.src = url;
-    } else {
-      bgLoaded.current = null;
-      redraw();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q.imageUrl]);
-
-  const getXY = e => {
-    const cv = cvRef.current;
-    const r = cv.getBoundingClientRect();
-    const sw = W / r.width, sh = H / r.height;
-    const clientX = e.clientX ?? e.touches?.[0]?.clientX;
-    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
-    return [(clientX - r.left) * sw, (clientY - r.top) * sh];
-  };
-
-  const start = e => {
-    e.preventDefault();
-    drawing.current = true;
-    const [x, y] = getXY(e);
-    strokes.current.push([{x, y}]);
-    const ctx = cvRef.current.getContext("2d");
-    ctx.beginPath(); ctx.moveTo(x, y);
-  };
-
-  const draw = e => {
-    if (!drawing.current) return;
-    e.preventDefault();
-    const [x, y] = getXY(e);
-    const cur = strokes.current[strokes.current.length - 1];
-    if (cur) cur.push({x, y});
-    const ctx = cvRef.current.getContext("2d");
-    ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    ctx.lineTo(x, y); ctx.stroke();
-    // Export from clean offscreen canvas so it's never tainted
-    exportImage();
-  };
-
-  const stop = () => { drawing.current = false; };
-
-  const clear = () => {
-    strokes.current = [];
-    redraw();
-    onChange(null);
-  };
-
-  return (
-    <div>
-      <canvas ref={cvRef} width={W} height={H}
-        style={{border:`1px solid ${C.border}`,borderRadius:8,cursor:"crosshair",width:"100%",touchAction:"none",display:"block",background:C.bg0}}
-        onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop}
-        onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}/>
-      <button style={{...sx.sm(C.red),marginTop:8}} onClick={clear}>✕ CLEAR</button>
-    </div>
-  );
-}
 
 // ─── Question Input ───────────────────────────────────────────────────────────
 function QInput({ q, value, onChange }) {
-  if (q.type==="text")    return <textarea style={{...sx.inp,height:80,resize:"vertical",marginBottom:0}} value={value||""} onChange={e=>onChange(e.target.value)} placeholder="Type your answer…"/>;
+  if (q.type==="text")    return <textarea aria-label={q.text} style={{...sx.inp,height:100,resize:"vertical",marginBottom:0}} value={value||""} onChange={e=>onChange(e.target.value)} placeholder="Type your answer…"/>;
   if (q.type==="number")  return <input aria-label={q.text} style={{...sx.inp,marginBottom:0}} type="number" step="any" inputMode="decimal" value={value??""} onChange={e=>onChange(e.target.value === '' ? '' : Number(e.target.value))}/>;
   if (q.type==="boolean") return (
     <div style={{display:"flex",gap:10}}>
-      {["Yes","No"].map(o=><button key={o} style={{...sx.sm(value===o?C.accent:C.muted),flex:1,padding:14,fontSize:14}} onClick={()=>onChange(o)}>{o}</button>)}
+      {["Yes","No"].map(o=><button key={o} aria-pressed={value===o} style={{...sx.sm(value===o?C.accent:C.muted),flex:1,padding:14,fontSize:14}} onClick={()=>onChange(o)}>{o}</button>)}
     </div>
   );
   if (q.type==="scale") return (
@@ -1100,16 +937,10 @@ function QInput({ q, value, onChange }) {
   );
   if (q.type==="select") {
     const opts=(q.options||[]).filter(o=>o.trim());
-    return <div style={{display:"flex",flexDirection:"column",gap:8}}>{opts.map(o=><button key={o} style={{...sx.sm(value===o?C.accent:C.muted),textAlign:"left",padding:"12px 14px",fontSize:13}} onClick={()=>onChange(o)}>{o}</button>)}</div>;
+    return <div className="answer-options">{opts.map(o=><button key={o} aria-pressed={value===o} style={{...sx.sm(value===o?C.accent:C.muted),textAlign:"left",padding:"12px 14px",fontSize:14}} onClick={()=>onChange(o)}>{o}</button>)}</div>;
   }
-  if (q.type==="photo") return (
-    <div>
-      <input type="file" accept="image/*" capture="environment" style={{display:"none"}} id={`ph-${q.id}`} onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>onChange(r.result);r.readAsDataURL(f);}}/>
-      <label htmlFor={`ph-${q.id}`} style={{...sx.btn(C.accent),display:"block",textAlign:"center",cursor:"pointer",marginBottom:0}}>📷 TAKE / CHOOSE PHOTO</label>
-      {value&&<img src={value} alt="preview" style={{display:"block",marginTop:8,maxWidth:"100%",borderRadius:8,border:`1px solid ${C.border}`}}/>}
-    </div>
-  );
-  if (q.type==="draw") return <DrawInput q={q} onChange={onChange}/>;
+  if (q.type==='photo') return <ReportPhoto question={q} value={value} onChange={onChange}/>;
+  if (q.type==='draw') return <ReportDrawing question={q} value={value} onChange={onChange}/>;
   return null;
 }
 

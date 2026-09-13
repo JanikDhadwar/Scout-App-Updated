@@ -35,6 +35,12 @@ test('local API persists data, validates writes, and returns JSON errors', async
     assert.equal(unknown.status, 404);
     assert.match(unknown.headers.get('content-type'), /json/);
     assert.equal((await write('/session', 'POST', { key: '__proto__' })).status, 400);
+    const report = { id:'offline-report', form_id:'form-1', user_id:'user-1', answers:{score:0,climb:'No'} };
+    await write('/submissions','POST',report);
+    await write('/submissions','POST',report);
+    const submissions = await (await fetch(`${base}/submissions`)).json();
+    assert.equal(submissions.length,1,'retrying an offline report must not create a duplicate');
+    assert.deepEqual(submissions[0].answers,report.answers);
     await fetch(`${base}/teams/team-1`, { method: 'DELETE' });
     assert.deepEqual(await (await fetch(`${base}/teams`)).json(), []);
   } finally {
