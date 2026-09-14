@@ -1,4 +1,4 @@
-# FRC Scout local app
+# Argus local app
 
 See [the Debian setup guide](../README.md) for installation, automatic GitHub
 updates, startup commands, data storage, and logs.
@@ -16,9 +16,9 @@ The entry point imports `src/frc-scout-local.jsx`. Firebase is not active.
    data download automatically while the app is open, too. Stay signed in.
 3. Fill out downloaded forms normally. Drafts, including drawings and resized
    photos, save to this browser. **Resume draft** restores an unfinished report.
-4. Submit the report. Scout commits it to the device’s upload queue first, then
+4. Submit the report. Argus commits it to the device’s upload queue first, then
    uploads it. The indicator shows how many reports are waiting.
-5. Reconnect with Scout open. It checks the server every 15 seconds and when the
+5. Reconnect with Argus open. It checks the server every 15 seconds and when the
    page becomes visible or the browser reports a connection. If the app was
    closed, reopen it to resume uploads, especially on iPad/iPhone. Wait for
    **All synced** before clearing browser data or switching browsers.

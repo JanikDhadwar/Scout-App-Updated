@@ -292,7 +292,7 @@ export default function App() {
 
       {user && team && (
         <header className="workspace-header">
-          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaustus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Scout'}</strong></div></div>
+          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaustus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Argus'}</strong></div></div>
           <div className="header-actions">
             <button className={`sync-pill ${syncState.connection==='offline'?'is-offline':''}`} onClick={()=>setShowSync(s=>!s)} aria-expanded={showSync}><span className={syncState.syncing?'status-dot is-syncing':'status-dot'}/>{statusLabel}</button>
             <span className="user-chip" title={user.username}>{user.username?.slice(0,2).toUpperCase()}</span>
@@ -317,7 +317,7 @@ export default function App() {
 
       {user && team && (
         <nav className="workspace-nav" aria-label="Main navigation">
-          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Scout</strong><span>Hephaustus</span></div></div>
+          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Argus</strong><span>Hephaustus</span></div></div>
           <div className="nav-section-label">Workspace</div>
           {navTabs.map(t => (
             <button key={t.id} className={`nav-link ${['myteam','data','manage'].includes(t.id)?'nav-secondary':''}`} aria-current={tab===t.id ? "page" : undefined} onClick={()=>navigate(t.id)}>
@@ -329,7 +329,7 @@ export default function App() {
           <div className="nav-footer"><div><span style={sx.avatar()}>{user.username?.[0]?.toUpperCase()}</span><span><strong>{user.username}</strong><small>{role}</small></span></div><button onClick={logout}>Sign out</button></div>
         </nav>
       )}
-      {showMore&&<div className="mobile-menu"><div className="section-heading"><strong>More in Scout</strong><button style={sx.sm(C.muted)} onClick={()=>setShowMore(false)}>Close</button></div>{navTabs.filter(t=>['myteam','data','manage'].includes(t.id)).map(t=><button key={t.id} onClick={()=>navigate(t.id)}><NavIcon name={t.id}/>{t.label}</button>)}<button onClick={logout}>Sign out</button></div>}
+      {showMore&&<div className="mobile-menu"><div className="section-heading"><strong>More in Argus</strong><button style={sx.sm(C.muted)} onClick={()=>setShowMore(false)}>Close</button></div>{navTabs.filter(t=>['myteam','data','manage'].includes(t.id)).map(t=><button key={t.id} onClick={()=>navigate(t.id)}><NavIcon name={t.id}/>{t.label}</button>)}<button onClick={logout}>Sign out</button></div>}
     </div>
   );
 }
@@ -367,7 +367,7 @@ function AuthScreen({ onLogin }) {
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"90vh",padding:"0 4px"}}>
       <div className="auth-brand">
         <div className="team-mark team-mark-large">6390</div>
-        <h1>Team 6390<br/>Scouting workspace</h1>
+        <h1>Argus<br/>Team 6390 scouting workspace</h1>
         <p>Your team's match notes, pit reports, and event data.</p>
       </div>
       <div style={{...sx.card,width:"100%",maxWidth:400}}>
@@ -466,7 +466,7 @@ function TeamScreen({ user, onJoin, onLogout }) {
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"80vh"}}>
       <div style={{textAlign:"center",marginBottom:24}}>
-        <div style={{fontSize:22,fontWeight:700,color:C.accent,letterSpacing:4}}>FRC<span style={{color:C.orange}}>·</span>SCOUT</div>
+        <div style={{fontSize:22,fontWeight:700,color:C.accent,letterSpacing:4}}>ARGUS</div>
         <div style={{fontSize:12,color:C.muted,marginTop:4}}>as <span style={{color:C.accent}}>{user.username}</span></div>
       </div>
 
@@ -866,7 +866,7 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
     <div className="panel success-panel">
       <div className="success-mark" aria-hidden="true">✓</div>
       <h1>Report saved.</h1>
-      <p>Saved on this device. Scout uploads it automatically when the server is reachable. Check the sync indicator for its upload status.</p>
+      <p>Saved on this device. Argus uploads it automatically when the server is reachable. Check the sync indicator for its upload status.</p>
       <button style={sx.btn(C.accent)} onClick={onDone}>BACK TO FORMS</button>
     </div>
   );

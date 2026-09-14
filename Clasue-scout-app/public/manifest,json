@@ -1,6 +1,6 @@
 {
-  "name": "FRC Scout",
-  "short_name": "FRCScout",
+  "name": "Argus · Hephaustus 6390",
+  "short_name": "Argus",
   "description": "FRC Field Scouting Platform",
   "start_url": "/",
   "display": "standalone",

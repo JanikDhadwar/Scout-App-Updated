@@ -1,4 +1,4 @@
-# FRC Scout — Debian self-hosting
+# Argus — Debian self-hosting
 
 The active app is `Clasue-scout-app/src/frc-scout-local.jsx`, served by
 `server.cjs` on port **3001**. It saves scouting data to a JSON file on your

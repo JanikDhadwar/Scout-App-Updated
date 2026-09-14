@@ -183,6 +183,6 @@ app.use((err, _req, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`FRC Scout DB server running on http://localhost:${PORT}`);
+  console.log(`Argus DB server running on http://localhost:${PORT}`);
   console.log(`Data file: ${DB_FILE}`);
 });

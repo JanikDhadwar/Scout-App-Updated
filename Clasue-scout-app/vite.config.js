@@ -13,8 +13,8 @@ server: {
     VitePWA({
       registerType: 'prompt',
       manifest: {
-        name: 'Scout · Hephaustus 6390',
-        short_name: 'Scout',
+        name: 'Argus · Hephaustus 6390',
+        short_name: 'Argus',
         description: 'FRC Field Scouting Platform',
         theme_color: '#ba2732',
         background_color: '#141414',
