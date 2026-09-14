@@ -292,7 +292,7 @@ export default function App() {
 
       {user && team && (
         <header className="workspace-header">
-          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaestus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Scout'}</strong></div></div>
+          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaustus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Scout'}</strong></div></div>
           <div className="header-actions">
             <button className={`sync-pill ${syncState.connection==='offline'?'is-offline':''}`} onClick={()=>setShowSync(s=>!s)} aria-expanded={showSync}><span className={syncState.syncing?'status-dot is-syncing':'status-dot'}/>{statusLabel}</button>
             <span className="user-chip" title={user.username}>{user.username?.slice(0,2).toUpperCase()}</span>
@@ -317,7 +317,7 @@ export default function App() {
 
       {user && team && (
         <nav className="workspace-nav" aria-label="Main navigation">
-          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Scout</strong><span>Hephaestus</span></div></div>
+          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Scout</strong><span>Hephaustus</span></div></div>
           <div className="nav-section-label">Workspace</div>
           {navTabs.map(t => (
             <button key={t.id} className={`nav-link ${['myteam','data','manage'].includes(t.id)?'nav-secondary':''}`} aria-current={tab===t.id ? "page" : undefined} onClick={()=>navigate(t.id)}>
