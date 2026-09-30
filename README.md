@@ -1,3 +1,31 @@
+# Argus — FRC Team 6390 Scouting App
+
+**Argus** is the scouting workspace for FRC Team 6390 (Hephaustus), live at [6390scout.app](https://6390scout.app). It replaces paper scouting sheets with a phone-friendly app that works offline at competitions.
+
+## What it is
+
+A web app for FIRST Robotics Competition scouting — collecting match and pit data on other teams so the drive team can make informed strategy and alliance-selection calls.
+
+## How it works
+
+1. **Sign in** — team members log in; roles (owner / admin / member) control who can see and manage what.
+2. **Build forms** — admins create custom scouting forms (e.g. "Qual Match Scout") with multiple question types and conditional logic, so follow-up questions only appear when relevant.
+3. **Pick an event** — the app pulls the real match schedule and team list from The Blue Alliance API.
+4. **Scout matches** — scouters fill out forms per match, per team, from their phones. Data saves offline and syncs when there's a connection.
+5. **Pit scout** — walk the pits and check off teams you've covered, with each record tied to who scouted it.
+6. **Analyze** — the Data tab turns all submissions into rankings and team-by-team breakdowns for strategy talks, plus a News tab for team announcements.
+
+## Under the hood
+
+- React 19 + Vite frontend, installed as a PWA — offline support via service worker and IndexedDB
+- Express server (`server.cjs`) on port 3001 with a JSON-file database (`db.json`) — no external database needed
+- Live competition data from The Blue Alliance API
+
+## Demo login
+
+Try it on the login page — user `Example`, password `123`.
+
+---
 # Argus — Debian self-hosting
 
 The active app is `Clasue-scout-app/src/frc-scout-local.jsx`, served by
