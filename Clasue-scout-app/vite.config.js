@@ -13,17 +13,16 @@ server: {
     VitePWA({
       registerType: 'prompt',
       manifest: {
-        name: 'Argus · Hephaustus 6390',
+        name: 'Argus Scouting',
         short_name: 'Argus',
         description: 'FRC Field Scouting Platform',
-        theme_color: '#ba2732',
-        background_color: '#141414',
+        theme_color: '#17191c',
+        background_color: '#17191c',
         display: 'standalone',
         start_url: '/',
         scope: '/',
         icons: [
-          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+          { src: '/app-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
         ]
       },
       workbox: {

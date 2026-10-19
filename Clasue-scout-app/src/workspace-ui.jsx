@@ -41,19 +41,49 @@ export function HomeDashboard({ team, user, role, mem, api, onNavigate, syncStat
   const news=[...data.announcements].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   const event=data.scout_events[0];
   return <div className="dashboard page-enter">
-    <div className="dashboard-intro"><div><span className="workspace-context">Team {team.number} scouting</span><h1>Welcome back, {user.username}.</h1><p>Choose a form, scout a team, and keep the crew up to date.</p></div><button className="primary-button" onClick={()=>onNavigate('forms')}>Start scouting <Icon name="arrow" size={18}/></button></div>
+    <div className="dashboard-intro">
+      <div><h1>Scouting</h1><p>{loading ? 'Loading workspace…' : `${data.forms.length} ${data.forms.length === 1 ? 'form' : 'forms'} available`}</p></div>
+      <button className="quiet-button" onClick={()=>onNavigate('forms')}>Open forms</button>
+    </div>
     {error&&<div className="notice" role="status">{error}</div>}
-    <div className="stat-grid">
-      {[['Scouting forms',data.forms.length,'forms'],['Your reports',reports.length,'forms'],['Team members',data.memberships.length,'myteam'],['Pending uploads',syncState.pending,'sync']].map(([label,value,target])=><button key={label} className="stat-card" onClick={()=>target==='sync'?onShowSync():onNavigate(target)}><span>{label}<Icon name="chevron" size={14}/></span><strong>{loading&&target!=='sync'?'…':value}</strong><small>{target==='sync'?(syncState.pending?'Saved on this device':'Everything is uploaded'):target==='forms'&&label==='Scouting forms'?'Match and pit scouting':label==='Your reports'?'Submitted by you':'In this workspace'}</small></button>)}
+    <div className="scouting-workspace">
+      <div className="workspace-primary">
+        <section className="workspace-section" aria-label="Scouting forms">
+          <div className="section-heading"><h2>Scouting forms</h2><span className="section-note">Match & pit reports</span></div>
+          <div className="form-list-heading" aria-hidden="true"><span>Form</span><span>Questions</span><span/></div>
+          {data.forms.length ? data.forms.slice(0,6).map(form=><button className="scout-form-row" key={form.id} onClick={()=>onNavigate('forms')}>
+            <Icon name="forms" size={18}/><span className="scout-form-name"><strong>{form.title}</strong><small>{form.allow_team_select?'Team scouting':'General report'}</small></span>
+            <span className="question-count">{form.questions?.length||0}</span><Icon name="chevron" size={16}/>
+          </button>) : <div className="list-empty"><p>{loading?'Loading forms…':role==='member'?'An admin needs to add your scouting forms.':'No forms yet. Add a form to start scouting.'}</p><button className="text-button" onClick={()=>onNavigate('forms')}>{role==='member'?'View forms':'Create a form'}</button></div>}
+          {data.forms.length>6&&<button className="text-button" onClick={()=>onNavigate('forms')}>View all {data.forms.length} forms</button>}
+        </section>
+        <section className="workspace-section" aria-label="Your recent reports">
+          <div className="section-heading"><h2>Your recent reports</h2><span className="section-note">{reports.length} submitted</span></div>
+          {reports.length ? <ul className="recent-report-list">{reports.slice(0,4).map(report=><li key={report.id}>
+            <span><strong>{report.scouted_team?`Team ${report.scouted_team}`:report.form_title||'Scouting report'}</strong><small>{report.scouted_team?report.form_title||'Scouting report':report.submitted_by}</small></span>
+            <time dateTime={report.created_at}>{new Date(report.created_at).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</time>
+          </li>)}</ul> : <p className="section-empty">{loading?'Loading reports…':'Your submitted reports will appear here.'}</p>}
+        </section>
+        <section className="workspace-section" aria-label="Team updates">
+          <div className="section-heading"><h2>Team updates</h2><button className="text-button" onClick={()=>onNavigate('announce')}>View news</button></div>
+          {news.length ? news.slice(0,3).map(item=><article className="news-item" key={item.id}><strong>{item.title}</strong><p>{item.body}</p><small>{item.author}, {new Date(item.created_at).toLocaleDateString()}</small></article>) : <p className="section-empty">No announcements.</p>}
+        </section>
+      </div>
+      <aside className="workspace-aside" aria-label="Competition and device">
+        <section className="workspace-section event-panel">
+          <h2>Current event</h2><h3>{event?.event_name||event?.name||'No event selected'}</h3>
+          <p>{event?'Match schedule, team assignments, and pit coverage.':'Select a competition to load its teams and match schedule.'}</p>
+          {!!event?.event_teams?.length&&<p className="event-team-count">{event.event_teams.length} teams attending</p>}
+          <button className="quiet-button" onClick={()=>onNavigate('event')}>{event?'View event':'Select event'}</button>
+        </section>
+        <section className="workspace-section device-panel">
+          <div className="section-heading"><h2>Device status</h2><span className={`status-dot ${syncState.connection==='offline'?'offline-dot':''}`}/></div>
+          <dl className="device-facts"><div><dt>Connection</dt><dd>{syncState.connection==='online'?'Connected':syncState.connection==='checking'?'Checking…':'Offline'}</dd></div><div><dt>Pending uploads</dt><dd>{syncState.pending}</dd></div><div><dt>Offline forms</dt><dd>{shellReady&&syncState.readyAt?'Downloaded':'Not ready'}</dd></div></dl>
+          {syncState.pending>0&&<p>Keep Argus open to finish uploading your saved reports.</p>}
+          <button className="text-button" onClick={onShowSync}>Sync details</button>
+        </section>
+        <Disclosure title="Account settings"><p className="muted">Signed in as {user.username}. Your role is {role}.</p><div className="button-row">{mem?.role!=='owner'&&data.memberships.length>1&&<button className="quiet-button danger-button" onClick={onLeaveTeam}>Leave team</button>}<button className="quiet-button danger-button" onClick={onDeleteAccount}>Delete my account</button>{role==='owner'&&<button className="quiet-button danger-button" onClick={onDeleteTeam}>Delete team</button>}</div></Disclosure>
+      </aside>
     </div>
-    <div className="dashboard-grid">
-      <section className="panel scouting-panel"><div className="section-heading"><div><h2>Ready to scout</h2><p className="muted section-description">Your team's match and pit forms.</p></div><button className="text-button" onClick={()=>onNavigate('forms')}>All forms <Icon name="arrow" size={16}/></button></div>
-        {data.forms.length?data.forms.slice(0,4).map(form=><button className="resource-row" key={form.id} onClick={()=>onNavigate('forms')}><span className="resource-number"><Icon name="forms"/></span><span><strong>{form.title}</strong><small>{form.questions?.length||0} questions, {form.allow_team_select?'team selection':'scouting report'}</small></span><Icon name="chevron" size={18}/></button>):<div className="empty-state"><span className="empty-icon"><Icon name="forms" size={26}/></span><strong>{loading?'Loading forms…':'No scouting forms yet'}</strong><p>{role==='member'?"Your team's forms will appear here when an admin creates them.":'Create a match or pit form to start collecting reports.'}</p><button className="quiet-button" onClick={()=>onNavigate('forms')}>Go to forms</button></div>}
-      </section>
-      <section className="panel event-panel"><div className="panel-label"><Icon name="event"/><span>Competition</span></div><h2>{event?.event_name||event?.name||'Where are we competing?'}</h2><p>{event?'View the match schedule, team list, and pit coverage for your competition.':'Pick an event to see the match schedule and teams to scout.'}</p><div className="event-meta"><span>Team {team.number}</span>{!!event?.event_teams?.length&&<span>{event.event_teams.length} teams</span>}</div><button className="quiet-button" onClick={()=>onNavigate('event')}>{event?'Open event':'Choose an event'} <Icon name="arrow" size={16}/></button></section>
-      <section className="panel updates-panel"><div className="section-heading"><h2>Team updates</h2><button className="text-button" onClick={()=>onNavigate('announce')}>All news <Icon name="arrow" size={16}/></button></div>{news.length?news.slice(0,3).map(item=><article className="news-item" key={item.id}><strong>{item.title}</strong><p>{item.body}</p><small>{item.author}, {new Date(item.created_at).toLocaleDateString()}</small></article>):<div className="empty-state compact-empty"><span className="empty-icon"><Icon name="news" size={24}/></span><div><strong>No announcements yet</strong><p>Notes from your scouting lead will appear here.</p></div></div>}</section>
-      <section className="panel device-panel"><div className="panel-label"><Icon name="device"/><span>On this device</span></div><h2>{syncState.pending?`${syncState.pending} report${syncState.pending===1?'':'s'} waiting to upload`:shellReady&&syncState.readyAt?'Offline scouting is ready':'Scout without Wi-Fi'}</h2><p>{syncState.pending?'Your reports will upload when the server is reachable. Keep Argus open to finish syncing.':'Download your forms before the event. Reports save on this device and upload when you reconnect.'}</p><div className="device-status"><span className={`status-dot ${syncState.connection==='offline'?'offline-dot':''}`}/>{syncState.connection==='online'?'Server connected':'Working from this device'}</div><button className="text-button" onClick={onShowSync}>Device & sync <Icon name="arrow" size={16}/></button></section>
-    </div>
-    <Disclosure title="Account & team settings" trailing={role}><p className="muted">These actions affect your account or team. You will be asked to confirm.</p><div className="button-row">{mem?.role!=='owner'&&data.memberships.length>1&&<button className="quiet-button danger-button" onClick={onLeaveTeam}>Leave team</button>}<button className="quiet-button danger-button" onClick={onDeleteAccount}>Delete my account</button>{role==='owner'&&<button className="quiet-button danger-button" onClick={onDeleteTeam}>Delete team</button>}</div></Disclosure>
   </div>;
 }

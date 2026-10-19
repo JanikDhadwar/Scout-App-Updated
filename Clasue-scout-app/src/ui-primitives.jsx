@@ -1,11 +1,5 @@
 import { useId, useState } from 'react';
 
-export function TeamMark({ className = '', number = '6390' }) {
-  return <span className={`team-mark ${className}`}>
-    {String(number) === '6390' ? <img src="/team-6390.png" alt="Team 6390" width="280" height="280"/> : number}
-  </span>;
-}
-
 export function Icon({ name, size = 20, ...props }) {
   const paths = {
     arrow: 'M5 12h14m-6-6 6 6-6 6',

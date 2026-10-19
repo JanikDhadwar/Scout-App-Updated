@@ -5,7 +5,7 @@ import { offline, deviceStore, draftKey } from './offline.js';
 import { HomeDashboard, SyncPanel } from './workspace-ui.jsx';
 import { useReportDraft } from './use-report-draft.js';
 import { ReportDrawing, ReportPhoto } from './report-media.jsx';
-import { Icon, TeamMark } from './ui-primitives.jsx';
+import { Icon } from './ui-primitives.jsx';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
@@ -49,7 +49,7 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#101114", bg1:"#191b20", bg2:"#24272e", border:"#353942", accent:"#f58992", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#adb3be", text:"#f5f6f8", dim:"#c5cad3", purple:"#b7a3d5" };
+const C = { bg0:"#17191c", bg1:"#1e2024", bg2:"#292c31", border:"#3d4149", accent:"#b5c9ed", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#adb3bd", text:"#eeeef0", dim:"#c5cad3", purple:"#b7a3d5" };
 const MO = "'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
@@ -59,10 +59,10 @@ const sx = {
   main:   { flex:1, overflowY:"auto", padding:"16px 12px", paddingBottom:80 },
   bnav:   { position:"fixed", bottom:0, left:0, right:0, background:C.bg1, borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100, height:60 },
   bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.text:C.muted, cursor:"pointer", fontFamily:MO, fontSize:12, fontWeight:on?650:450, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:5, padding:"8px 2px" }),
-  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:12, padding:"clamp(18px, 2vw, 26px)", marginBottom:16 },
+  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:6, padding:"clamp(18px, 2vw, 24px)", marginBottom:16 },
   ct:     { fontSize:15, fontWeight:650, color:C.text, marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
-  btn:    (c=C.accent) => ({ background:c===C.accent?"#c52e3b":"transparent", border:`1px solid ${c===C.accent?"#e0525d":c}`, color:c===C.accent?"#fff":c, padding:"14px 20px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:15, fontWeight:600, width:"100%", minHeight:48 }),
+  btn:    (c=C.accent) => ({ background:c===C.accent?"#e2e5ea":"transparent", border:`1px solid ${c===C.accent?"#e2e5ea":c}`, color:c===C.accent?"#191b20":c, padding:"12px 18px", borderRadius:5, cursor:"pointer", fontFamily:MO, fontSize:14, fontWeight:600, width:"100%", minHeight:46 }),
   sm:     (c=C.accent) => ({ background:c===C.accent?C.bg2:"transparent", border:`1px solid ${c===C.accent?C.border:c+'66'}`, color:c===C.accent?C.text:c, padding:"9px 13px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:44 }),
   lbl:    { fontSize:13, fontWeight:550, color:C.dim, marginBottom:8, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },
@@ -320,7 +320,7 @@ export default function App() {
 
       {user && team && (
         <header className="workspace-header">
-          <div className="workspace-heading"><TeamMark className="mobile-mark" number={team.number}/><div><span className="eyebrow">{team.name} / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Argus'}</strong></div></div>
+          <div className="workspace-heading"><span className="mobile-app-name">Argus</span><div><span className="eyebrow">{team.name}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Argus'}</strong></div></div>
           <div className="header-actions">
             <button className={`sync-pill ${syncState.connection==='offline'?'is-offline':''}`} onClick={()=>setShowSync(s=>!s)} aria-expanded={showSync}><span className={syncState.syncing?'status-dot is-syncing':'status-dot'}/>{statusLabel}</button>
             <span className="user-chip" title={user.username}>{user.username?.slice(0,2).toUpperCase()}</span>
@@ -345,8 +345,7 @@ export default function App() {
 
       {user && team && (
         <nav className="workspace-nav" aria-label="Main navigation">
-          <div className="nav-brand"><TeamMark number={team.number}/><div><strong>Argus<span className="brand-period">.</span></strong><span>Team {team.number}</span></div></div>
-          <div className="nav-section-label">Scouting workspace</div>
+          <div className="nav-brand"><strong>Argus</strong><span>Scouting</span></div>
           {navTabs.map(t => (
             <button key={t.id} className={`nav-link ${['myteam','data','manage'].includes(t.id)?'nav-secondary':''}`} aria-current={tab===t.id ? "page" : undefined} onClick={()=>navigate(t.id)}>
               <NavIcon name={t.id}/>
@@ -393,13 +392,9 @@ function AuthScreen({ onLogin }) {
 
   return (
     <div className="auth-layout">
-      <section className="auth-story">
-        <div className="auth-wordmark"><TeamMark/><span>Argus<span className="brand-period">.</span></span></div>
-        <div className="auth-story-main"><span className="workspace-context">Hephaustus / Team 6390</span><h1>Your team's<br/> scouting notes.</h1><p>Collect match and pit reports.<br/>Review them together with your team.</p><div className="auth-team-number" aria-hidden="true">6390<span>FRC scouting</span></div></div>
-        <div className="auth-offline-note"><Icon name="device" size={18}/><span>Scout offline. Sync when you're connected.</span></div>
-      </section>
       <section className="auth-form-area" aria-label="Account access"><div className="auth-form-card">
-        <h2>{mode==='login'?'Welcome to Argus':'Join the crew'}</h2><p className="muted">{mode==='login'?'Sign in to your scouting workspace.':'Create an account, then join your team.'}</p>
+        <div className="auth-wordmark">Argus</div>
+        <h1>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your scouting workspace.':'You can join your team after signing up.'}</p>
         <div className="auth-tabs" aria-label="Account options">
           {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}
@@ -410,9 +405,8 @@ function AuthScreen({ onLogin }) {
         <label htmlFor="scout-password" style={sx.lbl}>Password</label>
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&submit()}/>
         {err && <div role="alert" style={sx.err}>{err}</div>}
-        <button className="primary-button auth-submit" onClick={submit} disabled={busy}>{busy?(mode==="login"?"Signing in…":"Creating account…"):mode==="login"?"Sign in":"Create account"}<Icon name="arrow" size={18}/></button>
-        <p className="auth-help">Use the account you created with your team.</p>
-      </div><span className="auth-footer">Argus for Team 6390</span></section>
+        <button className="primary-button auth-submit" onClick={submit} disabled={busy}>{busy?(mode==="login"?"Signing in…":"Creating account…"):mode==="login"?"Sign in":"Create account"}</button>
+      </div><span className="auth-footer">Match and pit scouting</span></section>
     </div>
   );
 }
