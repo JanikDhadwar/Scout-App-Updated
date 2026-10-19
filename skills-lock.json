@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "unslop": {
+      "source": "cursor/plugins",
+      "sourceType": "github",
+      "skillPath": "harness/pstack/claude-code/skills/unslop/SKILL.md",
+      "computedHash": "4069ec6c10a0228152079f52706221dc469a9e30a3040398eefd1e9c18fe6cf2"
+    }
+  }
+}

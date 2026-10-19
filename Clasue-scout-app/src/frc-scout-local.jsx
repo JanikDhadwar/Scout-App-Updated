@@ -5,6 +5,7 @@ import { offline, deviceStore, draftKey } from './offline.js';
 import { HomeDashboard, SyncPanel } from './workspace-ui.jsx';
 import { useReportDraft } from './use-report-draft.js';
 import { ReportDrawing, ReportPhoto } from './report-media.jsx';
+import { Icon, TeamMark } from './ui-primitives.jsx';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
@@ -48,8 +49,8 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#111214", bg1:"#191b1e", bg2:"#22252a", border:"#33363c", accent:"#f07880", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#a3a7af", text:"#f4f3f1", dim:"#c1c3c8", purple:"#b7a3d5" };
-const MO = "'Segoe UI', system-ui, -apple-system, sans-serif";
+const C = { bg0:"#101114", bg1:"#191b20", bg2:"#24272e", border:"#353942", accent:"#f58992", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#adb3be", text:"#f5f6f8", dim:"#c5cad3", purple:"#b7a3d5" };
+const MO = "'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
   page:   { fontFamily:MO, background:C.bg0, color:C.text, minHeight:"100vh", display:"flex", flexDirection:"column" },
@@ -58,16 +59,16 @@ const sx = {
   main:   { flex:1, overflowY:"auto", padding:"16px 12px", paddingBottom:80 },
   bnav:   { position:"fixed", bottom:0, left:0, right:0, background:C.bg1, borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100, height:60 },
   bnavBtn:(on) => ({ flex:1, background:"transparent", border:"none", color:on?C.text:C.muted, cursor:"pointer", fontFamily:MO, fontSize:12, fontWeight:on?650:450, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:5, padding:"8px 2px" }),
-  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:14, padding:"clamp(16px, 2vw, 24px)", marginBottom:16 },
+  card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:12, padding:"clamp(18px, 2vw, 26px)", marginBottom:16 },
   ct:     { fontSize:15, fontWeight:650, color:C.text, marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
-  btn:    (c=C.accent) => ({ background:c===C.accent?"#ba2732":"transparent", border:`1px solid ${c===C.accent?"#ba2732":c}`, color:c===C.accent?"#fff":c, padding:"14px 20px", borderRadius:7, cursor:"pointer", fontFamily:MO, fontSize:15, fontWeight:600, width:"100%", minHeight:48 }),
-  sm:     (c=C.accent) => ({ background:"transparent", border:`1px solid ${c===C.accent?'#9d3b44':c+'66'}`, color:c, padding:"9px 13px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:44 }),
+  btn:    (c=C.accent) => ({ background:c===C.accent?"#c52e3b":"transparent", border:`1px solid ${c===C.accent?"#e0525d":c}`, color:c===C.accent?"#fff":c, padding:"14px 20px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:15, fontWeight:600, width:"100%", minHeight:48 }),
+  sm:     (c=C.accent) => ({ background:c===C.accent?C.bg2:"transparent", border:`1px solid ${c===C.accent?C.border:c+'66'}`, color:c===C.accent?C.text:c, padding:"9px 13px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:44 }),
   lbl:    { fontSize:13, fontWeight:550, color:C.dim, marginBottom:8, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },
   ok:     { color:C.green, fontSize:12, marginBottom:8 },
-  tag:    (c) => ({ background:c+"22", border:`1px solid ${c}44`, color:c, padding:"3px 8px", borderRadius:4, fontSize:10, letterSpacing:1, display:"inline-block" }),
-  nb:     (on) => ({ background:on?C.bg2:"transparent", border:on?`1px solid ${C.accent}`:"1px solid transparent", color:on?C.accent:C.muted, padding:"8px 14px", borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:11, letterSpacing:1 }),
+  tag:    (c) => ({ background:c+"22", border:`1px solid ${c}44`, color:c, padding:"3px 8px", borderRadius:4, fontSize:12, display:"inline-block" }),
+  nb:     (on) => ({ background:on?C.bg2:"transparent", border:on?`1px solid #484d58`:"1px solid transparent", color:on?C.text:C.muted, padding:"10px 14px", minHeight:44, borderRadius:6, cursor:"pointer", fontFamily:MO, fontSize:13 }),
   hr:     { borderTop:`1px solid ${C.border}`, margin:"12px 0" },
   sc:     { background:C.bg0, border:`1px solid ${C.border}`, borderRadius:8, padding:"14px 12px", textAlign:"center" },
   ob:     (c) => ({ background:c+"18", borderBottom:`1px solid ${c}`, color:c, padding:"6px 20px", fontSize:11, letterSpacing:2, textAlign:"center", textTransform:"uppercase" }),
@@ -148,7 +149,34 @@ export default function App() {
   const [syncState,setSyncState] = useState(offline.getState());
   const [showSync,setShowSync] = useState(false);
   const [showMore,setShowMore] = useState(false);
+  const [moreClosing,setMoreClosing] = useState(false);
+  const moreRef = useRef(null);
+  const moreTriggerRef = useRef(null);
   const [shellReady,setShellReady] = useState(!!navigator.serviceWorker?.controller);
+
+  useEffect(() => {
+    const menu = moreRef.current;
+    if (showMore) {
+      menu?.querySelector('button')?.focus();
+      const dismiss = event => {
+        if (event.type === 'keydown' && event.key !== 'Escape') return;
+        if (event.type === 'pointerdown' && (menu?.contains(event.target) || moreTriggerRef.current?.contains(event.target))) return;
+        setShowMore(false);
+        setMoreClosing(true);
+        if (event.type === 'keydown') moreTriggerRef.current?.focus();
+      };
+      document.addEventListener('keydown', dismiss);
+      document.addEventListener('pointerdown', dismiss);
+      return () => {
+        document.removeEventListener('keydown', dismiss);
+        document.removeEventListener('pointerdown', dismiss);
+      };
+    }
+    if (!moreClosing) return;
+    const closeMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dropdown-close-dur')) || 150;
+    const timer = setTimeout(() => setMoreClosing(false), closeMs);
+    return () => clearTimeout(timer);
+  }, [showMore, moreClosing]);
 
   useEffect(() => {
     const listener = event => setSyncState(event.detail);
@@ -231,7 +259,7 @@ export default function App() {
     setUser(u); await saveSession(u, null, null);
   }
   async function joinTeam(t, m) { setTeam(t); setMem(m); setTab("home"); await saveSession(user, t, m); }
-  async function logout() { await saveSession(null,null,null); await offline.setScope(null); setUser(null);setTeam(null);setMem(null);setTab('home');setShowSync(false); }
+  async function logout() { await saveSession(null,null,null); await offline.setScope(null); setUser(null);setTeam(null);setMem(null);setTab('home');setShowSync(false);setShowMore(false);setMoreClosing(false); }
 
   async function leaveTeam() {
     const allMems = await fbSelect("memberships", { team_id: team.id });
@@ -278,7 +306,7 @@ export default function App() {
 
   if (booting) return (
     <div style={{ ...sx.page, alignItems:"center", justifyContent:"center" }}>
-      <div style={{ color:C.accent, letterSpacing:4, fontSize:13 }}>LOADING…</div>
+      <div style={{ color:C.accent, letterSpacing:4, fontSize:13 }}>Loading…</div>
     </div>
   );
 
@@ -292,7 +320,7 @@ export default function App() {
 
       {user && team && (
         <header className="workspace-header">
-          <div className="workspace-heading"><span className="mobile-mark">6390</span><div><span className="eyebrow">Hephaustus / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Argus'}</strong></div></div>
+          <div className="workspace-heading"><TeamMark className="mobile-mark" number={team.number}/><div><span className="eyebrow">{team.name} / Team {team.number}</span><strong>{navTabs.find(t=>t.id===tab)?.label || 'Argus'}</strong></div></div>
           <div className="header-actions">
             <button className={`sync-pill ${syncState.connection==='offline'?'is-offline':''}`} onClick={()=>setShowSync(s=>!s)} aria-expanded={showSync}><span className={syncState.syncing?'status-dot is-syncing':'status-dot'}/>{statusLabel}</button>
             <span className="user-chip" title={user.username}>{user.username?.slice(0,2).toUpperCase()}</span>
@@ -317,19 +345,19 @@ export default function App() {
 
       {user && team && (
         <nav className="workspace-nav" aria-label="Main navigation">
-          <div className="nav-brand"><span className="team-mark">6390</span><div><strong>Argus</strong><span>Hephaustus</span></div></div>
-          <div className="nav-section-label">Workspace</div>
+          <div className="nav-brand"><TeamMark number={team.number}/><div><strong>Argus<span className="brand-period">.</span></strong><span>Team {team.number}</span></div></div>
+          <div className="nav-section-label">Scouting workspace</div>
           {navTabs.map(t => (
             <button key={t.id} className={`nav-link ${['myteam','data','manage'].includes(t.id)?'nav-secondary':''}`} aria-current={tab===t.id ? "page" : undefined} onClick={()=>navigate(t.id)}>
               <NavIcon name={t.id}/>
               <span>{t.label}</span>
             </button>
           ))}
-          <button className="nav-link mobile-more" aria-expanded={showMore} aria-current={['myteam','data','manage'].includes(tab)?'page':undefined} onClick={()=>setShowMore(s=>!s)}><NavIcon name="more"/><span>More</span></button>
-          <div className="nav-footer"><div><span style={sx.avatar()}>{user.username?.[0]?.toUpperCase()}</span><span><strong>{user.username}</strong><small>{role}</small></span></div><button onClick={logout}>Sign out</button></div>
+          <button ref={moreTriggerRef} className="nav-link mobile-more" aria-expanded={showMore} aria-controls="mobile-more-menu" aria-current={['myteam','data','manage'].includes(tab)?'page':undefined} onClick={()=>{setMoreClosing(showMore);setShowMore(s=>!s);}}><NavIcon name="more"/><span>More</span></button>
+          <div className="nav-footer"><div><span style={sx.avatar()}>{user.username?.[0]?.toUpperCase()}</span><span><strong>{user.username}</strong><small>{role}</small></span></div><button onClick={logout}><Icon name="logout" size={16}/>Sign out</button></div>
         </nav>
       )}
-      {showMore&&<div className="mobile-menu"><div className="section-heading"><strong>More in Argus</strong><button style={sx.sm(C.muted)} onClick={()=>setShowMore(false)}>Close</button></div>{navTabs.filter(t=>['myteam','data','manage'].includes(t.id)).map(t=><button key={t.id} onClick={()=>navigate(t.id)}><NavIcon name={t.id}/>{t.label}</button>)}<button onClick={logout}>Sign out</button></div>}
+      {user&&team&&<div ref={moreRef} id="mobile-more-menu" aria-label="More navigation" className={`mobile-menu t-dropdown ${showMore?'is-open':moreClosing?'is-closing':''}`} data-origin="bottom-right" inert={!showMore}><div className="section-heading"><strong>More in Argus</strong><button className="quiet-button" onClick={()=>{setMoreClosing(true);setShowMore(false);moreTriggerRef.current?.focus();}}>Close</button></div>{navTabs.filter(t=>['myteam','data','manage'].includes(t.id)).map(t=><button key={t.id} onClick={()=>{navigate(t.id);moreTriggerRef.current?.focus();}}><NavIcon name={t.id}/>{t.label}</button>)}<button onClick={logout}><Icon name="logout"/>Sign out</button></div>}
     </div>
   );
 }
@@ -364,15 +392,16 @@ function AuthScreen({ onLogin }) {
   }
 
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"90vh",padding:"0 4px"}}>
-      <div className="auth-brand">
-        <div className="team-mark team-mark-large">6390</div>
-        <h1>Argus<br/>Team 6390 scouting workspace</h1>
-        <p>Your team's match notes, pit reports, and event data.</p>
-      </div>
-      <div style={{...sx.card,width:"100%",maxWidth:400}}>
-        <div style={{display:"flex",gap:8,marginBottom:18}}>
-          {["login","signup"].map(m=><button key={m} style={{...sx.nb(mode===m),flex:1,padding:"10px 0"}} onClick={()=>{setMode(m);setErr("");}}>
+    <div className="auth-layout">
+      <section className="auth-story">
+        <div className="auth-wordmark"><TeamMark/><span>Argus<span className="brand-period">.</span></span></div>
+        <div className="auth-story-main"><span className="workspace-context">Hephaustus / Team 6390</span><h1>Your team's<br/> scouting notes.</h1><p>Collect match and pit reports.<br/>Review them together with your team.</p><div className="auth-team-number" aria-hidden="true">6390<span>FRC scouting</span></div></div>
+        <div className="auth-offline-note"><Icon name="device" size={18}/><span>Scout offline. Sync when you're connected.</span></div>
+      </section>
+      <section className="auth-form-area" aria-label="Account access"><div className="auth-form-card">
+        <h2>{mode==='login'?'Welcome to Argus':'Join the crew'}</h2><p className="muted">{mode==='login'?'Sign in to your scouting workspace.':'Create an account, then join your team.'}</p>
+        <div className="auth-tabs" aria-label="Account options">
+          {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}
           </button>)}
         </div>
@@ -380,9 +409,10 @@ function AuthScreen({ onLogin }) {
         <input id="scout-username" autoComplete="username" style={sx.inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="scouter42" autoCapitalize="none" onKeyDown={e=>e.key==="Enter"&&submit()}/>
         <label htmlFor="scout-password" style={sx.lbl}>Password</label>
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&submit()}/>
-        {err && <div style={sx.err}>{err}</div>}
-        <button style={sx.btn(C.accent)} onClick={submit} disabled={busy}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}</button>
-      </div>
+        {err && <div role="alert" style={sx.err}>{err}</div>}
+        <button className="primary-button auth-submit" onClick={submit} disabled={busy}>{busy?(mode==="login"?"Signing in…":"Creating account…"):mode==="login"?"Sign in":"Create account"}<Icon name="arrow" size={18}/></button>
+        <p className="auth-help">Use the account you created with your team.</p>
+      </div><span className="auth-footer">Argus for Team 6390</span></section>
     </div>
   );
 }
@@ -454,11 +484,11 @@ function TeamScreen({ user, onJoin, onLogout }) {
         <div style={{fontSize:48,marginBottom:8}}>✅</div>
         <div style={{...sx.ct,textAlign:"center"}}>Team Created!</div>
         <div style={{background:C.bg0,border:`1px solid ${C.green}`,borderRadius:8,padding:20,margin:"16px 0"}}>
-          <div style={{fontSize:11,color:C.muted,letterSpacing:2,marginBottom:6}}>JOIN PASSWORD</div>
+          <div style={{fontSize:11,color:C.muted,letterSpacing:2,marginBottom:6}}>Join password</div>
           <div style={{fontSize:28,fontWeight:700,color:C.green,letterSpacing:6}}>{created.team.password}</div>
           <div style={{fontSize:11,color:C.muted,marginTop:6}}>Share this with your scouters</div>
         </div>
-        <button style={sx.btn(C.green)} onClick={()=>onJoin(created.team,created.mem)}>ENTER TEAM HQ →</button>
+        <button style={sx.btn(C.green)} onClick={()=>onJoin(created.team,created.mem)}>Open workspace</button>
       </div>
     </div>
   );
@@ -481,7 +511,7 @@ function TeamScreen({ user, onJoin, onLogout }) {
                 <div style={{fontSize:13,fontWeight:700}}>{team.name}</div>
                 <span style={sx.tag(RC[mem.role]||C.muted)}>{mem.role?.toUpperCase()}</span>
               </div>
-              <button style={sx.sm(C.green)}>ENTER →</button>
+              <button style={sx.sm(C.green)}>Open team</button>
             </div>
           ))}
         </div>
@@ -490,22 +520,22 @@ function TeamScreen({ user, onJoin, onLogout }) {
       <div style={{...sx.card,width:"100%",maxWidth:400}}>
         <div style={sx.ct}>Join or Create</div>
         {!mode && <div style={{display:"flex",flexDirection:"column",gap:10}}>
-          <button style={sx.btn(C.accent)} onClick={()=>setMode("create")}>➕ CREATE TEAM</button>
-          <button style={sx.btn(C.orange)} onClick={()=>setMode("join")}>🔗 JOIN TEAM</button>
+          <button style={sx.btn(C.accent)} onClick={()=>setMode("create")}>Create team</button>
+          <button style={sx.btn(C.orange)} onClick={()=>setMode("join")}>Join team</button>
           <div style={sx.hr}/>
-          <button style={sx.btn(C.red)} onClick={onLogout}>LOGOUT</button>
+          <button style={sx.btn(C.red)} onClick={onLogout}>Sign out</button>
         </div>}
         {mode==="create"&&<>
-          <button style={{...sx.sm(),marginBottom:12}} onClick={()=>{setMode(null);setErr("");}}>← BACK</button>
+          <button style={{...sx.sm(),marginBottom:12}} onClick={()=>{setMode(null);setErr("");}}>Back</button>
           <label style={sx.lbl}>Team Number</label>
           <input style={sx.inp} placeholder="e.g. 4027" value={tNum} onChange={e=>setTNum(e.target.value)} inputMode="numeric"/>
-          <label style={sx.lbl}>Team Name</label>
+          <label style={sx.lbl}>Team name</label>
           <input style={sx.inp} placeholder="e.g. Tidal Force" value={tName} onChange={e=>setTName(e.target.value)}/>
           {err&&<div style={sx.err}>{err}</div>}
           <button style={sx.btn(C.green)} onClick={createTeam} disabled={busy}>{busy?"CREATING…":"CREATE TEAM →"}</button>
         </>}
         {mode==="join"&&<>
-          <button style={{...sx.sm(),marginBottom:12}} onClick={()=>{setMode(null);setErr("");}}>← BACK</button>
+          <button style={{...sx.sm(),marginBottom:12}} onClick={()=>{setMode(null);setErr("");}}>Back</button>
           <label style={sx.lbl}>Team Number</label>
           <input style={sx.inp} placeholder="e.g. 4027" value={jNum} onChange={e=>setJNum(e.target.value)} inputMode="numeric"/>
           <label style={sx.lbl}>Team Password</label>
@@ -559,24 +589,24 @@ function AnnouncementsTab({ team, user, role }) {
   return (
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-        <div style={{fontSize:16,fontWeight:700,color:C.accent,letterSpacing:2}}>📢 NEWS</div>
-        {isPrivileged&&<button style={{...sx.sm(C.orange),padding:"8px 14px"}} onClick={()=>setShowForm(s=>!s)}>{showForm?"CANCEL":"+ POST"}</button>}
+        <div><h1 className="page-title">Team news</h1><p className="page-subtitle">Updates and notes for your scouting crew.</p></div>
+        {isPrivileged&&<button className="quiet-button" onClick={()=>setShowForm(s=>!s)}>{showForm?"Cancel":"Post update"}</button>}
       </div>
       {showForm&&isPrivileged&&(
         <div style={sx.card}>
           <div style={sx.ct}>Post Announcement</div>
-          <label style={sx.lbl}>Title</label>
-          <input style={sx.inp} placeholder="e.g. Match schedule updated" value={title} onChange={e=>setTitle(e.target.value)}/>
-          <label style={sx.lbl}>Message</label>
-          <textarea style={{...sx.inp,height:100,resize:"vertical"}} placeholder="Type your announcement…" value={body} onChange={e=>setBody(e.target.value)}/>
+          <label htmlFor="announcement-title" style={sx.lbl}>Title</label>
+          <input id="announcement-title" style={sx.inp} placeholder="e.g. Match schedule updated" value={title} onChange={e=>setTitle(e.target.value)}/>
+          <label htmlFor="announcement-message" style={sx.lbl}>Message</label>
+          <textarea id="announcement-message" style={{...sx.inp,height:100,resize:"vertical"}} placeholder="Type your announcement…" value={body} onChange={e=>setBody(e.target.value)}/>
           {err&&<div style={sx.err}>{err}</div>}
-          <button style={sx.btn(C.orange)} onClick={post} disabled={busy}>{busy?"POSTING…":"POST →"}</button>
+          <button style={sx.btn(C.orange)} onClick={post} disabled={busy}>{busy?"Posting…":"Post update"}</button>
         </div>
       )}
       {announcements.length===0&&!showForm&&(
         <div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>
-          <div style={{fontSize:40,marginBottom:8}}>📢</div>
-          <div>{isPrivileged?"No announcements yet. Post one above.":"No announcements yet."}</div>
+          <span className="empty-icon centered-icon"><Icon name="news" size={26}/></span>
+          <h2>No team updates yet</h2><p className="muted">{isPrivileged?"Post an announcement to share schedules, reminders, or match notes.":"Announcements from your scouting lead will appear here."}</p>
         </div>
       )}
       {announcements.map(a=>(
@@ -591,7 +621,7 @@ function AnnouncementsTab({ team, user, role }) {
                 <span style={{marginLeft:8}}>{fmtTs(a.created_at)}</span>
               </div>
             </div>
-            {isPrivileged&&<button style={sx.sm(C.red)} onClick={()=>deleteAnn(a)}>🗑</button>}
+            {isPrivileged&&<button style={sx.sm(C.red)} onClick={()=>deleteAnn(a)}>Delete</button>}
           </div>
         </div>
       ))}
@@ -634,13 +664,13 @@ function FormsTab({ team, user, role, syncState, onPending }) {
         <div><h1 className="page-title">Scouting forms</h1><p className="page-subtitle">Match and pit reports for your team.</p></div>
         {(role==="owner"||role==="admin")&&<button style={{...sx.btn(),width:'auto'}} disabled={!canEdit} onClick={()=>setView("create")}>New form</button>}
       </div>
-      <div className="forms-toolbar"><input aria-label="Search forms" placeholder="Find a scouting form…" value={search} onChange={e=>setSearch(e.target.value)}/><span className="outline-tag">{forms.length} forms on this device</span></div>
+      <div className="forms-toolbar"><input aria-label="Search forms" placeholder="Find a scouting form…" value={search} onChange={e=>setSearch(e.target.value)}/><span className="outline-tag">{forms.length} {forms.length===1?'form':'forms'} on this device</span></div>
       {!canEdit&&<div className="notice">Downloaded forms are ready to fill out offline. Creating and editing form templates needs a server connection.</div>}
       {loadError&&<div className="notice notice-error" role="alert">{loadError}</div>}
       {loading&&<div className="panel" role="status">Loading your team’s forms…</div>}
       {!loading&&forms.length===0&&(
         <div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>
-          <div style={{fontSize:40,marginBottom:8}}>📋</div>
+          <span className="empty-icon centered-icon"><Icon name="forms" size={26}/></span>
           <div>{(role==="owner"||role==="admin")?"No forms yet. Create one above.":"No forms yet. Ask an admin."}</div>
         </div>
       )}
@@ -651,14 +681,13 @@ function FormsTab({ team, user, role, syncState, onPending }) {
             <div style={{flex:1,cursor:"pointer"}} onClick={()=>{setActive(f);setView("fill");}}>
               <div className="form-type"><NavIcon name="forms"/><span>{f.allow_team_select?'Team scouting':'Scouting report'}</span></div>
               <h2>{f.title}</h2>
-              <div style={{fontSize:11,color:C.muted}}>
-                {f.questions?.length||0} questions · {f.created_by}
-                {f.allow_team_select&&<span style={{marginLeft:6,...sx.tag(C.purple)}}>TEAM SELECT</span>}
-                {f.max_submissions_per_team&&<span style={{marginLeft:6,...sx.tag(C.orange)}}>MAX {f.max_submissions_per_team}/team</span>}
+              <div style={{fontSize:13,color:C.muted}}>
+                {f.questions?.length||0} questions{f.created_by?`, by ${f.created_by}`:''}
+                {f.max_submissions_per_team&&<span style={{marginLeft:6,...sx.tag(C.orange)}}>Up to {f.max_submissions_per_team} reports per team</span>}
               </div>
             </div>
             <div className="form-tile-actions">
-              <button style={sx.sm(C.accent)} onClick={()=>{setActive(f);setView("fill");}}>{drafts.some(d=>d.key===draftKey(user.id,team.id,f.id))?'Resume draft':'Open form'} →</button>
+              <button className="primary-button" onClick={()=>{setActive(f);setView("fill");}}>{drafts.some(d=>d.key===draftKey(user.id,team.id,f.id))?'Resume draft':'Open form'}<Icon name="arrow" size={16}/></button>
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit} aria-label={`Edit ${f.title}`} onClick={e=>{e.stopPropagation();setActive(f);setView("edit");}}>Edit</button>}
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit} aria-label={`Delete ${f.title}`} onClick={e=>deleteForm(f,e)}>×</button>}
             </div>
@@ -712,11 +741,11 @@ function FormBuilder({ team, user, editing, onSave, onCancel }) {
   return (
     <div className="form-builder page-enter">
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-        <button style={sx.sm()} onClick={onCancel}>← BACK</button>
+        <button style={sx.sm()} onClick={onCancel}>Back</button>
         <div style={{fontSize:20,fontWeight:650,color:C.text}}>{editing?"Edit form":"New form"}</div>
       </div>
       <div style={sx.card}>
-        <label style={sx.lbl}>Form Title</label>
+        <label style={sx.lbl}>Form title</label>
         <input style={sx.inp} placeholder="e.g. Qual Match Scout" value={title} onChange={e=>setTitle(e.target.value)}/>
         <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:10}}>
           <label style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:C.text,cursor:"pointer"}}>
@@ -867,7 +896,7 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
       <div className="success-mark" aria-hidden="true">✓</div>
       <h1>Report saved.</h1>
       <p>Saved on this device. Argus uploads it automatically when the server is reachable. Check the sync indicator for its upload status.</p>
-      <button style={sx.btn(C.accent)} onClick={onDone}>BACK TO FORMS</button>
+      <button style={sx.btn(C.accent)} onClick={onDone}>Back to forms</button>
     </div>
   );
 
@@ -883,9 +912,9 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
       {/* Team selector */}
       {form.allow_team_select&&(
         <div style={sx.card}>
-          <label style={sx.lbl}>Team You Are Scouting *</label>
+          <label htmlFor="report-scouted-team" style={sx.lbl}>Team you are scouting *</label>
           {eventTeams.length > 0 ? (
-            <select style={sx.inp} value={scoutedTeam} onChange={e=>setScoutedTeam(e.target.value)}>
+            <select id="report-scouted-team" style={sx.inp} value={scoutedTeam} onChange={e=>setScoutedTeam(e.target.value)}>
               <option value="">— Select Team —</option>
               {eventTeams.map(t=>{
                 const count = subCounts[t.team_number]||0;
@@ -896,7 +925,7 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
               })}
             </select>
           ) : (
-            <input style={sx.inp} placeholder="Team number e.g. 4027" value={scoutedTeam} onChange={e=>setScoutedTeam(e.target.value)} inputMode="numeric"/>
+            <input id="report-scouted-team" style={sx.inp} placeholder="Team number e.g. 4027" value={scoutedTeam} onChange={e=>setScoutedTeam(e.target.value)} inputMode="numeric"/>
           )}
         </div>
       )}
@@ -908,7 +937,7 @@ function FormFiller({ form, user, team, onDone, onCancel }) {
           <QInput q={q} value={ans[q.id]} onChange={v=>set(q.id,v)}/>
         </div>
       ))}
-      {err&&<div style={{...sx.err,marginBottom:10}}>{err}</div>}
+      {err&&<div role="alert" style={{...sx.err,marginBottom:10}}>{err}</div>}
       <button style={sx.btn()} onClick={submit} disabled={busy}>{busy?"Saving report…":"Submit scouting report"}</button>
       </div>
     </div>
@@ -1187,7 +1216,7 @@ function EventTab({ team, user, role }) {
   if (pendingEvent) return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"60vh",padding:16}}>
       <div style={sx.card}>
-        <div style={{...sx.ct,color:C.orange}}>⚠ Switch Event</div>
+        <div style={{...sx.ct,color:C.orange}}>Switch event</div>
         <div style={{fontSize:13,color:C.text,marginBottom:4}}>
           Switching from <strong style={{color:C.accent}}>{currentEvent.event_name}</strong> to <strong style={{color:C.green}}>{pendingEvent.name}</strong>.
         </div>
@@ -1195,11 +1224,11 @@ function EventTab({ team, user, role }) {
           All form submissions will be deleted. Your forms (templates) can be kept or also deleted.
         </div>
 
-        <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Export data first?</div>
+        <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Export data first?</div>
         <div style={{display:"flex",gap:8,marginBottom:16}}>
           <button style={{...sx.btn(C.green),flex:1,padding:"10px 8px",fontSize:12}}
             onClick={()=>{ setPendingEvent({...pendingEvent,_export:true}); }}>
-            📥 YES — EXPORT
+            Export data
           </button>
           <button style={{...sx.btn(C.muted),flex:1,padding:"10px 8px",fontSize:12}}
             onClick={()=>{ setPendingEvent({...pendingEvent,_export:false}); }}>
@@ -1208,12 +1237,12 @@ function EventTab({ team, user, role }) {
         </div>
 
         {pendingEvent._export !== undefined && <>
-          <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Delete forms too?</div>
+          <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Delete forms too?</div>
           <div style={{fontSize:12,color:C.muted,marginBottom:12}}>Submissions are always deleted. Forms are the templates you built — you can keep them for the new event.</div>
           <div style={{display:"flex",gap:8,marginBottom:8}}>
             <button style={{...sx.btn(C.red),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading}
               onClick={()=>doSelectEvent(pendingEvent, pendingEvent._export, true)}>
-              {loading?"…":"🗑 DELETE FORMS TOO"}
+              {loading?"…":"Delete forms too"}
             </button>
             <button style={{...sx.btn(C.orange),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading}
               onClick={()=>doSelectEvent(pendingEvent, pendingEvent._export, false)}>
@@ -1222,7 +1251,7 @@ function EventTab({ team, user, role }) {
           </div>
         </>}
 
-        <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setPendingEvent(null)}>CANCEL</button>
+        <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setPendingEvent(null)}>Cancel</button>
       </div>
     </div>
   );
@@ -1231,8 +1260,8 @@ function EventTab({ team, user, role }) {
   if (view==="assign"&&isPrivileged) return (
     <div>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-        <button style={sx.sm()} onClick={()=>setView("main")}>← BACK</button>
-        <div style={{fontSize:14,fontWeight:700,color:C.accent}}>SCOUTER ASSIGNMENT</div>
+        <button style={sx.sm()} onClick={()=>setView("main")}>Back</button>
+        <div style={{fontSize:14,fontWeight:700,color:C.accent}}>Scouter assignments</div>
       </div>
       <div style={sx.card}>
         <div style={sx.ct}>Exclude from Assignment</div>
@@ -1250,7 +1279,7 @@ function EventTab({ team, user, role }) {
         })}
       </div>
       {msg&&<div style={{...sx.card,color:msg.startsWith("✅")?C.green:C.red,fontSize:13}}>{msg}</div>}
-      <button style={sx.btn(C.green)} onClick={saveExcluded}>SAVE & REASSIGN →</button>
+      <button style={sx.btn(C.green)} onClick={saveExcluded}>Save and reassign</button>
     </div>
   );
 
@@ -1258,8 +1287,8 @@ function EventTab({ team, user, role }) {
   if (view==="matches") return (
     <div>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-        <button style={sx.sm()} onClick={()=>setView("main")}>← BACK</button>
-        <div style={{fontSize:14,fontWeight:700,color:C.accent}}>UPCOMING MATCHES</div>
+        <button style={sx.sm()} onClick={()=>setView("main")}>Back</button>
+        <div style={{fontSize:14,fontWeight:700,color:C.accent}}>Match schedule</div>
       </div>
       {matchesLoading&&<div style={{color:C.muted,fontSize:13,textAlign:"center",padding:24}}>Loading matches…</div>}
       {!matchesLoading&&matches.length===0&&<div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>No match data available.</div>}
@@ -1318,8 +1347,8 @@ function EventTab({ team, user, role }) {
     return (
       <div>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button style={sx.sm()} onClick={()=>setView("main")}>← BACK</button>
-          <div style={{fontSize:14,fontWeight:700,color:C.accent}}>PIT SCOUT OVERVIEW</div>
+          <button style={sx.sm()} onClick={()=>setView("main")}>Back</button>
+          <div style={{fontSize:14,fontWeight:700,color:C.accent}}>Pit scouting overview</div>
         </div>
         <div style={sx.card}>
           <div style={sx.ct}>All Teams ({eventTeams.length})</div>
@@ -1349,7 +1378,7 @@ function EventTab({ team, user, role }) {
     return (
       <div>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button style={sx.sm()} onClick={()=>setView("main")}>← BACK</button>
+          <button style={sx.sm()} onClick={()=>setView("main")}>Back</button>
           <div style={{fontSize:14,fontWeight:700,color:C.red}}>🗑 DELETE EVENT DATA</div>
         </div>
         <div style={sx.card}>
@@ -1358,22 +1387,22 @@ function EventTab({ team, user, role }) {
           </div>
           <div style={{fontSize:12,color:C.muted,marginBottom:16}}>The event itself and your scouter assignments stay. You can choose whether to keep or delete your forms.</div>
 
-          <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Export before deleting?</div>
+          <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Export before deleting?</div>
           <div style={{display:"flex",gap:8,marginBottom:16}}>
             <button style={{...sx.btn(C.green),flex:1,padding:"10px 8px",fontSize:12,background:exportChoice===true?C.green+"33":undefined}}
-              onClick={()=>setExportChoice(true)}>📥 YES — EXPORT FIRST</button>
+              onClick={()=>setExportChoice(true)}>Export first</button>
             <button style={{...sx.btn(C.muted),flex:1,padding:"10px 8px",fontSize:12,background:exportChoice===false?C.muted+"33":undefined}}
-              onClick={()=>setExportChoice(false)}>SKIP EXPORT</button>
+              onClick={()=>setExportChoice(false)}>Skip export</button>
           </div>
 
           {exportChoice!==null&&<>
-            <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Delete forms too?</div>
+            <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Delete forms too?</div>
             <div style={{fontSize:12,color:C.muted,marginBottom:12}}>Forms are the question templates you built. Submissions are the answers scouters filled in.</div>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
               <button style={{...sx.btn(C.red),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading} onClick={async()=>{
                 if (!confirm("Delete ALL submissions AND forms? This cannot be undone.")) return;
                 await handleDeleteData(true); if(!loading) setView("main");
-              }}>{loading?"DELETING…":"🗑 DELETE SUBMISSIONS + FORMS"}</button>
+              }}>{loading?"DELETING…":"Delete reports and forms"}</button>
               <button style={{...sx.btn(C.orange),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading} onClick={async()=>{
                 if (!confirm("Delete all submissions? Forms will be kept.")) return;
                 await handleDeleteData(false); if(!loading) setView("main");
@@ -1381,7 +1410,7 @@ function EventTab({ team, user, role }) {
             </div>
           </>}
 
-          <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setView("main")}>CANCEL</button>
+          <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setView("main")}>Cancel</button>
         </div>
       </div>
     );
@@ -1393,8 +1422,8 @@ function EventTab({ team, user, role }) {
     return (
       <div>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button style={sx.sm()} onClick={()=>setView("main")}>← BACK</button>
-          <div style={{fontSize:14,fontWeight:700,color:C.red}}>🏁 END EVENT</div>
+          <button style={sx.sm()} onClick={()=>setView("main")}>Back</button>
+          <div style={{fontSize:14,fontWeight:700,color:C.red}}>End event</div>
         </div>
         <div style={sx.card}>
           <div style={{fontSize:13,color:C.text,marginBottom:4}}>
@@ -1402,21 +1431,21 @@ function EventTab({ team, user, role }) {
           </div>
           <div style={{fontSize:12,color:C.muted,marginBottom:16}}>You can choose whether to keep or delete your forms, and whether to export first.</div>
 
-          <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Export before ending?</div>
+          <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Export before ending?</div>
           <div style={{display:"flex",gap:8,marginBottom:16}}>
             <button style={{...sx.btn(C.green),flex:1,padding:"10px 8px",fontSize:12,background:exportChoice===true?C.green+"33":undefined}}
-              onClick={()=>setExportChoice(true)}>📥 YES — EXPORT FIRST</button>
+              onClick={()=>setExportChoice(true)}>Export first</button>
             <button style={{...sx.btn(C.muted),flex:1,padding:"10px 8px",fontSize:12,background:exportChoice===false?C.muted+"33":undefined}}
-              onClick={()=>setExportChoice(false)}>SKIP EXPORT</button>
+              onClick={()=>setExportChoice(false)}>Skip export</button>
           </div>
 
           {exportChoice!==null&&<>
-            <div style={{fontSize:11,color:C.accent,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Delete forms too?</div>
+            <div style={{fontSize:11,color:C.accent,letterSpacing:0,textTransform:"none",marginBottom:8}}>Delete forms too?</div>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
               <button style={{...sx.btn(C.red),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading} onClick={async()=>{
                 if (!confirm("End event and delete ALL submissions and forms? Cannot be undone.")) return;
                 await doSelectEvent(null, exportChoice, true); setView("main");
-              }}>{loading?"ENDING…":"🗑 END + DELETE FORMS"}</button>
+              }}>{loading?"ENDING…":"End event and delete forms"}</button>
               <button style={{...sx.btn(C.orange),flex:1,padding:"10px 8px",fontSize:12}} disabled={loading} onClick={async()=>{
                 if (!confirm("End event and delete all submissions? Forms will be kept.")) return;
                 await doSelectEvent(null, exportChoice, false); setView("main");
@@ -1424,7 +1453,7 @@ function EventTab({ team, user, role }) {
             </div>
           </>}
 
-          <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setView("main")}>CANCEL</button>
+          <button style={{...sx.btn(C.muted),marginTop:4}} onClick={()=>setView("main")}>Cancel</button>
         </div>
       </div>
     );
@@ -1433,7 +1462,7 @@ function EventTab({ team, user, role }) {
   // Main event view
   return (
     <div>
-      <div style={{fontSize:16,fontWeight:700,color:C.accent,letterSpacing:2,marginBottom:12}}>🏆 EVENT</div>
+      <div className="page-heading section-heading"><div><h1 className="page-title">Competition</h1><p className="page-subtitle">Match schedules, team assignments, and pit coverage.</p></div></div>
 
       {currentEvent && (
         <div style={{...sx.card,borderColor:C.accent+"66"}}>
@@ -1441,17 +1470,17 @@ function EventTab({ team, user, role }) {
           <div style={{fontSize:16,fontWeight:700,marginBottom:2}}>{currentEvent.event_name}</div>
           <div style={{fontSize:12,color:C.muted,marginBottom:10}}>{currentEvent.event_location} · {eventTeams.length} teams</div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            <button style={{...sx.sm(C.accent),flex:1}} onClick={()=>{setView("matches");loadMatches();}}>📅 MATCHES</button>
-            {isPrivileged&&<button style={{...sx.sm(C.purple),flex:1}} onClick={()=>setView("pitscout_view")}>🔍 PIT OVERVIEW</button>}
-            {isPrivileged&&<button style={{...sx.sm(C.orange),flex:1}} onClick={generateAssignment}>🎲 RANDOMIZE</button>}
-            {isPrivileged&&<button style={{...sx.sm(C.muted),flex:1}} onClick={()=>setView("assign")}>👥 SCOUTERS</button>}
+            <button style={{...sx.sm(C.accent),flex:1}} onClick={()=>{setView("matches");loadMatches();}}>Match schedule</button>
+            {isPrivileged&&<button style={{...sx.sm(C.purple),flex:1}} onClick={()=>setView("pitscout_view")}>Pit overview</button>}
+            {isPrivileged&&<button style={{...sx.sm(C.orange),flex:1}} onClick={generateAssignment}>Reassign teams</button>}
+            {isPrivileged&&<button style={{...sx.sm(C.muted),flex:1}} onClick={()=>setView("assign")}>Scouters</button>}
           </div>
           {isPrivileged&&(
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:10,paddingTop:10,borderTop:`1px solid ${C.border}`}}>
               <button style={{...sx.sm(C.red),flex:1}} disabled={loading} onClick={async()=>{
                 setView("deletedata");
-              }}>🗑 DELETE DATA</button>
-              <button style={{...sx.sm(C.red),flex:1}} disabled={loading} onClick={()=>setView("endevent")}>🏁 END EVENT</button>
+              }}>Delete event data</button>
+              <button style={{...sx.sm(C.red),flex:1}} disabled={loading} onClick={()=>setView("endevent")}>End event</button>
             </div>
           )}
         </div>
@@ -1462,7 +1491,7 @@ function EventTab({ team, user, role }) {
       {/* My assignment */}
       {assignment&&(
         <div style={sx.card}>
-          <div style={sx.ct}>📋 My Teams to Scout</div>
+          <div style={sx.ct}>My teams to scout</div>
           {myTeams.length===0
             ?<div style={{color:C.muted,fontSize:13}}>Not assigned to any teams at this event.</div>
             :<div style={{display:"flex",flexWrap:"wrap",gap:8}}>
@@ -1472,7 +1501,7 @@ function EventTab({ team, user, role }) {
                     <div key={tn} style={{background:C.bg2,border:`1px solid ${isPit?C.green+"66":C.accent+"44"}`,borderRadius:8,padding:"10px 14px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,minWidth:70}}>
                       <div style={{fontSize:14,fontWeight:700,color:isPit?C.green:C.accent}}>#{tn}</div>
                       <button style={{...sx.sm(isPit?C.green:C.muted),fontSize:9,padding:"3px 6px",minHeight:"unset"}} onClick={()=>togglePitScout(tn)}>
-                        {isPit?"✅ PIT":"🔍 PIT?"}
+                        {isPit?"Pit scouted":"Mark pit scouted"}
                       </button>
                     </div>
                   );
@@ -1486,10 +1515,10 @@ function EventTab({ team, user, role }) {
       {!assignment&&currentEvent&&eventTeams.length>0&&(
         <div style={sx.card}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-            <div style={sx.ct} style={{margin:0}}>🔍 Pit Scouting</div>
+            <div style={{...sx.ct,margin:0}}>Pit scouting</div>
             <div style={{display:"flex",gap:6}}>
-              <button style={sx.nb(pitView==="mine")} onClick={()=>setPitView("mine")}>MINE</button>
-              {isPrivileged&&<button style={sx.nb(pitView==="all")} onClick={()=>setPitView("all")}>ALL</button>}
+              <button style={sx.nb(pitView==="mine")} onClick={()=>setPitView("mine")}>Mine</button>
+              {isPrivileged&&<button style={sx.nb(pitView==="all")} onClick={()=>setPitView("all")}>All</button>}
             </div>
           </div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
@@ -1552,15 +1581,15 @@ function EventTab({ team, user, role }) {
           <div style={sx.ct}>{currentEvent?"Change Event":"Find Event"}</div>
           <div style={{display:"flex",gap:8,marginBottom:10}}>
             <div style={{flex:"0 0 80px"}}>
-              <label style={sx.lbl}>Year</label>
-              <input style={{...sx.inp,marginBottom:0}} value={year} onChange={e=>setYear(e.target.value)} inputMode="numeric" maxLength={4}/>
+              <label htmlFor="event-year" style={sx.lbl}>Year</label>
+              <input id="event-year" style={{...sx.inp,marginBottom:0}} value={year} onChange={e=>setYear(e.target.value)} inputMode="numeric" maxLength={4}/>
             </div>
             <div style={{flex:1}}>
-              <label style={sx.lbl}>Search (name/city)</label>
-              <input style={{...sx.inp,marginBottom:0}} placeholder="e.g. Ontario or ONT" value={eventSearch} onChange={e=>setEventSearch(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchEvents()}/>
+              <label htmlFor="event-search" style={sx.lbl}>Event name or city</label>
+              <input id="event-search" style={{...sx.inp,marginBottom:0}} placeholder="e.g. Ontario or ONT" value={eventSearch} onChange={e=>setEventSearch(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchEvents()}/>
             </div>
           </div>
-          <button style={sx.btn(C.accent)} onClick={searchEvents} disabled={searching}>{searching?"SEARCHING…":"SEARCH EVENTS →"}</button>
+          <button style={sx.btn(C.accent)} onClick={searchEvents} disabled={searching}>{searching?"Searching…":"Find events"}</button>
           {searchErr&&<div style={{...sx.err,marginTop:8}}>{searchErr}</div>}
           {events.length>0&&(
             <div style={{marginTop:12}}>
@@ -1581,7 +1610,7 @@ function EventTab({ team, user, role }) {
 
       {!currentEvent&&!isPrivileged&&(
         <div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>
-          <div style={{fontSize:40,marginBottom:8}}>🏆</div>
+          <span className="empty-icon centered-icon"><Icon name="event" size={26}/></span>
           <div>No event selected yet. Ask an admin to set one up.</div>
         </div>
       )}
@@ -1858,12 +1887,12 @@ function MyTeamTab({ team, user, role }) {
 
   return (
     <div>
-      <div style={{fontSize:16,fontWeight:700,color:C.accent,letterSpacing:2,marginBottom:12}}>⭐ MY TEAM</div>
+      <div className="page-heading section-heading"><div><h1 className="page-title">My team</h1><p className="page-subtitle">Your robot, rankings, and upcoming matches.</p></div></div>
 
       {/* Sub-tab nav */}
       <div style={{display:"flex",gap:8,marginBottom:16,alignItems:"center"}}>
-        <button style={sx.nb(subTab==="myteam")} onClick={()=>setSubTab("myteam")}>⭐ MY TEAM</button>
-        <button style={sx.nb(subTab==="search")} onClick={()=>setSubTab("search")}>🔍 SEARCH TEAM</button>
+        <button style={sx.nb(subTab==="myteam")} onClick={()=>setSubTab("myteam")}>My team</button>
+        <button style={sx.nb(subTab==="search")} onClick={()=>setSubTab("search")}>Find a team</button>
         {subTab==="myteam"&&team.frc_team_number&&effectiveEventKey&&(
           <button
             style={{...sx.sm(streamMode?C.green:C.muted),marginLeft:"auto",display:"flex",alignItems:"center",gap:5,fontSize:10}}
@@ -1955,8 +1984,8 @@ function MyTeamTab({ team, user, role }) {
                         <button style={sx.sm(C.green)} onClick={()=>{
                           const parsed=parseStreamUrl(manualStreamInput);
                           if(parsed){setManualStreamUrl(manualStreamInput);setShowStreamInput(false);}
-                        }}>SET</button>
-                        {manualStreamUrl&&<button style={sx.sm(C.red)} onClick={()=>{setManualStreamUrl("");setManualStreamInput("");setShowStreamInput(false);}}>CLEAR</button>}
+                        }}>Set</button>
+                        {manualStreamUrl&&<button style={sx.sm(C.red)} onClick={()=>{setManualStreamUrl("");setManualStreamInput("");setShowStreamInput(false);}}>Clear</button>}
                       </div>
                     )}
                     {showStreamInput&&manualStreamInput&&!parseStreamUrl(manualStreamInput)&&(
@@ -2115,8 +2144,8 @@ function MyTeamTab({ team, user, role }) {
                         <button style={sx.sm(C.green)} onClick={()=>{
                           const parsed=parseStreamUrl(manualStreamInput);
                           if(parsed){setManualStreamUrl(manualStreamInput);setShowStreamInput(false);}
-                        }}>SET</button>
-                        {manualStreamUrl&&<button style={sx.sm(C.red)} onClick={()=>{setManualStreamUrl("");setManualStreamInput("");setShowStreamInput(false);}}>CLEAR</button>}
+                        }}>Set</button>
+                        {manualStreamUrl&&<button style={sx.sm(C.red)} onClick={()=>{setManualStreamUrl("");setManualStreamInput("");setShowStreamInput(false);}}>Clear</button>}
                       </div>
                     )}
                     {showStreamInput&&manualStreamInput&&!parseStreamUrl(manualStreamInput)&&(
@@ -2291,7 +2320,7 @@ function DataTab({ team, user, role }) {
   if (detail) return (
     <div>
       <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:12}}>
-        <button style={sx.sm()} onClick={()=>setDetail(null)}>← BACK</button>
+        <button style={sx.sm()} onClick={()=>setDetail(null)}>Back</button>
         <span style={{fontSize:13,color:C.accent}}>SUBMISSION</span>
       </div>
       <div style={sx.card}>
@@ -2315,8 +2344,8 @@ function DataTab({ team, user, role }) {
   if (!sel) return (
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-        <div style={{fontSize:16,fontWeight:700,color:C.accent}}>📊 DATA</div>
-        <button style={sx.sm(C.green)} onClick={exportAll}>📥 EXPORT ALL</button>
+        <div><h1 className="page-title">Scouting data</h1><p className="page-subtitle">Compare reports and review team performance.</p></div>
+        <button className="quiet-button" onClick={exportAll}>Export all reports</button>
       </div>
       {forms.length===0&&<div style={{...sx.card,textAlign:"center",color:C.muted,padding:40}}>No forms yet.</div>}
       {forms.map(f=>(
@@ -2326,7 +2355,7 @@ function DataTab({ team, user, role }) {
               <div style={{fontSize:15,fontWeight:700,marginBottom:2}}>{f.title}</div>
               <div style={{fontSize:11,color:C.muted}}>{f.questions?.length||0} questions</div>
             </div>
-            <button style={sx.sm()}>VIEW →</button>
+            <button style={sx.sm()}>View reports</button>
           </div>
         </div>
       ))}
@@ -2346,7 +2375,7 @@ function DataTab({ team, user, role }) {
   return (
     <div>
       <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:12}}>
-        <button style={sx.sm()} onClick={()=>setSel(null)}>← BACK</button>
+        <button style={sx.sm()} onClick={()=>setSel(null)}>Back</button>
         <span style={{fontSize:14,fontWeight:700,color:C.accent}}>{sel.title}</span>
         <span style={sx.tag(C.green)}>{subs.length}</span>
         <button style={{...sx.sm(C.green),marginLeft:"auto"}} onClick={()=>exportToCSV([sel],subs)}>📥 CSV</button>
@@ -2541,23 +2570,23 @@ function ManageTab({ team, user, onTeamUpdate, onRoleChange }) {
 
   return (
     <div>
-      <div style={{fontSize:16,fontWeight:700,color:C.accent,letterSpacing:2,marginBottom:12}}>⚙️ MANAGE</div>
+      <div className="page-heading section-heading"><div><h1 className="page-title">Team settings</h1><p className="page-subtitle">Manage your team, members, and scouting preferences.</p></div></div>
       {msg&&<div style={{...sx.card,color:C.green,fontSize:13,borderColor:C.green+"44",padding:12}}>{msg}</div>}
       {err&&<div style={{...sx.card,color:C.red,fontSize:13,borderColor:C.red+"44",padding:12}}>{err}</div>}
 
       <div style={sx.card}>
-        <div style={sx.ct}>Team Info</div>
+        <div style={sx.ct}>Team info</div>
         {editName?<>
-          <label style={sx.lbl}>Team Name</label>
+          <label style={sx.lbl}>Team name</label>
           <input style={sx.inp} value={tName} onChange={e=>setTName(e.target.value)}/>
           <div style={{display:"flex",gap:8}}>
-            <button style={{...sx.btn(C.green),flex:1}} onClick={saveName}>SAVE</button>
-            <button style={{...sx.btn(C.red),flex:1}} onClick={()=>{setEditName(false);setTName(team.name);}}>CANCEL</button>
+            <button style={{...sx.btn(C.green),flex:1}} onClick={saveName}>Save</button>
+            <button style={{...sx.btn(C.red),flex:1}} onClick={()=>{setEditName(false);setTName(team.name);}}>Cancel</button>
           </div>
         </>:<>
           <div style={{fontSize:14,marginBottom:4}}>#{team.number} — {team.name}</div>
           <div style={{fontSize:12,color:C.muted,marginBottom:10}}>Password: <span style={{color:C.green,letterSpacing:4,fontWeight:700}}>{team.password}</span></div>
-          <button style={sx.btn()} onClick={()=>setEditName(true)}>EDIT NAME</button>
+          <button style={sx.btn()} onClick={()=>setEditName(true)}>Edit name</button>
         </>}
       </div>
 
@@ -2565,7 +2594,7 @@ function ManageTab({ team, user, onTeamUpdate, onRoleChange }) {
         <div style={sx.ct}>Settings</div>
         <div style={{...sx.row,borderBottom:"none"}}>
           <div style={{flex:1}}>
-            <div style={{fontSize:13,fontWeight:700}}>Pit Scout Tracking</div>
+            <div style={{fontSize:13,fontWeight:700}}>Pit scout tracking</div>
             <div style={{fontSize:11,color:C.muted}}>Allow scouters to mark teams as pit scouted</div>
           </div>
           <button style={sx.sm(pitScoutEnabled?C.green:C.muted)} onClick={togglePitScoutEnabled}>
@@ -2579,15 +2608,15 @@ function ManageTab({ team, user, onTeamUpdate, onRoleChange }) {
         {!editFrc&&team.frc_team_number?(
           <>
             <div style={{fontSize:22,fontWeight:700,color:C.accent,marginBottom:8}}>#{team.frc_team_number}</div>
-            <button style={sx.btn()} onClick={()=>setEditFrc(true)}>CHANGE</button>
+            <button style={sx.btn()} onClick={()=>setEditFrc(true)}>Change</button>
           </>
         ):(
           <>
             <label style={sx.lbl}>FRC Team Number</label>
             <input style={sx.inp} placeholder="e.g. 254" value={frcTeamNum} onChange={e=>setFrcTeamNum(e.target.value)} inputMode="numeric"/>
             <div style={{display:"flex",gap:8}}>
-              <button style={{...sx.btn(C.green),flex:1}} onClick={saveFrcTeamNum} disabled={savingFrc}>{savingFrc?"SAVING…":"SAVE →"}</button>
-              {editFrc&&<button style={{...sx.btn(C.muted),flex:1}} onClick={()=>{setEditFrc(false);setFrcTeamNum(team.frc_team_number||"");}}>CANCEL</button>}
+              <button style={{...sx.btn(C.green),flex:1}} onClick={saveFrcTeamNum} disabled={savingFrc}>{savingFrc?"Saving…":"Save"}</button>
+              {editFrc&&<button style={{...sx.btn(C.muted),flex:1}} onClick={()=>{setEditFrc(false);setFrcTeamNum(team.frc_team_number||"");}}>Cancel</button>}
             </div>
           </>
         )}
@@ -2604,10 +2633,10 @@ function ManageTab({ team, user, onTeamUpdate, onRoleChange }) {
             </div>
             {m.user_id!==user.id&&m.role!=="owner"&&(
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                {m.role==="member"&&<button style={sx.sm(C.accent)} onClick={()=>setRole(m,"admin")}>ADMIN</button>}
-                {m.role==="admin" &&<button style={sx.sm(C.muted)}  onClick={()=>setRole(m,"member")}>MEMBER</button>}
+                {m.role==="member"&&<button style={sx.sm(C.accent)} onClick={()=>setRole(m,"admin")}>Admin</button>}
+                {m.role==="admin" &&<button style={sx.sm(C.muted)}  onClick={()=>setRole(m,"member")}>Member</button>}
                 <button style={sx.sm(C.orange)} onClick={()=>transferOwnership(m)} title="Transfer ownership">👑</button>
-                <button style={sx.sm(C.red)} onClick={()=>kick(m)}>KICK</button>
+                <button style={sx.sm(C.red)} onClick={()=>kick(m)}>Remove</button>
               </div>
             )}
           </div>
