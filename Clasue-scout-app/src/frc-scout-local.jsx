@@ -49,7 +49,7 @@ const tsNow  = () => new Date().toISOString();
 const fmtTs  = ts => { const d=new Date(ts); const diff=Date.now()-d; if(diff<60000)return"just now"; if(diff<3600000)return`${Math.floor(diff/60000)}m ago`; if(diff<86400000)return`${Math.floor(diff/3600000)}h ago`; return d.toLocaleDateString(); };
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = { bg0:"#17191c", bg1:"#1e2024", bg2:"#292c31", border:"#3d4149", accent:"#b5c9ed", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#adb3bd", text:"#eeeef0", dim:"#c5cad3", purple:"#b7a3d5" };
+const C = { bg0:"#17191c", bg1:"#1e2024", bg2:"#292c31", border:"#3d4149", accent:"#ff949d", orange:"#e9b777", green:"#82c99a", red:"#fb7b80", muted:"#adb3bd", text:"#eeeef0", dim:"#c5cad3", purple:"#b7a3d5" };
 const MO = "'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif";
 
 const sx = {
@@ -62,7 +62,7 @@ const sx = {
   card:   { background:C.bg1, border:`1px solid ${C.border}`, borderRadius:6, padding:"clamp(18px, 2vw, 24px)", marginBottom:16 },
   ct:     { fontSize:15, fontWeight:650, color:C.text, marginBottom:16 },
   inp:    { background:C.bg0, border:`1px solid ${C.border}`, color:C.text, padding:"12px 14px", borderRadius:8, width:"100%", fontFamily:MO, fontSize:14, boxSizing:"border-box", outline:"none", marginBottom:10 },
-  btn:    (c=C.accent) => ({ background:c===C.accent?"#e2e5ea":"transparent", border:`1px solid ${c===C.accent?"#e2e5ea":c}`, color:c===C.accent?"#191b20":c, padding:"12px 18px", borderRadius:5, cursor:"pointer", fontFamily:MO, fontSize:14, fontWeight:600, width:"100%", minHeight:46 }),
+  btn:    (c=C.accent) => ({ background:c===C.accent?"#bf2d3b":"transparent", border:`1px solid ${c===C.accent?"#dc5460":c}`, color:c===C.accent?"#ffffff":c, padding:"12px 18px", borderRadius:5, cursor:"pointer", fontFamily:MO, fontSize:14, fontWeight:600, width:"100%", minHeight:46 }),
   sm:     (c=C.accent) => ({ background:c===C.accent?C.bg2:"transparent", border:`1px solid ${c===C.accent?C.border:c+'66'}`, color:c===C.accent?C.text:c, padding:"9px 13px", borderRadius:8, cursor:"pointer", fontFamily:MO, fontSize:13, fontWeight:550, minHeight:44 }),
   lbl:    { fontSize:13, fontWeight:550, color:C.dim, marginBottom:8, display:"block" },
   err:    { color:C.red, fontSize:12, marginBottom:8 },

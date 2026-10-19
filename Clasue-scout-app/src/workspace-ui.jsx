@@ -43,7 +43,7 @@ export function HomeDashboard({ team, user, role, mem, api, onNavigate, syncStat
   return <div className="dashboard page-enter">
     <div className="dashboard-intro">
       <div><h1>Scouting</h1><p>{loading ? 'Loading workspace…' : `${data.forms.length} ${data.forms.length === 1 ? 'form' : 'forms'} available`}</p></div>
-      <button className="quiet-button" onClick={()=>onNavigate('forms')}>Open forms</button>
+      <button className="primary-button" onClick={()=>onNavigate('forms')}>Open forms</button>
     </div>
     {error&&<div className="notice" role="status">{error}</div>}
     <div className="scouting-workspace">
