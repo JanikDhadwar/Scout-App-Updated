@@ -56,7 +56,11 @@ test('offline cached collections answer filtered and item queries but never fabr
   assert.deepEqual(await f.client.api('GET','/forms?team_id=6390'),[forms[0]]);
   assert.deepEqual(await f.client.api('GET','/forms/form-1'),forms[0]);
   await assert.rejects(f.client.api('GET','/scout_events'),/not downloaded/);
-  await assert.rejects(f.client.api('GET','/users'),/unreachable/);
+  await assert.rejects(f.client.api('GET','/users'),/not downloaded/);
+  const people=[{id:'scouter',username:'Scout'}];
+  await f.store.put('cache',{key:'scouter:6390:/users',data:people});
+  assert.deepEqual(await f.client.api('GET','/users'),people);
+  await assert.rejects(f.client.api('GET','/auth/me'),/unreachable/);
 });
 test('reports stay scoped to the original user/team across sign-out and team changes',async()=>{
   const f=await setup();await f.client.enqueue(report());await f.client.sync();
@@ -82,4 +86,80 @@ test('server rejection is not mistaken for an offline cache response',async()=>{
   const f=await setup();await f.store.put('cache',{key:'scouter:6390:/forms',data:[{id:'old'}]});
   const denied=createOfflineClient({storage:f.store,fetcher:async()=>response({error:'Access denied'},403)});await denied.setScope(owner);
   await assert.rejects(denied.api('GET','/forms'),/Access denied/);
+});
+
+test('conflicting local edits never replace an already queued report',async()=>{
+  const f=await setup();await f.client.enqueue(report());await f.client.sync();
+  await f.store.put('drafts',{key:'correction',value:'preserve correction'});
+  await assert.rejects(f.client.enqueue({...report(),answers:{score:99}},'correction'),/already|conflict/i);
+  assert.deepEqual((await f.store.get('queue','report-1')).row,report());
+  assert.equal((await f.store.get('drafts','correction')).value,'preserve correction');
+});
+
+test('one conflicting queued report does not block other reports and conflicts survive reload',async()=>{
+  const f=await setup();await f.client.enqueue(report('conflict'));await f.client.enqueue(report('valid'));await f.client.sync();
+  const fetcher=async(url,options)=>options.method==='GET'?response({ok:true}):JSON.parse(options.body).id==='conflict'?response({error:'Conflicting report; inspect original'},409):response(JSON.parse(options.body));
+  const client=createOfflineClient({storage:f.store,fetcher});await client.setScope(owner);await client.sync();
+  assert.equal(client.getState().pending,1);assert.match(client.getState().error,/Conflicting/);
+  assert.equal((await f.store.get('receipts','valid')).row.id,'valid');
+  const restarted=createOfflineClient({storage:createOfflineStore('test',f.factory),fetcher});await restarted.setScope(owner);
+  assert.equal(restarted.getState().pending,1);assert.match(restarted.getState().error,/Conflicting/);
+});
+
+test('acknowledgement storage failure retains the queued report and exposes an error',async()=>{
+  const f=await setup();await f.client.enqueue(report());await f.client.sync();f.setMode('online');
+  const client=createOfflineClient({storage:{...f.store,acknowledge:async()=>{throw new Error('Receipt storage unavailable');}},fetcher:f.fetcher});
+  await client.setScope(owner);await client.sync();assert.equal(client.getState().pending,1);assert.match(client.getState().error,/storage/i);
+});
+
+test('new workspace collections cache offline and never cross account scopes',async()=>{
+  const f=await setup();const client=createOfflineClient({storage:f.store,fetcher:async()=>response([{id:'a',team_id:'6390',revision:1}])});await client.setScope(owner);
+  await client.api('GET','/assignments');await client.api('GET','/picklists');
+  const offline=createOfflineClient({storage:f.store,fetcher:async()=>{throw new Error('Offline');}});await offline.setScope(owner);
+  assert.equal((await offline.api('GET','/assignments'))[0].id,'a');assert.equal((await offline.api('GET','/picklists'))[0].revision,1);
+  await offline.setScope({userId:'other',teamId:'6390'});await assert.rejects(offline.api('GET','/assignments'),/not downloaded/);
+});
+
+test('role cache invalidation removes only current read snapshots and readiness, preserving all reports and other scopes',async()=>{
+ const f=await setup();f.setMode('online');await f.client.prepare();
+ f.setMode('offline');await f.client.enqueue(report());await f.client.sync();
+ await f.store.put('drafts',{key:'draft-keep',value:{answers:{score:9}}});
+ await f.store.put('receipts',{key:'receipt-keep',userId:owner.userId,teamId:owner.teamId,store:'submissions',row:report('receipt-keep')});
+ await f.store.put('cache',{key:'scouter:6390:/forms?kind=pit',scope:'scouter:6390:',store:'forms',data:[{id:'private'}]});
+ await f.store.put('cache',{key:'scouter:6390:/legacy',data:[{id:'legacy-private'}]});
+ await f.store.put('cache',{key:'other:6390:/forms',scope:'other:6390:',store:'forms',data:[{id:'other-user'}]});
+ await f.store.put('cache',{key:'scouter:63900:/forms',scope:'scouter:63900:',store:'forms',data:[{id:'other-workspace'}]});
+ await f.store.put('meta',{key:'other:6390:prepared',at:'other-ready'});
+ await f.store.put('meta',{key:'scouter:6390:unrelated',value:'keep'});
+ await f.client.invalidateReadCache();
+ assert.equal(f.client.getState().readyAt,null);assert.equal(f.client.getState().pending,1);
+ assert.deepEqual((await f.store.all('cache')).map(row=>row.key).sort(),['other:6390:/forms','scouter:63900:/forms']);
+ assert.equal(await f.store.get('meta','scouter:6390:prepared'),undefined);
+ assert.equal((await f.store.get('meta','other:6390:prepared')).at,'other-ready');
+ assert.equal((await f.store.get('meta','scouter:6390:unrelated')).value,'keep');
+ assert.deepEqual((await f.store.get('queue','report-1')).row,report());
+ assert.equal((await f.store.get('receipts','receipt-keep')).row.id,'receipt-keep');
+ assert.equal((await f.store.get('drafts','draft-keep')).value.answers.score,9);
+ await assert.rejects(f.client.api('GET','/forms'),/not downloaded/);
+ await f.client.setScope(null);await f.client.invalidateReadCache();
+ assert.equal((await f.store.all('cache')).length,2);
+});
+
+test('a GET started before role invalidation cannot restore or return its old privileged data',async()=>{
+ const f=await setup();let release;
+ const client=createOfflineClient({storage:f.store,fetcher:()=>new Promise(resolve=>{release=()=>resolve(response([{id:'privileged'}]));})});await client.setScope(owner);
+ const pendingRead=client.api('GET','/submissions');
+ await client.invalidateReadCache();release();
+ await assert.rejects(pendingRead,/changed|invalidated/i);
+ assert.equal((await f.store.all('cache')).length,0);
+});
+
+test('download preparation started under an old role cannot recreate snapshots or readiness',async()=>{
+ const f=await setup(),releases=[];
+ const client=createOfflineClient({storage:f.store,fetcher:()=>new Promise(resolve=>{releases.push(()=>resolve(response([{id:'old-role-record'}])));})});await client.setScope(owner);
+ const preparing=client.prepare();assert.ok(releases.length>0);
+ await client.invalidateReadCache();releases.forEach(release=>release());await preparing;
+ assert.equal((await f.store.all('cache')).length,0);
+ assert.equal(await f.store.get('meta','scouter:6390:prepared'),undefined);
+ assert.equal(client.getState().readyAt,null);
 });

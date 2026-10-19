@@ -1,0 +1,23 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const net=require('node:net');
+const {spawn}=require('node:child_process');
+const {createFixture}=require('./qa-fixture.cjs');
+const appDirectory=path.resolve(__dirname,'../Clasue-scout-app');
+const exited=child=>new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',(code,signal)=>resolve({code,signal}));});
+(async()=>{
+ const fixture=createFixture();
+ const reservation=net.createServer();await new Promise((resolve,reject)=>{reservation.once('error',reject);reservation.listen(0,'127.0.0.1',resolve);});const port=reservation.address().port;await new Promise(resolve=>reservation.close(resolve));
+ if(!fs.existsSync(path.join(appDirectory,'dist/index.html')))throw new Error('Run npm run build before browser QA.');
+ const baseURL=`http://127.0.0.1:${port}`;
+ console.log(`Browser QA fixture: ${fixture.dbFile}\nBrowser QA URL: ${baseURL}`);
+ const server=spawn(process.execPath,[path.join(appDirectory,'server.cjs')],{cwd:appDirectory,env:{...process.env,APP_PORT:String(port),DB_FILE:fixture.dbFile,TBA_API_KEY:'',GROQ_API_KEY:'',NODE_ENV:'test'},stdio:['ignore','pipe','pipe'],windowsHide:true});
+ let serverOutput='';server.stdout.on('data',data=>{serverOutput+=data;});server.stderr.on('data',data=>{serverOutput+=data;});const stopped=exited(server);
+ try{
+  let ready=false;const deadline=Date.now()+20000;
+  while(Date.now()<deadline){if(server.exitCode!==null)throw new Error(`Fixture server exited: ${serverOutput}`);try{const response=await fetch(`${baseURL}/api/health`,{signal:AbortSignal.timeout(1000)});if(response.ok){ready=true;break;}}catch{/* Server is still starting. */}await new Promise(resolve=>setTimeout(resolve,100));}
+  if(!ready)throw new Error(`Fixture server startup timed out: ${serverOutput}`);
+  const runner=spawn(process.execPath,[path.join(__dirname,'browser-checks.mjs')],{cwd:appDirectory,env:{...process.env,QA_BASE_URL:baseURL},stdio:'inherit',windowsHide:true});
+  const result=await exited(runner);process.exitCode=result.code??1;
+ }finally{server.kill();await stopped;fs.writeFileSync(path.join(fixture.directory,'server.log'),serverOutput);console.log(`Stopped fixture server. Retained test data: ${fixture.directory}`);}
+})().catch(error=>{console.error(error);process.exitCode=1;});

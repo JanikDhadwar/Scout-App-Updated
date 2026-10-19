@@ -1,20 +1,37 @@
-const CACHEABLE = new Set(['teams', 'memberships', 'forms', 'submissions', 'announcements', 'scout_events', 'pit_scouts']);
+const CACHEABLE = new Set(['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements', 'scout_events', 'pit_scouts', 'assignments', 'picklists']);
 export class RequestError extends Error {
   constructor(message, status = 0) { super(message); this.status = status; }
 }
 export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(globalThis), onChange = () => {} }) {
-  let scope = null, flight = null;
+  let scope = null, flight = null, enqueueFlight = Promise.resolve();
   let state = { connection:'checking', pending:0, syncing:false, error:'', storageError:'', readyAt:null, lastSync:null };
   const update = patch => { state = { ...state, ...patch }; onChange(state); };
   const keyFor = (path, owner = scope) => `${owner?.userId || 'guest'}:${owner?.teamId || ''}:${path}`;
   const belongs = (entry, owner) => entry.userId === owner?.userId && entry.teamId === owner?.teamId;
+  const readVersions = new Map();
+  const readVersion = owner => readVersions.get(keyFor('',owner)) || 0;
+  const requireCurrentRead = (owner,version) => {
+    if(readVersion(owner)!==version)throw new RequestError('Read access changed. Reload data for your current role.',409);
+  };
+  async function invalidateReadCache() {
+    if(!scope)return;
+    const owner={...scope},scopeKey=keyFor('',owner);
+    // Invalidate requests already in flight before awaiting any device storage operation.
+    readVersions.set(scopeKey,readVersion(owner)+1);
+    if(belongs(owner,scope))update({readyAt:null});
+    for(const cached of await storage.all('cache')) {
+      if(cached.scope===scopeKey||cached.key.startsWith(scopeKey))await storage.remove('cache',cached.key);
+    }
+    await storage.remove('meta',keyFor('prepared',owner));
+    if(belongs(owner,scope))await refresh();
+  }
   async function request(method, path, body) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), method === 'GET' ? 5000 : 20000);
     try {
       const response = await fetcher(`/api${path}`, {
-        method, cache:'no-store', signal:controller.signal,
-        headers:body ? { 'Content-Type':'application/json' } : {},
+        method, credentials:'same-origin', cache:'no-store', signal:controller.signal,
+        headers:{...(body?{'Content-Type':'application/json'}:{}),...(scope?.teamId?{'X-Argus-Workspace':scope.teamId}:{})},
         body:body ? JSON.stringify(body) : undefined,
       });
       if (!response.ok) {
@@ -55,6 +72,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
   }
   async function read(path) {
     const owner = scope && { ...scope };
+    const version = readVersion(owner);
     const url = new URL(path, 'https://scout.local');
     url.searchParams.sort();
     const normalized = url.pathname + url.search;
@@ -63,6 +81,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     try {
       if(owner && CACHEABLE.has(store) && state.connection==='offline') throw new RequestError('Using downloaded data.');
       const data = await request('GET', normalized);
+      requireCurrentRead(owner,version);
       if (owner && CACHEABLE.has(store)) {
         try {
           await storage.put('cache', { key, store, scope:keyFor('',owner), data });
@@ -72,7 +91,9 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
         }
         catch { update({ storageError:'Device storage is full or unavailable. Offline data could not be saved.', error:'Device storage is full or unavailable. Offline data could not be saved.' }); }
       }
-      return owner ? combine(normalized,data,owner,false) : data;
+      const result=owner ? await combine(normalized,data,owner,false) : data;
+      requireCurrentRead(owner,version);
+      return result;
     } catch (error) {
       if (error.status && error.status < 500) throw error;
       if (!owner || !CACHEABLE.has(store)) throw error;
@@ -86,7 +107,9 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
         }
       }
       if (!cached) throw new RequestError('This data is not downloaded yet. Connect to the server once to prepare this device.');
-      return combine(normalized,cached.data,owner);
+      const result=await combine(normalized,cached.data,owner);
+      requireCurrentRead(owner,version);
+      return result;
     }
   }
   async function api(method, path, body) {
@@ -96,7 +119,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     const store = path.split('/')[1];
     if(scope&&CACHEABLE.has(store))try {
       for (const cached of await storage.all('cache')) {
-        if (cached.store === store) await storage.remove('cache',cached.key);
+        if (cached.store === store && cached.scope === keyFor('')) await storage.remove('cache',cached.key);
       }
       if(method==='DELETE'&&store==='submissions') {
         const id=path.split('/')[2];
@@ -118,10 +141,10 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
           try {
             const result = await request('POST',`/${entry.store}`,entry.row);
             if (result?.id !== entry.row.id) throw new RequestError('Upload was not acknowledged. Retrying safely.');
-            await storage.acknowledge(entry);
+            try { await storage.acknowledge(entry); } catch { throw new RequestError('Device storage could not confirm this upload. The queued report is preserved for retry.', 507); }
             update({ lastSync:new Date().toISOString() });
           } catch (error) {
-            await storage.put('queue',{ ...entry, error:error.status && error.status < 500 ? `Report ${entry.row.id.slice(0,8)}: ${error.message}` : null });
+            await storage.put('queue',{ ...entry, error:error.status && (error.status < 500 || error.status === 507) ? `Report ${entry.row.id.slice(0,8)}: ${error.message}` : null });
             if (!error.status || error.status >= 500) break;
           }
         }
@@ -134,20 +157,32 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     })().finally(()=>{ flight=null; });
     return flight;
   }
-  async function enqueue(row, draftKey) {
+  async function saveQueued(row, draftKey) {
     if (!scope || row.user_id !== scope.userId || row.team_id !== scope.teamId) throw new Error('Sign in to the report’s team before saving.');
     if (new Blob([JSON.stringify(row)]).size > 9.5 * 1024 * 1024) throw new Error('This report has too many large photos. Use smaller images before submitting.');
-    await storage.enqueue({ key:row.id, row, store:'submissions', userId:scope.userId, teamId:scope.teamId, queuedAt:new Date().toISOString(), error:null },draftKey);
+    const existing = await storage.get('queue',row.id) || await storage.get('receipts',row.id);
+    if (existing) {
+      if (!belongs(existing,scope) || JSON.stringify(existing.row) !== JSON.stringify(row)) throw new RequestError('A different report already uses this ID. Your draft and original report are preserved.',409);
+      return existing.row;
+    }
+    try { await storage.enqueue({ key:row.id, row, store:'submissions', userId:scope.userId, teamId:scope.teamId, queuedAt:new Date().toISOString(), error:null },draftKey); } catch(error) { update({storageError:'Device storage could not save this report. Your draft is preserved.',error:'Device storage could not save this report. Your draft is preserved.'}); throw error; }
     await refresh();
     void sync().catch(error=>update({error:error.message}));
     return row;
   }
+  function enqueue(row,draftKey) {
+    const saving = enqueueFlight.then(()=>saveQueued(row,draftKey));
+    enqueueFlight = saving.catch(()=>{});
+    return saving;
+  }
   async function prepare() {
     if (!scope) return;
     const owner = { ...scope };
+    const version = readVersion(owner);
     // Complete collections support the legacy tabs' local filtering, too.
     const results = await Promise.allSettled([...CACHEABLE].map(async store=>{
       const data=await request('GET',`/${store}`);
+      requireCurrentRead(owner,version);
       await storage.put('cache',{key:keyFor(`/${store}`,owner),store,scope:keyFor('',owner),data});
       if(store==='submissions')for(const receipt of await storage.all('receipts')) {
         if(belongs(receipt,owner))await storage.remove('receipts',receipt.key);
@@ -159,10 +194,11 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
       return;
     }
     const at = new Date().toISOString();
+    requireCurrentRead(owner,version);
     await storage.put('meta',{key:keyFor('prepared',owner),at});
     if (scope?.userId === owner.userId && scope?.teamId === owner.teamId) {update({storageError:''});await refresh();}
   }
-  return { api, enqueue, sync, prepare, pending, refresh, getState:()=>state,
+  return { api, enqueue, sync, prepare, pending, refresh, invalidateReadCache, getState:()=>state,
     setScope: async value => { scope=value; await refresh(); },
   };
 }

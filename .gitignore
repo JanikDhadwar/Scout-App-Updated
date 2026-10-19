@@ -2,3 +2,32 @@
 *.lock.tmp
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+
+# Python skill caches
+__pycache__/
+*.pyc
+
+# Private server credentials
+.env
+.env.*
+!.env.example
+
+# Private data, local QA, generated builds and database recovery files
+node_modules/
+dist/
+playwright-report/
+test-results/
+coverage/
+*.db
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+db.json
+db.json.*
+argus.env
+
+# Private browser-importable integration settings
+argus-connections.private.json
+argus-integrations.private.json
+argus-integrations.private.json.tmp

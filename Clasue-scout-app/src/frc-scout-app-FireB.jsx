@@ -114,13 +114,11 @@ function getNavTabs(role) {
 }
 
 // ─── TBA helpers ──────────────────────────────────────────────────────────────
-const TBA_BASE = "https://www.thebluealliance.com/api/v3";
-const TBA_KEY  = "PgNUlQdJ8WUGRmyYFCSiz5zYddD6F2UKLEvzRv3spx4N8fNUXkEtUoF6hM3L9kGS";
+// Official data uses the authenticated server proxy. No API credential belongs in a browser entry.
 async function tbaFetch(path) {
-  const headers = TBA_KEY ? { "X-TBA-Auth-Key": TBA_KEY } : {};
-  const r = await fetch(`${TBA_BASE}${path}`, { headers });
-  if (!r.ok) throw new Error(`TBA ${r.status}`);
-  return r.json();
+  const response=await fetch(`/api/tba${path}`,{credentials:'same-origin'});
+  if(!response.ok)throw new Error('Official event data is unavailable.');
+  return response.json();
 }
 
 // ─── CSV export helper ────────────────────────────────────────────────────────
