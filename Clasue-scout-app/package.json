@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.cjs",
     "test:browser": "node ../scripts/run-browser-checks.cjs",
-    "test": "node --test server.test.cjs analyst-service.test.cjs integration-store.test.cjs src/form-conditions.test.js src/offline-client.test.js src/argus/*.test.js",
+    "test": "node --test ../scripts/deploy-status.test.cjs server.test.cjs analyst-service.test.cjs integration-store.test.cjs src/form-conditions.test.js src/offline-client.test.js src/argus/*.test.js",
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",

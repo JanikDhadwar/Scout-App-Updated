@@ -33,3 +33,13 @@ Keep credentials outside Git and release directories. On the existing Debian ins
 ## Setup without a terminal
 
 After the server pulls and restarts, sign in as workspace owner, open Settings and choose Import connection file. Select the private argus-connections.private.json file from your computer. This file is ignored by Git. Argus sends it to your own authenticated server and stores only supported connection values in argus-integrations.private.json beside the live database. Future releases and restarts retain that file. No restart is needed after import. Members can see connection status but cannot view or change keys; owners can only configure their own workspace.
+
+## Deployment diagnostics
+
+Every push to main runs the Argus build and tests workflow in GitHub Actions. Its logs show dependency, test and Linux build failures independently of the server.
+
+Once the server checkout receives the new deploy.sh and scripts/deploy-status.cjs, subsequent updater runs write a safe public report at /deployment-status.json. It records the fetched target revision, checkout revision, last successful revision and current stage or exit code. The report is copied into the current old release as well as a newly built candidate, so a failed build or rollback can still be diagnosed. It does not expose command output, API keys, database contents or server paths. Detailed logs stay private at SCOUT_STATE_DIR/deploy-latest.log.
+
+An updater invocation parses its script before pulling. The first invocation that pulls this change may still execute the earlier script; the following timer run uses the reporting code. A stopped updater or one that cannot pull cannot install its own logger. Missing status alone does not prove which condition occurred, especially if a proxy blocks the status URL. Server access is required if the updater cannot receive changes at all.
+
+The status writer passed isolated tests for failed candidates, reporting through an old active release, safe output and path restrictions. The application test suite now has 49 passing checks and the build passes. Bash syntax validation is included in the Linux GitHub Actions job; no local Linux shell was available to execute the complete systemd deployment.

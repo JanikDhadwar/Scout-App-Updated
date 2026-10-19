@@ -52,3 +52,5 @@ Groq activation verified with the user-provided private key and synthetic eviden
 The user authorized security checks, commit and push through GitHub Desktop. See security-review.md. Private credentials, databases and generated artifacts are ignored. Dependency audit now reports zero vulnerabilities. Legacy hashes upgrade on successful authentication, login failure counters do not count successful sign-ins, and direct form/event deletions are blocked. Real database integrity is unchanged.
 
 Terminal-free setup is now available in Settings. Owner-only private connection import persists outside release folders. Final verification: 47 automated tests, 15 browser checks, build and focused lint pass. The user will commit and push.
+
+Deployment investigation confirmed GitHub main at 72342d1 while the live health endpoint still served c14f311. Added stage/revision diagnostics publishable from the old active release and a read-only GitHub Actions build/test workflow. Root cause remains unknown until updater or CI evidence is available. No live server state was modified.

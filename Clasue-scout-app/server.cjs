@@ -224,7 +224,7 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
 app.use('/api',(_req,res)=>fail(res,404,'Unknown API route'));
 // Removed unprefixed collection aliases; they must never bypass authentication.
 app.use((req,res,next)=>STORES.includes(req.path.split('/')[1])||req.path.startsWith('/session')?fail(res,404,'Unknown route'):next());
-app.use(express.static(DIST_DIR,{setHeaders(res,file){if(file.endsWith('.html')||file.endsWith('sw.js'))res.set('Cache-Control','no-cache');}}));
+app.use(express.static(DIST_DIR,{setHeaders(res,file){if(file.endsWith('.html')||file.endsWith('sw.js')||file.endsWith('deployment-status.json'))res.set('Cache-Control','no-cache');}}));
 app.use((req,res,next)=>{if(req.method!=='GET')return next();const index=path.join(DIST_DIR,'index.html');if(!fs.existsSync(index))return res.status(503).send('App build not found. Run npm run build first.');res.set('Cache-Control','no-cache');res.sendFile(index);});
 app.use((err,_req,res,_next)=>{console.error(err.message);fail(res,err.status||500,'Request failed. Please try again.');});
 app.listen(Number(process.env.APP_PORT||3001),()=>{console.log(`Argus DB server running`);console.log(`Data file: ${DB_FILE}`);});
