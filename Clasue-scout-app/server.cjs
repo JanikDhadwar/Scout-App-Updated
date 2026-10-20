@@ -11,6 +11,7 @@ const { askGroq, DEFAULT_MODEL } = require('./analyst-service.cjs');
 const { createIntegrationStore } = require('./integration-store.cjs');
 const { checkConnections } = require('./connection-check.cjs');
 const { generateAssignments, submissionError } = require('./scouting-rules.cjs');
+const {activeEvent,previewTransition,applyTransition}=require('./event-transition.cjs');
 const app = express();
 app.disable('x-powered-by');
 app.disable('etag');
@@ -44,7 +45,7 @@ function verifyPassword(password, hash) {
 function membership(db, uid, tid) {return rows(db,'memberships').find(m=>m.user_id===uid && m.team_id===tid);}
 function role(db,uid,tid) {return membership(db,uid,tid)?.role;}
 function admin(db,uid,tid) {return ['owner','admin'].includes(role(db,uid,tid));}
-function publicTeam(db,t,uid) {const {password,password_hash,...safe}=t; if(role(db,uid,t.id)==='owner' && password)safe.password=password;return safe;}
+function publicTeam(db,t,uid) {const {password,password_hash,...safe}=t;safe.active_event_id=activeEvent(db,t.id)?.id||null;if(role(db,uid,t.id)==='owner' && password)safe.password=password;return safe;}
 function fail(res,status,message) {return res.status(status).json({error:message});}
 function login(req,res,u) {
   if(req.authAttemptKey)attempts.delete(req.authAttemptKey);
@@ -182,6 +183,8 @@ app.post('/api/assignments/generate',(req,res)=>{
   const event=rows(db,'scout_events').find(row=>row.id===event_id);
   if(!event||!admin(db,req.user.id,event.team_id))return fail(res,403,'Administrator permission required for this event');
   if(event.archived_at)return fail(res,409,'Restore this event before generating assignments.');
+  const activeTeam=rows(db,'teams').find(team=>team.id===event.team_id);
+  if(activeTeam?.active_event_id&&activeTeam.active_event_id!==event.id)return fail(res,409,'Generate assignments for the active event only.');
   if(assignment_revision!==(event.assignment_revision||0))return fail(res,409,'Assignments changed. Refresh before generating again.');
   const scoutIds=req.body.scout_ids===undefined?rows(db,'memberships').filter(row=>row.team_id===event.team_id).map(row=>row.user_id):req.body.scout_ids;
   if(!['pit','match','both'].includes(report_kind)||!Array.isArray(scoutIds)||!scoutIds.length||scoutIds.some(id=>!membership(db,id,event.team_id)))return fail(res,400,'Select workspace scouts and a report type');
@@ -198,6 +201,16 @@ app.post('/api/assignments/generate',(req,res)=>{
   }catch(error){fail(res,400,error.message);}
 });
 
+app.get('/api/event-transition/preview',(req,res)=>{
+ const {team_id,next_event_id}=req.query,db=readDB();
+ if(!admin(db,req.user.id,team_id))return fail(res,403,'Team administrator permission required');
+ try{res.json(previewTransition(db,team_id,next_event_id));}catch(error){fail(res,error.status||500,error.message);}
+});
+app.post('/api/event-transition',(req,res)=>{
+ const {team_id,next_event_id,expected,delete_forms}=req.body||{},db=readDB();
+ if(!admin(db,req.user.id,team_id))return fail(res,403,'Team administrator permission required');
+ try{const result=applyTransition(db,{teamId:team_id,nextEventId:next_event_id,expected,deleteForms:delete_forms});writeDB(db);res.json({...result,team:publicTeam(db,result.team,req.user.id)});}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
+});
 function visible(db,store,row,uid) {
   if(store==='users')return row.id===uid||rows(db,'memberships').some(m=>m.user_id===row.id&&membership(db,uid,m.team_id));
   const tid=store==='teams'?row.id:row.team_id;
@@ -224,6 +237,12 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
   if(original && !visible(db,store,original,req.user.id))return fail(res,403,'Permission denied');
   if(original && store!=='teams' && row.team_id!==original.team_id)return fail(res,400,'Workspace cannot be changed');
   if(!membership(db,req.user.id,tid))return fail(res,403,'Workspace permission required');
+  if(['submissions','pit_scouts','assignments','picklists'].includes(store)&&req.method!=='DELETE'){
+    if(rows(db,'scout_events').some(event=>event.team_id===tid&&event.event_key===row.event_key&&event.data_cleared_at))return fail(res,409,'This event was cleared. Your local report is preserved; export it from Device and sync.');
+    if(store==='submissions'&&rows(db,'report_tombstones').some(report=>report.id===key&&report.team_id===tid))return fail(res,409,'This report ID belongs to a cleared event. Your local copy is preserved.');
+    const team=rows(db,'teams').find(team=>team.id===tid),current=activeEvent(db,tid);
+    if(team?.active_event_id&&row.event_key&&row.event_key!==current?.event_key)return fail(res,409,'Only the active event accepts new data. Your local copy is preserved.');
+  }
   if(store==='submissions') {
     if(req.method!=='POST')return fail(res,409,'Reports are immutable. Preserve the original and submit a new correction.');
     if(row.user_id!==req.user.id)return fail(res,403,'Report identity must match your account');
@@ -246,10 +265,14 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(role(db,req.user.id,tid)!=='owner')return fail(res,403,'Owner permission required');
     if(req.method==='DELETE')return fail(res,409,'Team deletion would orphan scouting records. Archive the workspace instead.');
     if(!original||row.owner_id!==original.owner_id||row.number!==original.number)return fail(res,400,'Team identity cannot be changed');
+    if(Object.hasOwn(body,'active_event_id')||Object.hasOwn(body,'event_transition'))return fail(res,409,'Use Change event to switch events and review outgoing data.');
   } else if(!admin(db,req.user.id,tid))return fail(res,403,'Administrator permission required');
   if(req.method==='DELETE'&&['forms','scout_events'].includes(store))return fail(res,409,'Archive this record instead. Scouting evidence and unfinished drafts must be retained.');
   if(store==='forms'&&req.method!=='DELETE'&&row.max_submissions_per_team!=null&&(!Number.isInteger(row.max_submissions_per_team)||row.max_submissions_per_team<1||!row.allow_team_select))return fail(res,400,'Submission limits require team selection and a positive whole number');
   if(store==='scout_events') {
+    if(original?.data_cleared_at)return fail(res,409,'This event was cleared and cannot be changed.');
+    if(Object.hasOwn(body,'data_cleared_at'))return fail(res,400,'Event clearing is managed by Change event.');
+    if(original&&row.event_key!==original.event_key)return fail(res,409,'Use Change event instead of replacing an event key.');
     if(Object.hasOwn(body,'assignment_revision'))return fail(res,400,'Assignment revisions are managed by assignment writes');
     if(Object.hasOwn(body,'analytics_config')) {
       const expected=body.analytics_revision ?? 0,current=original?.analytics_revision ?? 0;

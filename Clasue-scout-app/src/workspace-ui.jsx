@@ -42,7 +42,7 @@ export function HomeDashboard({ team, user, role, mem, api, onNavigate, syncStat
   const event=data.scout_events[0];
   return <div className="dashboard page-enter">
     <div className="dashboard-intro">
-      <div><h1>Scouting</h1><p>{loading ? 'Loading workspace…' : `${data.forms.length} ${data.forms.length === 1 ? 'form' : 'forms'} available`}</p></div>
+      <div><h1>Scouting</h1><p>{loading ? 'Loading team data…' : `${data.forms.length} ${data.forms.length === 1 ? 'form' : 'forms'} available`}</p></div>
       <button className="primary-button" onClick={()=>onNavigate('forms')}>Open forms</button>
     </div>
     {error&&<div className="notice" role="status">{error}</div>}

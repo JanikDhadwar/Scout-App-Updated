@@ -22,7 +22,7 @@ try{
  await page.locator('.a-sidebar').waitFor();
  const teams=await page.evaluate(async()=>{const result=await fetch('/api/teams');return result.json();});
  assert.ok(teams.some(team=>team.id==='qa-workspace'&&team.name==='QA robotics'),'Refusing to mutate a server without the synthetic QA workspace.');
- await check('dashboard and navigation',async()=>{for(const destination of ['dashboard','teams','matches','analytics','strategy','events','settings','assignments']){await route(`/${destination}`);await page.locator('#workspace-main h1, #workspace-main h2').first().waitFor();}await route('/dashboard');});
+ await check('dashboard and navigation',async()=>{for(const destination of ['dashboard','teams','matches','analytics','strategy','events','settings','assignments']){await route(`/${destination}`);await page.locator('#workspace-main h1, #workspace-main h2').first().waitFor();}await route('/dashboard');await page.locator('.a-dashboard-evidence .av-distribution svg').waitFor();const axis=await page.locator('.a-dashboard-evidence .av-distribution svg text').allTextContents();assert.ok(!axis.some(text=>text.includes('NaN')),'Distribution must have numeric bounds');assert.ok(await page.locator('.a-dashboard-evidence .av-distribution svg rect').count()>1,'Different match medians must produce distinct distribution bins');});
  await check('sidebar scroll and hide preference',async()=>{
   await page.setViewportSize({width:1280,height:600});
   assert.equal(await page.locator('.a-sidebar').evaluate(el=>getComputedStyle(el).overflowY),'auto');
@@ -37,6 +37,17 @@ try{
  await check('presentation keyboard',async()=>{await route('/present/254');await page.getByRole('button',{name:'Next',exact:true}).waitFor();await page.keyboard.press('ArrowRight');await page.getByRole('status').filter({hasText:'Section 2 of 7'}).waitFor();await page.keyboard.press('ArrowLeft');await page.getByRole('status').filter({hasText:'Section 1 of 7'}).waitFor();await page.keyboard.press('Escape');});
  await check('picklist reorder save and reload',async()=>{await route('/strategy');await page.getByLabel('Saved picklist').selectOption('qa-picklist');await page.getByRole('button',{name:'Move team 1678 up',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();await page.reload({waitUntil:'networkidle'});await page.getByLabel('Saved picklist').selectOption('qa-picklist');assert.match(await page.locator('.picklist-entry').first().innerText(),/1678/);await page.getByRole('button',{name:'Move team 1678 down',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();});
  await check('unsaved picklist survives navigation',async()=>{await route('/strategy');await page.getByLabel('Saved picklist').selectOption('qa-picklist');const note=`Unsaved strategy note ${Date.now()}`;await page.getByLabel('Team 254 strategy notes',{exact:true}).fill(note);await route('/dashboard');await route('/strategy');assert.equal(await page.getByLabel('Team 254 strategy notes',{exact:true}).inputValue(),note);await page.getByText('Unsaved picklist restored from this device.',{exact:true}).waitFor();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();});
+ await check('match schedule filters and robot launch retain exact scouting context',async()=>{
+  await route('/matches');const schedule=page.getByRole('region',{name:'Match schedule',exact:true});
+  await page.getByRole('button',{name:'Upcoming',exact:true}).click();assert.equal(await schedule.locator('tbody tr').count(),1);
+  await page.getByRole('button',{name:'Completed',exact:true}).click();assert.equal(await schedule.locator('tbody tr').count(),3);
+  await page.getByRole('button',{name:'Not scouted',exact:true}).click();assert.ok(await schedule.locator('tbody tr').count()>0);
+  await page.getByRole('button',{name:'All matches',exact:true}).click();await route('/matches/2026qa_qm4');
+  const launch=page.getByRole('region',{name:'Qual 4 scouting launch',exact:true});await launch.waitFor();
+  for(const width of [1440,1280,1024,768,390,360]){await page.setViewportSize({width,height:1000});await page.screenshot({path:path.join(artifacts,`match-launch-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);}
+  await launch.getByRole('button',{name:'Start scouting',exact:true}).click();const picker=page.getByRole('dialog',{name:'Choose your robot',exact:true});await picker.getByRole('button',{name:'Scout team 254, red alliance',exact:true}).click();await picker.getByRole('button',{name:'Scout team 254',exact:true}).click();await page.getByLabel('Match key',{exact:true}).waitFor();
+  assert.equal(await page.getByLabel('Match key',{exact:true}).inputValue(),'2026qa_qm4');assert.equal(await page.getByLabel('Event key',{exact:true}).inputValue(),'2026qa');assert.equal(await page.getByLabel('Team you are scouting *',{exact:true}).inputValue(),'254');
+ });
  await check('assignment opens exact report metadata',async()=>{await route('/assignments');await page.getByRole('button',{name:'Scout',exact:true}).first().click();await page.getByLabel('Match key',{exact:true}).waitFor();assert.equal(await page.getByLabel('Event key',{exact:true}).inputValue(),'2026qa');assert.equal(await page.getByLabel('Match key',{exact:true}).inputValue(),'2026qa_qm4');assert.equal(await page.getByLabel('Team you are scouting *',{exact:true}).inputValue(),'6390');});
  await check('archived form preserves unfinished draft',async()=>{await route('/match?event_key=2026qa&match_key=2026qa_qm4&scouted_team=6390&form_id=qa-match-form');await page.getByLabel('Scout notes',{exact:true}).fill('Archived draft recovery');await page.getByText('Draft saved as you go',{exact:true}).waitFor();await page.evaluate(async()=>{const result=await fetch('/api/forms/qa-match-form',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({archived:true})});if(!result.ok)throw new Error('Could not archive fixture form');});await route('/teams');await route('/match');await page.getByRole('button',{name:'Resume draft'}).click();assert.equal(await page.getByLabel('Scout notes',{exact:true}).inputValue(),'Archived draft recovery');await page.evaluate(async()=>fetch('/api/forms/qa-match-form',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({archived:false})}));});
  await check('real presentation downloads',async()=>{await route('/present/254');for(const [label,extension] of [['Export PDF','pdf'],['Export PowerPoint','pptx']]){const downloading=page.waitForEvent('download');await page.getByRole('button',{name:label,exact:true}).click();const file=await downloading;assert.ok(file.suggestedFilename().endsWith('.'+extension));await file.saveAs(path.join(artifacts,'browser-team-254.'+extension));assert.ok(fs.statSync(path.join(artifacts,'browser-team-254.'+extension)).size>1000);}await page.keyboard.press('Escape');});
@@ -68,11 +79,11 @@ try{
  });
  await check('official event chooser keeps existing events',async()=>{
   await page.route('**/api/tba/events/*/simple',route=>route.fulfill({json:[{key:'2026qa',name:'QA Invitational 2026'}]}));
-  await route('/events');await page.getByRole('button',{name:'Load events',exact:true}).click();await page.getByLabel('Official event',{exact:true}).selectOption('2026qa');await page.getByRole('button',{name:'Select official event',exact:true}).click();await page.getByText('Existing event selected.',{exact:true}).waitFor();
+  await route('/events');await page.getByRole('button',{name:'Load events',exact:true}).click();await page.getByLabel('Official event',{exact:true}).selectOption('2026qa');await page.getByRole('button',{name:'Select official event',exact:true}).click();await page.getByText('Review the event change before continuing.',{exact:true}).waitFor();
   const events=await page.evaluate(async()=>await(await fetch('/api/scout_events')).json());assert.equal(events.filter(row=>row.event_key==='2026qa').length,1);await page.unroute('**/api/tba/events/*/simple');
  });
- await check('five main links and related section tools',async()=>{
-  await route('/dashboard');assert.equal(await page.locator('.a-sidebar nav a').count(),5);await page.getByRole('navigation',{name:'Quick actions'}).getByRole('link',{name:'My assignments',exact:true}).waitFor();
+ await check('desktop navigation and five mobile destinations',async()=>{
+  await route('/dashboard');assert.equal(await page.locator('.a-sidebar nav a').count(),9);assert.equal(await page.locator('.a-mobile-nav a, .a-mobile-nav button').count(),5);await page.getByRole('navigation',{name:'Quick actions'}).getByRole('link',{name:'My assignments',exact:true}).waitFor();
   await route('/match');await page.getByRole('navigation',{name:'Section tools'}).getByRole('link',{name:'Assignments',exact:true}).click();await page.getByRole('heading',{name:'Scouting assignments',exact:true}).waitFor();
   await route('/events');await page.getByRole('navigation',{name:'Section tools'}).getByRole('link',{name:'Pit display',exact:true}).click();await page.getByRole('heading',{name:'Pit display: Team 254',exact:true}).waitFor();
  });
@@ -81,9 +92,9 @@ try{
   await page.route('**/api/tba/event/2026away/teams/simple',route=>route.fulfill({json:[{team_number:9999,nickname:'QA away team'}]}));
   await page.route('**/api/tba/event/2026away/matches',route=>route.fulfill({json:[]}));
   await page.route('**/api/tba/event/2026away',route=>route.fulfill({json:{key:'2026away',name:'QA Away Event',webcasts:[]}}));
-  await route('/events');await page.getByLabel('Season year',{exact:true}).fill('2026');await page.getByRole('button',{name:'Load events',exact:true}).click();await page.getByLabel('Find event',{exact:true}).fill('Faraway');await page.getByLabel('Official event',{exact:true}).selectOption('2026away');await page.getByRole('button',{name:'Select official event',exact:true}).click();await page.getByText('Event selected. Open Match schedule, Pit display or Scouting to continue.',{exact:true}).waitFor();
+  await route('/events');await page.getByLabel('Season year',{exact:true}).fill('2026');await page.getByRole('button',{name:'Load events',exact:true}).click();await page.getByLabel('Find event',{exact:true}).fill('Faraway');await page.getByLabel('Official event',{exact:true}).selectOption('2026away');await page.getByRole('button',{name:'Select official event',exact:true}).click();await page.getByRole('dialog',{name:'Change event',exact:true}).waitFor();
   const events=await page.evaluate(async()=>await(await fetch('/api/scout_events')).json());assert.equal(events.filter(row=>row.event_key==='2026qa').length,1);assert.equal(events.filter(row=>row.event_key==='2026away').length,1);assert.equal(events.find(row=>row.event_key==='2026away').event_teams[0].team_number,9999);
-  await page.getByLabel('Current event',{exact:true}).selectOption('qa-event');
+  await page.getByRole('dialog',{name:'Change event',exact:true}).getByRole('button',{name:'Cancel',exact:true}).click();
   for(const pattern of ['**/api/tba/events/*/simple','**/api/tba/event/2026away/teams/simple','**/api/tba/event/2026away/matches','**/api/tba/event/2026away'])await page.unroute(pattern);
  });
  await check('missing setup explains the next action',async()=>{
@@ -103,17 +114,13 @@ try{
   await page.screenshot({path:path.join(artifacts,'connection-check.png'),fullPage:true});await page.unroute('**/api/integrations/check');
  });
  await check('one click assigns both types to the whole team',async()=>{
-  await page.evaluate(async()=>{
-    const base=await(await fetch('/api/scout_events/qa-event')).json();
-    const row={id:'qa-quick-event',team_id:'qa-workspace',event_key:'2026quick',event_name:'QA quick assignments',event_teams:base.event_teams,matches:[{key:'2026quick_qm1',match_number:1,alliances:{red:{team_keys:['frc254','frc1678'],score:-1},blue:{team_keys:['frc6390'],score:-1}}}]};
-    const result=await fetch('/api/scout_events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(row)});if(!result.ok)throw Error('Fixture event creation failed');
-  });
-  await page.reload({waitUntil:'networkidle'});await page.getByLabel('Current event',{exact:true}).selectOption('qa-quick-event');await route('/assignments');
-  await page.getByRole('button',{name:'Assign pit and match scouting',exact:true}).click();await page.getByText(/4 pit and 3 match assignments added/).waitFor();
-  const assigned=await page.evaluate(async()=>await(await fetch('/api/assignments')).json());const rows=assigned.filter(row=>row.event_key==='2026quick');
-  assert.equal(rows.length,7);assert.equal(new Set(rows.filter(row=>row.report_kind==='match').map(row=>row.scout_user_id)).size,3);assert.equal(new Set(rows.filter(row=>row.report_kind==='pit').map(row=>row.scout_user_id)).size,3);
+  const originalMatches=await page.evaluate(async()=>{const event=await(await fetch('/api/scout_events/qa-event')).json();const matches=[{key:'2026qa_qm4',match_number:4,alliances:{red:{team_keys:['frc254','frc1678'],score:-1},blue:{team_keys:['frc6390'],score:-1}}}];const response=await fetch('/api/scout_events/qa-event',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({matches})});if(!response.ok)throw Error('Could not prepare temporary QA schedule');return event.matches;});
+  await page.reload({waitUntil:'networkidle'});await route('/assignments');await page.getByRole('button',{name:'Assign pit and match scouting',exact:true}).click();await page.getByText(/pit and .* match assignments added/).waitFor();
+  const assigned=await page.evaluate(async()=>await(await fetch('/api/assignments')).json());const rows=assigned.filter(row=>row.event_key==='2026qa');
+  assert.ok(rows.some(row=>row.report_kind==='pit'));assert.ok(rows.some(row=>row.report_kind==='match'));
+  for(const match of new Set(rows.filter(row=>row.report_kind==='match').map(row=>row.match_key))){const tasks=rows.filter(row=>row.report_kind==='match'&&row.match_key===match);assert.equal(new Set(tasks.map(row=>row.scout_user_id)).size,tasks.length);}
   await page.getByRole('button',{name:'Assign pit and match scouting',exact:true}).click();await page.getByText(/0 pit and 0 match assignments added/).waitFor();
-  await page.getByLabel('Current event',{exact:true}).selectOption('qa-event');
+  await page.evaluate(async matches=>{const response=await fetch('/api/scout_events/qa-event',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({matches})});if(!response.ok)throw Error('Could not restore QA schedule');},originalMatches);
  });
  await check('owner can import private connections without exposing keys',async()=>{await route('/settings');await page.getByText('Connection settings',{exact:true}).click();await page.getByLabel('Import Argus connection file',{exact:true}).setInputFiles({name:'qa-connections.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({GROQ_API_KEY:'qa-private-provider-key',TBA_API_KEY:'qa-private-event-key',GROQ_MODEL:'openai/gpt-oss-20b'}))});await page.getByText('Connections saved on the server. Future app updates will keep them. No restart is needed.',{exact:true}).waitFor();assert.ok(!(await page.locator('body').innerText()).includes('qa-private-provider-key'));await page.reload({waitUntil:'networkidle'});await page.getByText('Official event data: key saved — not tested. Groq AI: key saved — not tested.',{exact:true}).waitFor();});
  await check('historical report search and form-specific CSV are restored',async()=>{
@@ -137,12 +144,27 @@ try{
   await page.reload({waitUntil:'networkidle'});await route('/assignments');await page.getByText('Teams assigned in the older version',{exact:true}).click();await page.getByRole('button',{name:'Pit scout 254',exact:true}).waitFor();
   await route('/matches');await page.getByRole('checkbox',{name:'My assigned teams',exact:true}).check();assert.equal(await page.getByText('9999',{exact:true}).count(),0);assert.ok(await page.getByRole('main').getByRole('link',{name:'Qual 4',exact:true}).isVisible());
  });
- await check('ending an event archives it and retains reports',async()=>{
-  const before=await page.evaluate(async()=>await(await fetch('/api/submissions')).json());await route('/events');await page.getByText('Event archive and exports',{exact:true}).click();
-  page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'End and archive event',exact:true}).click();await page.getByRole('button',{name:'Restore event',exact:true}).waitFor();
-  const after=await page.evaluate(async()=>await(await fetch('/api/submissions')).json());assert.deepEqual(after,before);
-  await route('/assignments');assert.ok(await page.getByRole('button',{name:'Assign pit and match scouting',exact:true}).isDisabled());
-  await route('/events');await page.getByText('Event archive and exports',{exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Restore event',exact:true}).click();await page.getByRole('button',{name:'End and archive event',exact:true}).waitFor();
+ await check('event change can be cancelled without altering data and contains keyboard focus',async()=>{
+  await route('/events');await page.getByRole('button',{name:'QA Away Event',exact:true}).click();
+  const modal=page.getByRole('dialog',{name:'Change event',exact:true});await modal.getByRole('button',{name:'Download event backup',exact:true}).waitFor();
+  assert.ok(await modal.getByRole('button',{name:'Delete outgoing data and change event',exact:true}).isDisabled());
+  for(const width of [1440,1280,1024,768,390,360]){await page.setViewportSize({width,height:1000});await page.screenshot({path:path.join(artifacts,`event-transition-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);}
+  await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('dialog')));
+  await page.keyboard.press('Escape');assert.equal(await modal.count(),0);
+  const state=await page.evaluate(async()=>({team:await(await fetch('/api/teams/qa-workspace')).json(),reports:await(await fetch('/api/submissions')).json()}));assert.equal(state.team.active_event_id,'qa-event');assert.ok(state.reports.some(row=>row.id==='qa-zero'));
+ });
+ await check('event export downloads the full outgoing event before confirmed deletion and keeps forms',async()=>{
+  await route('/events');await page.getByRole('button',{name:'QA Away Event',exact:true}).click();const modal=page.getByRole('dialog',{name:'Change event',exact:true});
+  const downloading=page.waitForEvent('download');await modal.getByRole('button',{name:'Download event backup',exact:true}).click();const file=await downloading,filename=path.join(artifacts,'event-backup.json');await file.saveAs(filename);
+  const backup=JSON.parse(fs.readFileSync(filename,'utf8'));assert.equal(backup.event.event_key,'2026qa');assert.ok(backup.submissions.some(row=>row.id==='qa-zero'));assert.ok(backup.forms.some(row=>row.id==='qa-match-form'));assert.equal(backup.users,undefined);
+  await modal.getByLabel('I saved the event backup and can open it.',{exact:true}).check();await modal.getByLabel('Confirm outgoing event key',{exact:true}).fill('2026qa');await modal.getByRole('button',{name:'Delete outgoing data and change event',exact:true}).click();await modal.waitFor({state:'hidden'});
+  const state=await page.evaluate(async()=>({team:await(await fetch('/api/teams/qa-workspace')).json(),reports:await(await fetch('/api/submissions')).json(),forms:await(await fetch('/api/forms')).json()}));assert.notEqual(state.team.active_event_id,'qa-event');assert.ok(!state.reports.some(row=>row.event_key==='2026qa'));assert.ok(state.reports.some(row=>row.id==='qa-legacy'));assert.ok(state.forms.some(row=>row.id==='qa-match-form'&&!row.archived_at));
+  await page.reload({waitUntil:'networkidle'});await page.getByRole('heading',{name:'Event data',exact:true}).waitFor();assert.ok(await page.locator('.a-event-select').getByText('QA Away Event',{exact:true}).isVisible());
+ });
+ await check('delete-only event change removes forms from new scouting and retains draft definitions',async()=>{
+  await page.evaluate(async()=>{const result=await fetch('/api/scout_events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'qa-final-event',team_id:'qa-workspace',event_key:'2026final',event_name:'QA final event',event_teams:[],matches:[]})});if(!result.ok)throw Error("Could not create fixture event");});
+  await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'QA final event',exact:true}).click();const modal=page.getByRole('dialog',{name:'Change event',exact:true});await modal.getByLabel('Delete data without exporting',{exact:true}).check();await modal.getByLabel('Delete forms from new scouting',{exact:true}).check();await modal.getByLabel('Confirm outgoing event key',{exact:true}).fill('2026away');await modal.getByRole('button',{name:'Delete outgoing data and change event',exact:true}).click();await modal.waitFor({state:'hidden'});
+  const state=await page.evaluate(async()=>({team:await(await fetch('/api/teams/qa-workspace')).json(),forms:await(await fetch('/api/forms')).json()}));assert.equal(state.team.active_event_id,'qa-final-event');assert.ok(state.forms.find(row=>row.id==='qa-match-form').archived_at);assert.ok(state.forms.find(row=>row.id==='qa-match-form').questions.length);
  });
  if(errors.length)results.push({name:'uncaught browser errors',status:'failed',errors});
 }finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({baseURL,results,errors},null,2));console.log(JSON.stringify({artifacts,results},null,2));}

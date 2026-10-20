@@ -141,10 +141,10 @@ export default function App() {
   async function clearSession(){await saveSession(null);await offline.setScope(null);setUser(null);setTeam(null);setMem(null);}
   async function logout(){try{await apiCall('POST','/auth/logout',{});await clearSession();}catch(error){alert(`Could not sign out: ${error.message}`);}}
   async function switchWorkspace(){setTeam(null);setMem(null);await saveSession(user,null,null);}
-  async function leaveWorkspace(){if(mem?.role==='owner'||!confirm('Leave this workspace? Your submitted reports remain with the team; drafts and pending reports stay scoped to this workspace.'))return;try{await apiCall('DELETE',`/memberships/${encodeURIComponent(mem.id)}`);await offline.invalidateReadCache();await offline.setScope({userId:user.id});await switchWorkspace();}catch(error){alert(error.message);}}
+  async function leaveWorkspace(){if(mem?.role==='owner'||!confirm('Leave this team? Your submitted reports remain with the team; drafts and pending reports stay scoped to this team.'))return;try{await apiCall('DELETE',`/memberships/${encodeURIComponent(mem.id)}`);await offline.invalidateReadCache();await offline.setScope({userId:user.id});await switchWorkspace();}catch(error){alert(error.message);}}
   async function refreshMem(){try{const rows=await fbSelect('memberships',{team_id:team.id,user_id:user.id});if(rows[0]){setMem(rows[0]);await saveSession(user,team,rows[0]);}}catch{ /* Keep the last confirmed role while offline. */ }}
-  async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this workspace?':'Archive this workspace? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
-  async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active workspaces you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
+  async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this team?':'Archive this team? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
+  async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active teams you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
   if(booting)return <div className="argus-boot" role="status">Opening ARGUS…</div>;
   if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main className="workspace-main">{!user?<AuthScreen onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
@@ -173,7 +173,7 @@ function AuthScreen({ onLogin }) {
     <div className="auth-layout">
       <section className="auth-form-area" aria-label="Account access"><form className="auth-form-card" onSubmit={e=>{e.preventDefault();submit();}}>
         <div className="auth-wordmark">Argus</div>
-        <h1>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your scouting workspace.':'You can join your team after signing up.'}</p>
+        <h1>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your team scouting app.':'You can join your team after signing up.'}</p>
         <div className="auth-tabs" aria-label="Account options">
           {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}
@@ -222,7 +222,7 @@ function TeamScreen({ user, onJoin, onLogout }) {
     setBusy(true); setErr("");
     try {
       const result=await apiCall('POST','/auth/create-team',{number:tNum.trim(),name:tName.trim()});setCreated(result);
-    } catch(error) {setErr(error.message||'Could not create workspace.');}
+    } catch(error) {setErr(error.message||'Could not create team.');}
     setBusy(false);
   }
 
@@ -231,7 +231,7 @@ function TeamScreen({ user, onJoin, onLogout }) {
     setBusy(true); setErr("");
     try {
       const result=await apiCall('POST','/auth/join-team',{number:jNum.trim(),password:jPwd.trim()});await onJoin(result.team,result.mem);
-    } catch(error) {setErr(error.message||'Could not join workspace.');}
+    } catch(error) {setErr(error.message||'Could not join team.');}
     setBusy(false);
   }
 
@@ -245,7 +245,7 @@ function TeamScreen({ user, onJoin, onLogout }) {
           <div style={{fontSize:28,fontWeight:700,color:C.green,letterSpacing:6}}>{created.team.password}</div>
           <div style={{fontSize:11,color:C.muted,marginTop:6}}>Share this with your scouters</div>
         </div>
-        <button style={sx.btn(C.green)} onClick={()=>onJoin(created.team,created.mem)}>Open workspace</button>
+        <button style={sx.btn(C.green)} onClick={()=>onJoin(created.team,created.mem)}>Open team</button>
       </div>
     </div>
   );

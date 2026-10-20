@@ -1,4 +1,4 @@
-# Argus 2.0
+# Argus 4.0.0
 
 ## Local development
 
@@ -8,11 +8,17 @@ The server uses `DB_FILE` when configured, otherwise `Clasue-scout-app/db.json`.
 
 ## Event workflow
 
-Add an event in Event data, then choose it in the header. Manual events work without an integration. To download official teams, matches, results and rankings, set `TBA_API_KEY` on the server and choose Refresh official event data. The server also loads its private, git-ignored `.env` file. The existing key has been configured there locally and verified with TBA. Production needs the same private server setting. The key stays on the server. Existing downloaded data remains usable when official refresh fails.
+One event is active for your team. Use Change event to open Event data, add/import the next event, then choose it. A confirmation screen offers Export and delete data or Delete data without exporting, plus Keep forms or Delete forms from new scouting. Only the outgoing event's confirmed reports, photos/drawings, visits, assignments, picklists and downloaded competition data are cleared. Other teams, unrelated history, accounts and records with unknown event context remain. Removing forms archives their definitions for unfinished drafts. Cancel preserves everything. For an export, download the JSON backup and confirm that you saved it before typing the outgoing event key to authorize deletion. The backup is not an automatic restore mechanism.
+
+Event changes require a team administrator and an online server confirmation. A changed report or form invalidates the preview: reload it and export again. Offline drafts and pending reports remain on their original devices; pending reports are not part of the server backup. Sync or export them first. A cleared event rejects late uploads instead of silently recreating deleted data. Legacy teams continue accepting their existing report contexts until their first confirmed event transition; new transitions set a shared server-owned active event.
+
+Manual events work without an integration. To download official teams, matches, results and rankings, configure Blue Alliance through Settings or the private server `TBA_API_KEY`, then choose Refresh official event data. The key stays on the server. Existing downloaded data remains usable when official refresh fails.
+
+The dashboard and match schedule use compact panels and labelled red/blue alliance teams. Open a match or use the dashboard's next-match launcher, choose Start scouting, then select your robot. A matching assignment opens its form; a single available match form opens automatically. With multiple forms, choose the report form next. Match timing uses downloaded scheduled/predicted times and labels estimates; it does not claim that play is live. All matches, Upcoming, Completed and Not scouted filters use the visible schedule and your permitted confirmed reports.
 
 Admins can create match and pit forms with conditional questions, photos and drawings. Existing uncategorized forms remain available. Reports save drafts on the device and carry their event and match context. Use Assignments to choose the match, team, scout and form. Completion requires a matching confirmed report. Pending uploads remain distinct from completion.
 
-Team profiles, comparisons and presentations use the same calculations. Metric definitions in Analytics let an admin explicitly map a phase and unit. No scoring weights are inferred. Picklists save to the event and retain unsaved device drafts. Reports includes current-event, legacy and all-workspace views, with CSV and JSON downloads.
+Team profiles, comparisons, dashboard charts and presentations use the same calculations. Metric definitions in Analytics let an admin explicitly map a phase and unit. No scoring weights are inferred. Dashboard averages expose sample counts and links to team evidence; distribution bins use only linked match medians, including zero. Picklists save to the event and retain unsaved device drafts. Reports includes current-event, legacy and all-team views, with CSV and JSON downloads.
 
 ## Analyst and exports
 

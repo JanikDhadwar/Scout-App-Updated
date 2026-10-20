@@ -57,7 +57,7 @@ function TrendChart({ metric, onOpenReport }) {
   </figure>;
 }
 
-function DistributionChart({ metric }) {
+export function DistributionChart({ metric }) {
   const id=useId(),values=metric?.values || [];
   if(!values.length)return null;
   const low=metric.min,high=metric.max,count=low===high?1:Math.min(6,values.length);

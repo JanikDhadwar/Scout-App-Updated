@@ -24,4 +24,4 @@ Run only the command matching the release. It updates package.json and package-l
 
 ## Validation
 
-The API regression test checks that health reports the package version. Validation for this change includes the full test suite, production build, focused ESLint and inspecting generated release metadata for 4.0.0. No production push or deployment is part of this change.
+The API regression test checks that health reports the package version. All 66 tests, the production build and focused ESLint passed. Generated release metadata reports 4.0.0. All 28 fixture-only Edge browser checks passed, including offline recovery, permissions, assignments, picklists, presentation controls and real downloads. Dashboard screenshots at 1440, 1280, 1024, 768, 390 and 360px show the version label without document overflow. No production push or deployment was performed by the agent.

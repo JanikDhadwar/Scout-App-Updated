@@ -1,11 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAnalytics, answerQuestion, presentationSections } from './analytics.js';
+import { buildAnalytics, answerQuestion, presentationSections, eventMetricDistribution } from './analytics.js';
 
 const forms = [{id:'f',team_id:'w',title:'Match',questions:[{id:'n',text:'Pieces',type:'number'},{id:'b',text:'Climbed',type:'boolean'},{id:'conditional',text:'Detail',type:'number',visibility:{rules:[{questionId:'b',operator:'equals',value:'Yes'}]}}]}];
 const event = {event_key:'e',event_name:'Event',event_teams:[{team_number:254,nickname:'Test'}],analytics_config:{'f:n':{phase:'auto',unit:'pieces',direction:'higher'}}};
 const report=(id,answers,extra={})=>({id,team_id:'w',form_id:'f',scouted_team:254,event_key:'e',created_at:'2026-01-01T00:00:00Z',answers,...extra});
 const build=(reports,extra={})=>buildAnalytics({forms,reports,event,scope:{teamId:'w',eventKey:'e'},asOf:'2026-01-02T00:00:00Z',...extra});
+
+test('dashboard distribution has numeric bounds and only linked match medians, including zero',()=>{
+ const analytics=build([report('zero',{n:0},{match_key:'e_qm1'}),report('five',{n:5},{match_key:'e_qm2'}),report('pit',{n:100},{report_kind:'pit',match_key:'e_qm3'}),report('unlinked',{n:999})]);
+ const distribution=eventMetricDistribution(analytics,'f:n');assert.equal(distribution.min,0);assert.equal(distribution.max,5);assert.equal(distribution.values.length,2);assert.deepEqual(distribution.values.flatMap(row=>row.sourceIds),['zero','five']);
+});
 test('scope excludes other workspaces and keeps legacy evidence separate',()=>{
  const a=build([report('a',{n:0}),report('legacy',{n:100},{event_key:null}),report('foreign',{n:999},{team_id:'other'}),report('other-event',{n:50},{event_key:'other'})]);
  const t=a.teams[0];assert.equal(t.reportCount,1);assert.equal(t.unlinkedReportCount,1);assert.equal(t.metrics['f:n'].mean,0);assert.deepEqual(t.metrics['f:n'].sourceIds,['a']);

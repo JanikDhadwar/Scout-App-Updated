@@ -89,6 +89,14 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
 
 export function analyticsForData(data={},workspace,event){return buildAnalytics({forms:data.forms || [],reports:data.submissions || [],event,teams:event?.event_teams || [],matches:data.matches || [],scope:{teamId:workspace?.id,eventKey:event?.event_key}});}
 
+export function eventMetricDistribution(analytics,metricId){
+ const metric=analytics.metrics.find(row=>row.id===metricId);
+ if(!metric||!['number','scale'].includes(metric.type))return {values:[],min:null,max:null,n:0};
+ const values=analytics.teams.flatMap(team=>(team.metrics[metricId]?.values||[]).filter(row=>row.matchKey&&Number.isFinite(row.value)).map(row=>({...row,teamNumber:team.teamNumber})));
+ let min=null,max=null;for(const row of values){min=min==null?row.value:Math.min(min,row.value);max=max==null?row.value:Math.max(max,row.value);}
+ return {...metric,values,min,max,n:values.length};
+}
+
 /** Form-level evidence summary for the report library, not a season score.
  * Caller supplies authorized, filtered reports; numeric duplicates use one median
  * per event/team/match. Unknown event/match links remain separate observations.
