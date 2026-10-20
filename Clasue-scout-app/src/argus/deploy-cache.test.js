@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import cache from '../../deploy-cache.cjs';
 const env={CLOUDFLARE_API_TOKEN:'private-token',CLOUDFLARE_ZONE_ID:'a'.repeat(32),SCOUT_PUBLIC_HOST:'6390scout.app'};
 test('deployment purge verifies the dedicated zone and purges all edge content without disclosing credentials',async()=>{
@@ -11,7 +13,22 @@ test('deployment purge verifies the dedicated zone and purges all edge content w
  await assert.rejects(cache.purgeCloudflare({env,fetcher:async(url)=>{if(url.endsWith('/purge_cache'))purged=true;return {ok:true,json:async()=>({success:true,result:{name:'shared-parent.app'}})};}}),/refusing/);assert.equal(purged,false);
  await assert.rejects(cache.purgeCloudflare({env,fetcher:async()=>{throw Error('private-token');}}),error=>!error.message.includes('private-token'));
  await assert.rejects(cache.purgeCloudflare({env,fetcher:async()=>({ok:true,json:async()=>({success:false,errors:['private-token']})})}),/failed/);
- assert.throws(()=>cache.configuration({}),/Configure/);
+ assert.throws(()=>cache.configuration({CLOUDFLARE_ZONE_ID:env.CLOUDFLARE_ZONE_ID}),/Configure/);
+});
+
+test('deployment without Cloudflare credentials skips the external purge and passes installer preflight',async()=>{
+ assert.equal(cache.configuration({}),null);
+ assert.deepEqual(await cache.purgeCloudflare({env:{},fetcher:()=>assert.fail('An unconfigured deployment must not call Cloudflare.')}),{purged:false,reason:'not_configured'});
+ const childEnv={...process.env};delete childEnv.CLOUDFLARE_API_TOKEN;delete childEnv.CLOUDFLARE_ZONE_ID;delete childEnv.SCOUT_PUBLIC_HOST;
+ for(const args of [['--check'],[]]){
+  const result=spawnSync(process.execPath,[fileURLToPath(new URL('../../deploy-cache.cjs',import.meta.url)),...args],{env:childEnv,encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/skipp/i);
+ }
+});
+
+test('partially configured or malformed Cloudflare credentials are not silently skipped',()=>{
+ assert.throws(()=>cache.configuration({CLOUDFLARE_API_TOKEN:'private-token'}),/ZONE_ID/);
+ assert.throws(()=>cache.configuration({CLOUDFLARE_API_TOKEN:'invalid\ntoken',CLOUDFLARE_ZONE_ID:env.CLOUDFLARE_ZONE_ID}),/token/);
 });
 test('deploy only completes after healthy activation and edge purge, with explicit cache-failure retry',()=>{
  const script=fs.readFileSync(new URL('../../../deploy.sh',import.meta.url),'utf8');

@@ -64,7 +64,7 @@ server. The Firebase component is not used.
      chmod 600 ~/.local/share/scout-app/db.json
    fi
    git pull --ff-only origin main
-   # Configure the private Cloudflare deploy settings first; see the link below.
+   # Cloudflare credentials are optional; installation works without them.
    bash scripts/install-debian.sh
    ```
 
@@ -81,7 +81,7 @@ To use another branch or port on installation:
 DEPLOY_BRANCH=main APP_PORT=3001 bash scripts/install-debian.sh
 ```
 
-Before running the installer, configure the [private Cloudflare deployment settings](docs/argus-2/deployment-cache.md). Cache purging is required: deployment fails safely if these settings are missing.
+Installation does not require Cloudflare credentials. To enable automatic edge-cache purging later, configure the [optional private Cloudflare deployment settings](docs/argus-2/deployment-cache.md).
 
 ## What happens after a push
 
@@ -89,7 +89,7 @@ Before running the installer, configure the [private Cloudflare deployment setti
 after reboot). New commits trigger a fast-forward pull, `npm ci`, a production
 build, and a restart of `scout-app.service`. Multiple pushes between checks
 deploy the latest commit. No public GitHub webhook endpoint is needed. Each healthy
-release purges Cloudflare before deployment is marked complete. Browser and CDN
+release purges Cloudflare when credentials are configured, before deployment is marked complete. Browser and CDN
 responses use no-store; new builds refresh offline app caches without deleting
 scouting drafts or pending uploads. See [cache behavior and setup](docs/argus-2/deployment-cache.md).
 
