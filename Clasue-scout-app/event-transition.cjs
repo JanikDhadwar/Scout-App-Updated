@@ -1,5 +1,5 @@
 const {createHash}=require('node:crypto');
-const stores=['submissions','pit_scouts','assignments','picklists'];
+const stores=['submissions','pit_scouts','assignments','picklists','match_handoffs'];
 const rows=(db,store)=>Array.isArray(db[store])?db[store]:[];
 function reject(message,status=409){throw Object.assign(new Error(message),{status});}
 function activeEvent(db,teamId){

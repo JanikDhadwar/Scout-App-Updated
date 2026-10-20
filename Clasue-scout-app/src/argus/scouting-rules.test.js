@@ -14,6 +14,7 @@ test('match assignments avoid simultaneous robots per scout and exclude complete
  assert.throws(()=>rules.generateAssignments({event,scoutIds:['a'],kind:'match',formId:'m'}),/enough scouts/);
  const added=rules.generateAssignments({event,scoutIds:['a','b','c','d','e','f'],kind:'match',formId:'m'});assert.equal(added.length,12);
  for(const match of event.matches)assert.equal(new Set(added.filter(row=>row.match_key===match.key).map(row=>row.scout_user_id)).size,6);
+ assert.equal(rules.generateAssignments({event,scoutIds:['a','b','c','d','e','f'],kind:'match',formId:'another-form',existing:added}).length,0,'A second form must not generate duplicate robot coverage');
  assert.equal(rules.generateAssignments({event:{...event,matches:event.matches.map(row=>({...row,actual_time:123}))},scoutIds:['a'],kind:'match',formId:'m'}).length,0);
 });
 test('submission limits apply across scouts but stay scoped to form, workspace and event',()=>{

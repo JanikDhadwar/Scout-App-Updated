@@ -9,7 +9,7 @@ function generateAssignments({event,scoutIds,kind,formId,existing=[]}) {
   const added=[];
   for(const task of tasks){
     if(!Number.isInteger(task.team_number)||task.team_number<=0)continue;
-    if(relevant.some(row=>type(row)===kind&&row.form_id===formId&&String(row.team_number)===String(task.team_number)&&(row.match_key||null)===(task.match_key||null)))continue;
+    if(relevant.some(row=>type(row)===kind&&(kind==='match'||row.form_id===formId)&&String(row.team_number)===String(task.team_number)&&(row.match_key||null)===(task.match_key||null)))continue;
     const busy=new Set([...relevant,...added].filter(row=>kind==='match'&&type(row)==='match'&&row.match_key===task.match_key).map(row=>row.scout_user_id));
     const available=shuffle(scouts.filter(id=>!busy.has(id))).sort((a,b)=>loads.get(a)-loads.get(b));
     if(!available.length)throw new Error('Select enough scouts to cover every robot in a match without assigning two robots to one person. Existing assignments are preserved.');

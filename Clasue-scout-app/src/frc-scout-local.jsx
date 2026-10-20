@@ -1,3 +1,4 @@
+import { assignedRobots, matchReportError } from './argus/match-access.js';
 import { APP_VERSION } from './app-version.js';
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
@@ -623,9 +624,15 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
   const [err,setErr]=useState(""); const [busy,setBusy]=useState(false);
   const [done,setDone]=useState(false);
   const scoutedTeam=draft.value.scoutedTeam ?? '';
-  const setScoutedTeam=value=>draft.change(current=>({...current,scoutedTeam:value,assignment_id:null}));
+  const setScoutedTeam=value=>draft.change(current=>{const event=availableEvents.find(event=>event.event_key===current.event_key),match=event?.matches?.find(match=>match.key===current.match_key),slot=assignedRobots({event,match,assignments:assignmentData,userId:user.id}).find(slot=>slot.teamNumber===String(value));return {...current,scoutedTeam:value,assignment_id:slot?.assignment?.id||null,alliance:slot?.alliance||current.alliance};});
   const [eventTeams,setEventTeams]=useState([]);
   const [availableEvents,setAvailableEvents]=useState([]);
+  const [assignmentData,setAssignmentData]=useState([]);
+  const isMatchForm=(form.kind||reportKind||'match')!=='pit';
+  const reportEvent=availableEvents.find(event=>event.event_key===draft.value.event_key);
+  const reportMatch=reportEvent?.matches?.find(match=>match.key===draft.value.match_key);
+  const allowedReportRobots=assignedRobots({event:reportEvent,match:reportMatch,assignments:assignmentData,userId:user.id});
+  const selectableTeams=isMatchForm?allowedReportRobots.map(slot=>eventTeams.find(team=>String(team.team_number)===slot.teamNumber)||{team_number:slot.teamNumber}):eventTeams;
   const [subCounts,setSubCounts]=useState({}); // team_number -> count
 
   useEffect(()=>{
@@ -633,7 +640,8 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
     (async()=>{
       // Load event teams
       try {
-        const evs = await idbAll("scout_events");
+        const [evs,assigned] = await Promise.all([idbAll("scout_events"),idbAll("assignments")]);
+        if(active)setAssignmentData(assigned);
         const owned=evs.filter(e=>e.team_id===team.id);
         const ev=owned.find(e=>e.event_key===draft.value.event_key);
         if(active){setAvailableEvents(owned);setEventTeams(ev?.event_teams || []);}
@@ -669,6 +677,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
     setBusy(true); setErr("");
     const sub={id:draft.value.id,form_id:form.id,form_title:draft.value.form_title||form.title,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,event_key:draft.value.event_key||null,match_key:draft.value.match_key||null,match_number:draft.value.match_number==null||draft.value.match_number===''?null:Number(draft.value.match_number),alliance:draft.value.alliance||null,assignment_id:draft.value.assignment_id||null,report_kind:draft.value.report_kind||form.kind||reportKind||'match',questions_snapshot:structuredClone(questions||[]),answers:visibleAnswers(questions,ans),created_at:tsNow()};
     try {
+      if(isMatchForm){const [events,assignments]=await Promise.all([idbAll('scout_events'),idbAll('assignments')]);const event=events.find(event=>event.team_id===team.id&&event.event_key===sub.event_key);const accessError=matchReportError({event,assignments,userId:user.id,report:sub});if(accessError)throw new Error(accessError);}
       await draft.flush();
       await offline.enqueue(sub,localDraftKey);
       setDone(true);
@@ -696,20 +705,21 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
 
       {contextDiffers&&<div className="notice" role="status">A saved draft has different team, event, or match context. Its values have been preserved. Review the fields below before submitting.</div>}
       <section style={sx.card} aria-labelledby="report-context-title"><h2 id="report-context-title" style={{fontSize:18,marginTop:0}}>Report context</h2>
-        <label style={sx.lbl} htmlFor="report-event">Event key</label><input id="report-event" list="report-events" style={sx.inp} value={draft.value.event_key||''} onChange={e=>draft.change(current=>({...current,event_key:e.target.value,assignment_id:null}))} placeholder="Event key, or blank for an unlinked report"/><datalist id="report-events">{availableEvents.map(event=><option key={event.id||event.event_key} value={event.event_key}>{event.event_name}</option>)}</datalist>
-        <p className="muted" style={{fontSize:12}}>Blank event keys stay unlinked and are excluded from event analytics.</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:12}}><div><label style={sx.lbl} htmlFor="report-match">Match key</label><input id="report-match" style={sx.inp} value={draft.value.match_key||''} onChange={e=>draft.change(current=>({...current,match_key:e.target.value,assignment_id:null}))} placeholder="e.g. 2026event_qm1"/></div><div><label style={sx.lbl} htmlFor="report-match-number">Match number</label><input id="report-match-number" type="number" style={sx.inp} value={draft.value.match_number??''} onChange={e=>setContext('match_number',e.target.value)}/></div><div><label style={sx.lbl} htmlFor="report-alliance">Alliance</label><select id="report-alliance" style={sx.inp} value={draft.value.alliance||''} onChange={e=>setContext('alliance',e.target.value)}><option value="">Unknown / not applicable</option><option value="red">Red alliance</option><option value="blue">Blue alliance</option></select></div></div>
-        <label style={sx.lbl} htmlFor="report-kind">Report type</label><select id="report-kind" style={sx.inp} value={draft.value.report_kind||form.kind||reportKind||'match'} onChange={e=>setContext('report_kind',e.target.value)}><option value="match">Match scouting</option><option value="pit">Pit scouting</option></select>
+        {isMatchForm&&<label style={sx.lbl}>Your assigned match<select style={sx.inp} aria-label="Your assigned match" value={draft.value.match_key||''} onChange={e=>{const match=reportEvent?.matches?.find(match=>match.key===e.target.value),slot=assignedRobots({event:reportEvent,match,assignments:assignmentData,userId:user.id})[0];if(match&&slot)draft.change(current=>({...current,match_key:match.key,match_number:match.match_number,alliance:slot.alliance,scoutedTeam:slot.teamNumber,assignment_id:slot.assignment?.id||null}));}}><option value="">Choose an assigned match</option>{(reportEvent?.matches||[]).filter(match=>assignedRobots({event:reportEvent,match,assignments:assignmentData,userId:user.id}).length).map(match=><option value={match.key} key={match.key}>Match {match.match_number}</option>)}</select></label>}
+        <label style={sx.lbl} htmlFor="report-event">Event key</label><input id="report-event" readOnly={isMatchForm} list="report-events" style={sx.inp} value={draft.value.event_key||''} onChange={e=>draft.change(current=>({...current,event_key:e.target.value,assignment_id:null}))} placeholder="Event key, or blank for an unlinked report"/><datalist id="report-events">{availableEvents.map(event=><option key={event.id||event.event_key} value={event.event_key}>{event.event_name}</option>)}</datalist>
+        <p className="muted" style={{fontSize:12}}>{isMatchForm?'Match reports use your assigned event and robot. Ask a coordinator or accept a handoff to change coverage.':'Blank event keys stay unlinked and are excluded from event analytics.'}</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:12}}><div><label style={sx.lbl} htmlFor="report-match">Match key</label><input id="report-match" readOnly={isMatchForm} style={sx.inp} value={draft.value.match_key||''} onChange={e=>draft.change(current=>({...current,match_key:e.target.value,assignment_id:null}))} placeholder="e.g. 2026event_qm1"/></div><div><label style={sx.lbl} htmlFor="report-match-number">Match number</label><input id="report-match-number" readOnly={isMatchForm} type="number" style={sx.inp} value={draft.value.match_number??''} onChange={e=>setContext('match_number',e.target.value)}/></div><div><label style={sx.lbl} htmlFor="report-alliance">Alliance</label><select id="report-alliance" disabled={isMatchForm} style={sx.inp} value={draft.value.alliance||''} onChange={e=>setContext('alliance',e.target.value)}><option value="">Unknown / not applicable</option><option value="red">Red alliance</option><option value="blue">Blue alliance</option></select></div></div>
+        <label style={sx.lbl} htmlFor="report-kind">Report type</label><select id="report-kind" disabled style={sx.inp} value={draft.value.report_kind||form.kind||reportKind||'match'} onChange={e=>setContext('report_kind',e.target.value)}><option value="match">Match scouting</option><option value="pit">Pit scouting</option></select>
         <label style={sx.lbl} htmlFor="report-scout">Scout identity</label><input id="report-scout" style={sx.inp} value={user.username} readOnly/><p className="muted" style={{fontSize:12}}>Reports use your signed-in identity.{draft.value.assignment_id?' Linked assignment: '+draft.value.assignment_id:''}</p>
       </section>
       {/* Team selector */}
-      {form.allow_team_select&&(
+      {(form.allow_team_select||isMatchForm)&&(
         <div style={sx.card}>
           <label htmlFor="report-scouted-team" style={sx.lbl}>Team you are scouting *</label>
-          {eventTeams.length > 0 ? (
+          {selectableTeams.length > 0||isMatchForm ? (
             <select id="report-scouted-team" style={sx.inp} value={scoutedTeam} onChange={e=>setScoutedTeam(e.target.value)}>
               <option value="">— Select Team —</option>
-              {eventTeams.map(t=>{
+              {selectableTeams.map(t=>{
                 const count = subCounts[t.team_number]||0;
                 const atMax = form.max_submissions_per_team && count >= form.max_submissions_per_team;
                 return <option key={t.team_number} value={t.team_number} disabled={atMax}>

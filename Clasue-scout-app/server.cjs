@@ -12,6 +12,9 @@ const { createIntegrationStore } = require('./integration-store.cjs');
 const { checkConnections } = require('./connection-check.cjs');
 const { generateAssignments, submissionError } = require('./scouting-rules.cjs');
 const {activeEvent,previewTransition,applyTransition}=require('./event-transition.cjs');
+const {matchReportError}=require('./src/argus/match-access.js');
+const handoffs=require('./match-handoffs.cjs');
+const scoutPresence=new Map();
 const app = express();
 app.disable('x-powered-by');
 app.disable('etag');
@@ -201,6 +204,25 @@ app.post('/api/assignments/generate',(req,res)=>{
   }catch(error){fail(res,400,error.message);}
 });
 
+app.get('/api/handoffs',(req,res)=>{
+ const teamId=req.query.team_id,db=readDB();if(!membership(db,req.user.id,teamId))return fail(res,403,'Team membership required');
+ const now=Date.now();scoutPresence.set(`${teamId}:${req.user.id}`,now);
+ for(const [key,time] of scoutPresence)if(time<now-60000)scoutPresence.delete(key);
+ const result=rows(db,'match_handoffs').filter(row=>row.team_id===teamId&&(row.from_user_id===req.user.id||row.to_user_id===req.user.id)).slice(-80).reverse().map(row=>({...row,status:row.status==='pending'&&row.expires_at<=now?'expired':row.status,from_username:rows(db,'users').find(user=>user.id===row.from_user_id)?.username||'Scout',to_username:rows(db,'users').find(user=>user.id===row.to_user_id)?.username||'Scout'}));
+ res.json(result);
+});
+app.get('/api/handoffs/context',(req,res)=>{
+ const {team_id,event_id,match_key}=req.query,db=readDB();
+ try{res.json(handoffs.handoffContext(db,{teamId:team_id,eventId:event_id,matchKey:match_key,userId:req.user.id,isOnline:id=>Date.now()-(scoutPresence.get(`${team_id}:${id}`)||0)<45000}));}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
+});
+app.post('/api/handoffs',(req,res)=>{
+ const {id,team_id,event_id,match_key,team_number,to_user_id,owner_revision}=req.body||{},db=readDB();
+ try{const row=handoffs.createHandoff(db,{id,teamId:team_id,eventId:event_id,matchKey:match_key,teamNumber:team_number,toUserId:to_user_id,ownerRevision:owner_revision,userId:req.user.id,isOnline:uid=>Date.now()-(scoutPresence.get(`${team_id}:${uid}`)||0)<45000});writeDB(db);res.json(row);}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
+});
+app.post('/api/handoffs/:id/respond',(req,res)=>{
+ const {action,revision}=req.body||{},db=readDB();
+ try{const row=handoffs.respondHandoff(db,{id:req.params.id,userId:req.user.id,action,revision,isOnline:uid=>{const handoff=rows(db,'match_handoffs').find(row=>row.id===req.params.id);return Date.now()-(scoutPresence.get(`${handoff.team_id}:${uid}`)||0)<45000;}});writeDB(db);res.json(row);}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
+});
 app.get('/api/event-transition/preview',(req,res)=>{
  const {team_id,next_event_id}=req.query,db=readDB();
  if(!admin(db,req.user.id,team_id))return fail(res,403,'Team administrator permission required');
@@ -249,6 +271,13 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!rows(db,'forms').some(f=>f.id===row.form_id&&f.team_id===tid))return fail(res,400,'Choose a form in this workspace');
     row.submitted_by=req.user.username;
     if(original)return isDeepStrictEqual(original,{...body,submitted_by:req.user.username})?res.json(original):fail(res,409,'A different report already uses this ID. Your local copy is preserved.');
+    const form=rows(db,'forms').find(form=>form.id===row.form_id);
+    if(form.kind&&row.report_kind&&form.kind!==row.report_kind)return fail(res,400,'Use the report type configured for this form.');
+    if((form.kind||'match')!=='pit'){
+      const event=rows(db,'scout_events').find(event=>event.team_id===tid&&event.event_key===row.event_key);
+      const accessError=matchReportError({event,assignments:rows(db,'assignments'),userId:req.user.id,report:row});
+      if(accessError)return fail(res,403,accessError);
+    }
     const limitError=submissionError(rows(db,'forms').find(f=>f.id===row.form_id),row,rows(db,'submissions'));
     if(limitError)return fail(res,409,limitError);
   } else if(store==='pit_scouts') {
@@ -289,6 +318,11 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
       const form=rows(db,'forms').find(form=>form.team_id===tid&&form.id===row.form_id&&!form.archived&&!form.archived_at);
       if(!event||!form||(form.kind||'match')!==(row.report_kind||'match')||!/^\d+$/.test(String(row.team_number)))return fail(res,400,'Choose an event, team and matching form for this assignment');
       if(row.report_kind!=='pit'&&!row.match_key)return fail(res,400,'Choose a match for this assignment');
+      if(row.report_kind!=='pit'){
+        const match=event.matches?.find(match=>match.key===row.match_key);
+        if(!match||!['red','blue'].some(color=>match.alliances?.[color]?.team_keys?.includes(`frc${row.team_number}`)))return fail(res,400,'Choose a robot playing in this match.');
+        if(!row.archived_at&&rows(db,'assignments').some(other=>other.id!==key&&other.team_id===tid&&other.event_key===row.event_key&&other.match_key===row.match_key&&String(other.team_number)===String(row.team_number)&&other.report_kind!=='pit'&&!other.archived_at))return fail(res,409,'This robot already has a scout for this match. Edit the existing assignment or request a handoff.');
+      }
     }
     row.revision=(original?.revision||0)+1;
     if(store==='assignments'){
