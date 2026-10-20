@@ -4,7 +4,7 @@
 
 Argus is an FRC match and pit scouting workspace. Prioritize fast report entry, readable schedules, traceable analytics and alliance decisions. The active application is `Clasue-scout-app/src/frc-scout-local.jsx`; the unused Firebase entry is not the deployed app.
 
-Use the shared tokens and primitives in `src/argus/workspace.css`. The canvas is navy graphite `#0B1018`, surfaces `#151D29`, text `#F2F5FA`, secondary text `#A7B5C8` and primary action blue `#4266DD`. Red presentation actions and labelled red/blue alliance colors are intentional. Do not add a team logo, gradients, promotional copy or decorative metric cards. Keep copy in sentence case and use plain action names.
+Use the shared tokens and primitives in `src/argus/workspace.css`. The canvas is navy graphite `#0B1018`, surfaces `#151D29`, text `#F2F5FA`, secondary text `#A7B5C8` and primary action red `#C53645`. Red presentation actions and labelled red/blue alliance colors are intentional. Do not add a team logo, gradients, promotional copy or decorative metric cards. Keep copy in sentence case and use plain action names.
 
 Use the platform sans font, tabular numbers, restrained borders, and consistent spacing. Desktop uses a sidebar. Phones use five bottom navigation destinations with a More menu. Tables may scroll inside labelled containers; the document must fit 360px through desktop widths. Keep controls usable with touch, keyboard and zoom. Provide labels, visible focus, chart data tables, modal focus containment, a skip link and reduced motion. Animate user actions briefly; avoid repeated entrance effects.
 

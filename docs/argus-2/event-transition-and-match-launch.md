@@ -16,7 +16,7 @@ Backup download is a real JSON download. The user must confirm that it was saved
 
 ## Interface and match launch
 
-Shared styling uses the existing navy/graphite tokens, compact sidebar/header, blue actions, denser operational panels, labelled alliance badges and schedule tables. Desktop exposes scouting destinations directly; phones retain five bottom destinations and More. Team terminology replaces workspace language in the main interface while internal tenant IDs and permissions remain compatible.
+Shared styling uses the existing navy/graphite tokens, compact sidebar/header, red primary actions (updated in 4.1.1), denser operational panels, labelled alliance badges and schedule tables. Desktop exposes scouting destinations directly; phones retain five bottom destinations and More. Team terminology replaces workspace language in the main interface while internal tenant IDs and permissions remain compatible.
 
 The dashboard exposes source-backed observations and a match-sample distribution. `eventMetricDistribution` lives in the shared analytics module, preserves zeros and uses already-deduplicated linked match medians; pit and unlinked samples are excluded from this chart. Per-team averages show sample counts and link to the team evidence. No mock scoring weights, fabricated rankings, win rates or live-field status were introduced.
 
