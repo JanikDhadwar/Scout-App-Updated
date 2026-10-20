@@ -9,7 +9,8 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
   const keyFor = (path, owner = scope) => `${owner?.userId || 'guest'}:${owner?.teamId || ''}:${path}`;
   const belongs = (entry, owner) => entry.userId === owner?.userId && entry.teamId === owner?.teamId;
   const readVersions = new Map();
-  const readVersion = owner => readVersions.get(keyFor('',owner)) || 0;
+  let releaseEpoch=0;
+  const readVersion = owner => (readVersions.get(keyFor('',owner)) || 0)+releaseEpoch;
   const requireCurrentRead = (owner,version) => {
     if(readVersion(owner)!==version)throw new RequestError('Read access changed. Reload data for your current role.',409);
   };
@@ -17,13 +18,30 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     if(!scope)return;
     const owner={...scope},scopeKey=keyFor('',owner);
     // Invalidate requests already in flight before awaiting any device storage operation.
-    readVersions.set(scopeKey,readVersion(owner)+1);
+    readVersions.set(scopeKey,(readVersions.get(scopeKey)||0)+1);
     if(belongs(owner,scope))update({readyAt:null});
     for(const cached of await storage.all('cache')) {
       if(cached.scope===scopeKey||cached.key.startsWith(scopeKey))await storage.remove('cache',cached.key);
     }
     await storage.remove('meta',keyFor('prepared',owner));
     if(belongs(owner,scope))await refresh();
+  }
+  let releaseFlight=Promise.resolve();
+  function invalidateForRelease(buildId) {
+    if(typeof buildId!=='string'||!/^[-a-zA-Z0-9]{1,100}$/.test(buildId))return Promise.reject(new RequestError('Invalid build version.'));
+    const work=releaseFlight.catch(()=>{}).then(async()=>{
+      if((await storage.get('meta','argus-release'))?.buildId===buildId)return false;
+      const cached=await storage.all('cache');
+      // Cover old-account requests too, even if no snapshot exists yet.
+      releaseEpoch++;
+      update({readyAt:null});
+      for(const row of cached)await storage.remove('cache',row.key);
+      for(const row of await storage.all('meta'))if(typeof row.key==='string'&&row.key.endsWith(':prepared'))await storage.remove('meta',row.key);
+      // Drafts, pending uploads and acknowledged receipts are never build caches.
+      await storage.put('meta',{key:'argus-release',buildId});
+      return true;
+    });
+    releaseFlight=work;return work;
   }
   async function request(method, path, body) {
     const controller = new AbortController();
@@ -198,7 +216,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     await storage.put('meta',{key:keyFor('prepared',owner),at});
     if (scope?.userId === owner.userId && scope?.teamId === owner.teamId) {update({storageError:''});await refresh();}
   }
-  return { api, enqueue, sync, prepare, pending, refresh, invalidateReadCache, getState:()=>state,
+  return { api, enqueue, sync, prepare, pending, refresh, invalidateReadCache, invalidateForRelease, getState:()=>state,
     setScope: async value => { scope=value; await refresh(); },
   };
 }

@@ -53,21 +53,9 @@ report running
 git merge --ff-only "refs/remotes/origin/$DEPLOY_BRANCH"
 [[ $(git rev-parse HEAD) == "$revision" ]] || { echo 'Local commits differ from origin; resolve before deploying.' >&2; report failed 1; exit 1; }
 report succeeded
-stage=archive
+stage=cache_config
 report running
-release=$(mktemp -d "$SCOUT_STATE_DIR/releases/$revision.XXXXXX")
-echo "Building $revision in $release"
-git archive "$revision" Clasue-scout-app | tar -x -C "$release"
-cd "$release/Clasue-scout-app"
-stage=install
-report running
-npm ci --include=dev --no-audit --no-fund
-stage=build
-report running
-npm run build
-stage=validate
-report running
-node --check server.cjs
+node "$REPO_DIR/Clasue-scout-app/deploy-cache.cjs" --check --env "$SCOUT_STATE_DIR/cloudflare-deploy.env"
 activate() {
   ln -sfn "$1" "$SCOUT_STATE_DIR/current.next"
   mv -Tf "$SCOUT_STATE_DIR/current.next" "$SCOUT_STATE_DIR/current"
@@ -81,13 +69,42 @@ healthy() {
   done
   return 1
 }
+finish_cache() {
+  stage=cache_purge
+  report running
+  node "$REPO_DIR/Clasue-scout-app/deploy-cache.cjs" --env "$SCOUT_STATE_DIR/cloudflare-deploy.env"
+  printf '%s\n' "$revision" > "$SCOUT_STATE_DIR/deployed-revision"
+  stage=complete
+  report succeeded
+}
+# A failed edge purge is retried without rebuilding/restarting an already healthy release.
+if [[ "${1:-}" != --force && -f "$SCOUT_STATE_DIR/activated-revision" ]] && [[ $(cat "$SCOUT_STATE_DIR/activated-revision") == "$revision" ]] && [[ -n "$previous" ]]; then
+  candidate=$release
+  release=$previous
+  if healthy; then finish_cache; exit 0; fi
+  release=$candidate
+fi
+stage=archive
+report running
+release=$(mktemp -d "$SCOUT_STATE_DIR/releases/$revision.XXXXXX")
+echo "Building $revision in $release"
+git archive "$revision" Clasue-scout-app | tar -x -C "$release"
+cd "$release/Clasue-scout-app"
+stage=install
+report running
+npm ci --include=dev --no-audit --no-fund
+stage=build
+report running
+ARGUS_REVISION="$revision" npm run build
+stage=validate
+report running
+node --check server.cjs
 activate "$release"
 stage=restart
 report running
 if sudo -n /usr/bin/systemctl restart scout-app.service && healthy; then
-  printf '%s\n' "$revision" > "$SCOUT_STATE_DIR/deployed-revision"
-  stage=complete
-  report succeeded
+  printf '%s\n' "$revision" > "$SCOUT_STATE_DIR/activated-revision"
+  finish_cache
   echo "Deployed $revision successfully."
 else
   failed_stage=$stage

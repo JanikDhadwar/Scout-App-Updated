@@ -89,6 +89,32 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
 
 export function analyticsForData(data={},workspace,event){return buildAnalytics({forms:data.forms || [],reports:data.submissions || [],event,teams:event?.event_teams || [],matches:data.matches || [],scope:{teamId:workspace?.id,eventKey:event?.event_key}});}
 
+/** Form-level evidence summary for the report library, not a season score.
+ * Caller supplies authorized, filtered reports; numeric duplicates use one median
+ * per event/team/match. Unknown event/match links remain separate observations.
+ */
+export function summarizeReportFields(reports=[],forms=[]) {
+ const fields=new Map();
+ for(const report of reports)for(const question of questionsFor(report,forms)){
+   const reportKind=report.report_kind==='pit'?'pit':'match',key=`${report.form_id}:${question.id}:${reportKind}`;
+   if(!fields.has(key))fields.set(key,{id:key,reportKind,formId:report.form_id,questionId:question.id,label:question.text,type:question.type,formTitle:report.form_title||forms.find(form=>form.id===report.form_id)?.title||report.form_id});
+ }
+ return [...fields.values()].map(field=>{
+   const eligible=reports.filter(report=>report.form_id===field.formId&&(report.report_kind==='pit'?'pit':'match')===field.reportKind&&visibleQuestions(questionsFor(report,forms),report.answers||{}).some(question=>question.id===field.questionId));
+   const answered=eligible.filter(report=>hasAnswer(report.answers?.[field.questionId]));
+   const base={...field,eligible:eligible.length,missing:eligible.length-answered.length,n:answered.length,invalid:0,sourceIds:answered.map(report=>report.id)};
+   if(['number','scale'].includes(field.type)){
+     const valid=answered.filter(report=>finite(report.answers[field.questionId])&&(field.type!=='scale'||Number(report.answers[field.questionId])>=1&&Number(report.answers[field.questionId])<=10));
+     const groups=new Map();
+     for(const report of valid){const key=report.report_kind!=='pit'&&report.event_key&&report.match_key&&report.scouted_team?JSON.stringify([report.event_key,String(report.scouted_team),report.match_key]):`report:${report.id}`;groups.set(key,[...(groups.get(key)||[]),Number(report.answers[field.questionId])]);}
+     const values=[...groups.values()].map(median);
+     return {...base,n:values.length,observationCount:valid.length,invalid:answered.length-valid.length,mean:values.length?values.reduce((sum,value)=>sum+value,0)/values.length:null,min:values.length?Math.min(...values):null,max:values.length?Math.max(...values):null};
+   }
+   if(['select','boolean'].includes(field.type)){const counts=new Map();for(const report of answered){const value=String(report.answers[field.questionId]);counts.set(value,(counts.get(value)||0)+1);}return {...base,counts:[...counts].map(([value,count])=>({value,count,percent:count/answered.length*100}))};}
+   return base;
+ });
+}
+
 export function presentationSections(analytics,team){
  if(!team)return [];
  const numeric=Object.values(team.metrics).filter(metric=>['number','scale'].includes(metric.type) && metric.n);

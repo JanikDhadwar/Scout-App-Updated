@@ -13,6 +13,8 @@ node -e 'const [major,minor]=process.versions.node.split(".").map(Number); if(ma
 git check-ref-format --branch "$DEPLOY_BRANCH" >/dev/null
 mkdir -p "$SCOUT_STATE_DIR"
 chmod 700 "$SCOUT_STATE_DIR"
+# Fail before changing services if the mandatory private edge-cache settings are missing.
+node "$REPO_DIR/Clasue-scout-app/deploy-cache.cjs" --check --env "$SCOUT_STATE_DIR/cloudflare-deploy.env"
 # Copy the old database once; reinstalling never replaces live data.
 if [[ ! -f "$SCOUT_STATE_DIR/db.json" && -f "$REPO_DIR/Clasue-scout-app/db.json" ]]; then
   cp "$REPO_DIR/Clasue-scout-app/db.json" "$SCOUT_STATE_DIR/db.json"

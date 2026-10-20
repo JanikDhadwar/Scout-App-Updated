@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assignmentReports, buildSearchIndex, searchIndex } from './workspace-model.js';
+import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, navigationGroup, sectionLinks } from './workspace-model.js';
+
+test('five main destinations retain routes for related tools',()=>{
+ assert.equal(mainDestinations.length,5);
+ for(const section of ['match','pit','assignments'])assert.equal(navigationGroup(section),'match');
+ for(const section of ['events','display','matches'])assert.equal(navigationGroup(section),'events');
+ for(const section of ['teams','analytics','strategy','reports'])assert.equal(navigationGroup(section),'teams');
+ assert.ok(sectionLinks.events.some(([key])=>key==='display'));
+ assert.ok(sectionLinks.match.some(([key])=>key==='assignments'));
+});
+
+test('pit assignments and unavailable schedule rows have no completed match',()=>{assert.equal(isCompleted(undefined),false);assert.equal(isCompleted(null),false);assert.equal(isCompleted({}),false);});
 
 test('assignments complete only from matching submitted records, not unrelated or opened forms',()=>{
  const a={id:'a',team_id:'w',event_key:'e',match_key:'e_qm1',team_number:254,scout_user_id:'u'};

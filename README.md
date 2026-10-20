@@ -64,6 +64,7 @@ server. The Firebase component is not used.
      chmod 600 ~/.local/share/scout-app/db.json
    fi
    git pull --ff-only origin main
+   # Configure the private Cloudflare deploy settings first; see the link below.
    bash scripts/install-debian.sh
    ```
 
@@ -80,12 +81,17 @@ To use another branch or port on installation:
 DEPLOY_BRANCH=main APP_PORT=3001 bash scripts/install-debian.sh
 ```
 
+Before running the installer, configure the [private Cloudflare deployment settings](docs/argus-2/deployment-cache.md). Cache purging is required: deployment fails safely if these settings are missing.
+
 ## What happens after a push
 
 `scout-update.timer` checks the configured branch every minute (and shortly
 after reboot). New commits trigger a fast-forward pull, `npm ci`, a production
 build, and a restart of `scout-app.service`. Multiple pushes between checks
-deploy the latest commit. No public GitHub webhook endpoint is needed.
+deploy the latest commit. No public GitHub webhook endpoint is needed. Each healthy
+release purges Cloudflare before deployment is marked complete. Browser and CDN
+responses use no-store; new builds refresh offline app caches without deleting
+scouting drafts or pending uploads. See [cache behavior and setup](docs/argus-2/deployment-cache.md).
 
 Builds happen in separate release directories. The current app keeps running
 during installation/build. Only a completed build is activated. The updater

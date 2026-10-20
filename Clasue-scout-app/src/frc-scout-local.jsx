@@ -89,6 +89,13 @@ export default function App() {
   const [user,setUser]=useState(null),[team,setTeam]=useState(null),[mem,setMem]=useState(null),[booting,setBooting]=useState(true);
   const [syncState,setSyncState]=useState(offline.getState());
   const [shellReady,setShellReady]=useState(!!navigator.serviceWorker?.controller);
+  useEffect(()=>{
+    let registration,timer,stopped=false;
+    const check=async()=>{if(navigator.onLine&&document.visibilityState==='visible'){try{registration=registration||await navigator.serviceWorker?.getRegistration();if(!stopped)await registration?.update();}catch{ /* Recheck after reconnecting. */ }}};
+    navigator.serviceWorker?.getRegistration().then(value=>{if(!stopped){registration=value;check();timer=setInterval(check,60000);}}).catch(()=>{});
+    window.addEventListener('online',check);document.addEventListener('visibilitychange',check);
+    return()=>{stopped=true;clearInterval(timer);window.removeEventListener('online',check);document.removeEventListener('visibilitychange',check);};
+  },[]);
   async function saveSession(u,t,m){if(u)localStorage.setItem(SESSION_KEY,JSON.stringify({user:{id:u.id,username:u.username},team:t||null,mem:m||null}));else localStorage.removeItem(SESSION_KEY);}
   useEffect(()=>{
     const listener=event=>setSyncState(event.detail),ready=()=>setShellReady(!!navigator.serviceWorker?.controller);
@@ -124,7 +131,7 @@ export default function App() {
   useEffect(()=>{
     if(!user||!team)return;
     let stopped=false,running=false,lastPrepared=0;
-    const check=async()=>{if(stopped||running)return;running=true;try{await offline.setScope({userId:user.id,teamId:team.id});await offline.sync();if(offline.getState().connection==='online'&&Date.now()-lastPrepared>60000){await offline.prepare();lastPrepared=Date.now();}}catch(error){if(!stopped)setSyncState(state=>({...state,error:error.message}));}finally{running=false;}};
+    const check=async()=>{if(stopped||running)return;running=true;try{await offline.setScope({userId:user.id,teamId:team.id});try{const release=await apiCall('GET','/release');if(await offline.invalidateForRelease(release.buildId))window.dispatchEvent(new Event('argus-workspace-updated'));}catch{ /* Offline releases keep downloaded data and pending uploads intact. */ }await offline.sync();if(offline.getState().connection==='online'&&Date.now()-lastPrepared>60000){await offline.prepare();lastPrepared=Date.now();}}catch(error){if(!stopped)setSyncState(state=>({...state,error:error.message}));}finally{running=false;}};
     check();const timer=setInterval(check,15000);window.addEventListener('online',check);document.addEventListener('visibilitychange',check);
     return()=>{stopped=true;clearInterval(timer);window.removeEventListener('online',check);document.removeEventListener('visibilitychange',check);};
   },[user,team]);
@@ -133,6 +140,7 @@ export default function App() {
   async function clearSession(){await saveSession(null);await offline.setScope(null);setUser(null);setTeam(null);setMem(null);}
   async function logout(){try{await apiCall('POST','/auth/logout',{});await clearSession();}catch(error){alert(`Could not sign out: ${error.message}`);}}
   async function switchWorkspace(){setTeam(null);setMem(null);await saveSession(user,null,null);}
+  async function leaveWorkspace(){if(mem?.role==='owner'||!confirm('Leave this workspace? Your submitted reports remain with the team; drafts and pending reports stay scoped to this workspace.'))return;try{await apiCall('DELETE',`/memberships/${encodeURIComponent(mem.id)}`);await offline.invalidateReadCache();await offline.setScope({userId:user.id});await switchWorkspace();}catch(error){alert(error.message);}}
   async function refreshMem(){try{const rows=await fbSelect('memberships',{team_id:team.id,user_id:user.id});if(rows[0]){setMem(rows[0]);await saveSession(user,team,rows[0]);}}catch{ /* Keep the last confirmed role while offline. */ }}
   async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this workspace?':'Archive this workspace? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
   async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active workspaces you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
@@ -140,7 +148,7 @@ export default function App() {
   if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main className="workspace-main">{!user?<AuthScreen onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
   const renderLegacy=(view,context={})=>view==='match'||view==='pit'?<FormsTab key={`${view}:${context.match_key||''}:${context.scouted_team||''}`} team={team} user={user} role={role} syncState={syncState} reportKind={view} context={context} onPending={()=>{offline.refresh();window.dispatchEvent(new Event('scout-report-saved'));}}/>:view==='news'?<AnnouncementsTab team={team} user={user} role={role}/>:view==='myteam'?<MyTeamTab key={context.event_key} team={team} eventKey={context.event_key}/>:view==='manage'?<ManageTab team={team} user={user} onTeamUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} onRoleChange={refreshMem}/>:view==='sync'?<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>{window.location.hash='/settings';}}/>:null;
-  return <ArgusWorkspace workspace={team} user={user} role={role} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={()=>updateServiceWorker(true)}/>;
+  return <ArgusWorkspace workspace={team} user={user} role={role} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={()=>updateServiceWorker(true)}/>;
 }
 
 // ─── Auth Screen ──────────────────────────────────────────────────────────────
@@ -481,6 +489,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
     if (qs.some(q=>!q.text.trim())){ setErr("All questions need text."); return; }
     const conditionError = validateConditions(qs);
     if (conditionError) { setErr(conditionError); return; }
+    if(allowTeamSelect&&maxPerTeam&&(!Number.isInteger(Number(maxPerTeam))||Number(maxPerTeam)<1)){setErr('Enter a positive whole-number submission limit.');return;}
     setBusy(true); setErr("");
     const form={
       ...editing,
@@ -490,12 +499,12 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
       title:title.trim(),
       questions:qs,
       allow_team_select:allowTeamSelect,
-      max_submissions_per_team:maxPerTeam?Number(maxPerTeam):null,
+      max_submissions_per_team:allowTeamSelect&&maxPerTeam?Number(maxPerTeam):null,
       created_by: editing?.created_by||user.username,
       created_at: editing?.created_at||tsNow(),
       updated_at:tsNow(),
     };
-    try { await fbInsert("forms",form); onSave(); }
+    try { await fbInsert("forms",form); window.dispatchEvent(new Event('argus-workspace-updated')); onSave(); }
     catch { setErr("Error saving form."); }
     setBusy(false);
   }
@@ -518,8 +527,8 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
         </div>
         {allowTeamSelect&&(
           <>
-            <label style={sx.lbl}>Max submissions per team (blank = unlimited)</label>
-            <input style={{...sx.inp,marginBottom:0}} type="number" placeholder="e.g. 3" value={maxPerTeam} onChange={e=>setMaxPerTeam(e.target.value)} inputMode="numeric"/>
+            <label style={sx.lbl}>Max submissions per team per event (blank = unlimited)</label>
+            <input style={{...sx.inp,marginBottom:0}} aria-label="Max submissions per team per event" type="number" min="1" step="1" placeholder="e.g. 1" value={maxPerTeam} onChange={e=>setMaxPerTeam(e.target.value)} inputMode="numeric"/>
           </>
         )}
       </div>
@@ -631,11 +640,13 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
       // Load submission counts per team for this form
       if (form.max_submissions_per_team) {
         try {
-          const subs = await fbSelect("submissions",{form_id:form.id});
-          const counts = {};
-          subs.filter(s=>(s.event_key||'')===(draft.value.event_key||'')).forEach(s=>{ if(s.scouted_team) counts[s.scouted_team]=(counts[s.scouted_team]||0)+1; });
+          const counts = await apiCall('GET',`/form-submission-counts/${encodeURIComponent(form.id)}?event_key=${encodeURIComponent(draft.value.event_key||'')}`);
+          const queued=await offline.pending();
+          for(const entry of queued){const s=entry.row;if(s.team_id===team.id&&s.form_id===form.id&&(s.event_key||'')===(draft.value.event_key||'')&&s.scouted_team)counts[s.scouted_team]=(counts[s.scouted_team]||0)+1;}
           if(active)setSubCounts(counts);
-        } catch { /* Keep the report draft usable if submission counts are unavailable. */ }
+        } catch {
+          try {const subs=await fbSelect('submissions',{form_id:form.id});const counts={};for(const s of subs)if((s.event_key||'')===(draft.value.event_key||'')&&s.scouted_team)counts[s.scouted_team]=(counts[s.scouted_team]||0)+1;if(active)setSubCounts(counts);}catch{if(active)setSubCounts({});}
+        }
       }
     })();
     return ()=>{active=false;};

@@ -1,6 +1,6 @@
 const fs=require('node:fs');
 const path=require('node:path');
-const stages=new Set(['starting','fetch','merge','archive','install','build','validate','restart','health','rollback','idle','complete']);
+const stages=new Set(['starting','fetch','merge','archive','install','build','validate','cache_config','cache_purge','restart','health','rollback','idle','complete']);
 const states=new Set(['running','failed','succeeded','current']);
 const revision=value=>typeof value==='string'&&/^[a-f0-9]{40,64}$/.test(value.trim())?value.trim():null;
 function writeDeploymentStatus({stateDir,stage,status,targetRevision,checkoutRevision,candidateRelease,exitCode=0}) {

@@ -8,8 +8,11 @@ const crypto = require('node:crypto');
 const { isDeepStrictEqual } = require('node:util');
 const { askGroq, DEFAULT_MODEL } = require('./analyst-service.cjs');
 const { createIntegrationStore } = require('./integration-store.cjs');
+const { checkConnections } = require('./connection-check.cjs');
+const { generateAssignments, submissionError } = require('./scouting-rules.cjs');
 const app = express();
 app.disable('x-powered-by');
+app.disable('etag');
 const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'db.json');
 const DIST_DIR = path.join(__dirname, 'dist');
 const integrations=createIntegrationStore(path.join(path.dirname(DB_FILE),'argus-integrations.private.json'));
@@ -48,7 +51,7 @@ function login(req,res,u) {
   res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure || process.env.COOKIE_SECURE==='true',maxAge:7*86400000,path:'/'});
   return res.json(publicUser(u));
 }
-app.use((_req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin'});next();});
+app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store, max-age=0','CDN-Cache-Control':'no-store','Cloudflare-CDN-Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin'});next();});
 app.use(express.json({limit:'10mb'}));
 app.use('/api',(req,res,next)=>{
   res.set('Cache-Control','no-store');
@@ -58,6 +61,7 @@ app.use('/api',(req,res,next)=>{
   }
   next();
 });
+app.get('/api/release',(_req,res)=>{try{const value=JSON.parse(fs.readFileSync(path.join(DIST_DIR,'release.json'),'utf8'));if(typeof value.buildId!=='string'||!/^[-a-zA-Z0-9]{1,100}$/.test(value.buildId))throw Error();res.json({buildId:value.buildId});}catch{fail(res,503,'Build version is unavailable.');}});
 app.get('/api/health',(_req,res)=>{readDB();const ok=process.env.NODE_ENV!=='production'||fs.existsSync(path.join(DIST_DIR,'index.html'));res.status(ok?200:503).json({ok,release:path.basename(path.dirname(__dirname))});});
 app.use('/api',(req,res,next)=>{
   const token=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('argus_session='))?.slice(14);
@@ -128,6 +132,16 @@ app.post('/api/auth/transfer-ownership',(req,res)=>{
 });
 app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:!!integrationKey(req,'GROQ_API_KEY',workspaceId)});});
 app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{res.json(integrations.save(workspaceId,values));}catch{fail(res,400,'Could not save private settings. Check the key format and server storage permissions.');}});
+const connectionChecks=new Map();
+app.post('/api/integrations/check',async(req,res)=>{
+  const {workspaceId}=req.body||{};
+  if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');
+  const bucket=`${req.user.id}:${workspaceId}`,now=Date.now();
+  if(connectionChecks.get(bucket)>now-30000)return fail(res,429,'Wait 30 seconds before checking again.');
+  if(connectionChecks.size>1000)for(const [key,time]of connectionChecks)if(time<now-30000)connectionChecks.delete(key);
+  connectionChecks.set(bucket,now);
+  res.json(await checkConnections({tbaKey:integrationKey(req,'TBA_API_KEY',workspaceId),groqKey:integrationKey(req,'GROQ_API_KEY',workspaceId),model:integrationKey(req,'GROQ_MODEL',workspaceId)||DEFAULT_MODEL}));
+});
 const analystRequests=new Map();
 app.get('/api/analyst/status',(_req,res)=>res.json({provider:'groq',configured:!!integrationKey(_req,'GROQ_API_KEY'),model:integrationKey(_req,'GROQ_MODEL')||DEFAULT_MODEL}));
 app.post('/api/analyst/ask',async(req,res)=>{
@@ -156,6 +170,33 @@ app.get('/api/tba/*path',async(req,res)=>{
   if(!integrationKey(req,'TBA_API_KEY'))return fail(res,503,'Official data needs an API key. Ask the workspace owner to connect event data in Settings.');
   try {const result=await fetch(`https://www.thebluealliance.com/api/v3/${route}`,{headers:{'X-TBA-Auth-Key':integrationKey(req,'TBA_API_KEY'),'User-Agent':'Argus-Scouting/2.0'},signal:AbortSignal.timeout(10000)});if(!result.ok)return fail(res,result.status===404?404:502,'Official data request failed');res.json(await result.json());}catch{return fail(res,502,'Official data is temporarily unreachable');}
 });
+app.get('/api/form-submission-counts/:formId',(req,res)=>{
+  const db=readDB(),form=rows(db,'forms').find(row=>row.id===req.params.formId);
+  if(!form||!membership(db,req.user.id,form.team_id))return fail(res,404,'Form not found');
+  const counts={};for(const report of rows(db,'submissions'))if(report.team_id===form.team_id&&report.form_id===form.id&&(report.event_key||'')===(req.query.event_key||'')&&/^\d+$/.test(String(report.scouted_team)))counts[report.scouted_team]=(counts[report.scouted_team]||0)+1;
+  res.json(counts);
+});
+app.post('/api/assignments/generate',(req,res)=>{
+  const {event_id,report_kind,form_id,pit_form_id,match_form_id,assignment_revision}=req.body||{},db=readDB();
+  const event=rows(db,'scout_events').find(row=>row.id===event_id);
+  if(!event||!admin(db,req.user.id,event.team_id))return fail(res,403,'Administrator permission required for this event');
+  if(event.archived_at)return fail(res,409,'Restore this event before generating assignments.');
+  if(assignment_revision!==(event.assignment_revision||0))return fail(res,409,'Assignments changed. Refresh before generating again.');
+  const scoutIds=req.body.scout_ids===undefined?rows(db,'memberships').filter(row=>row.team_id===event.team_id).map(row=>row.user_id):req.body.scout_ids;
+  if(!['pit','match','both'].includes(report_kind)||!Array.isArray(scoutIds)||!scoutIds.length||scoutIds.some(id=>!membership(db,id,event.team_id)))return fail(res,400,'Select workspace scouts and a report type');
+  const kinds=report_kind==='both'?['pit','match']:[report_kind];
+  const plans=kinds.map(kind=>({kind,form:rows(db,'forms').find(row=>row.id===(report_kind==='both'?(kind==='pit'?pit_form_id:match_form_id):form_id)&&row.team_id===event.team_id&&!row.archived&&!row.archived_at&&(row.kind||'match')===kind)}));
+  if(plans.some(plan=>!plan.form))return fail(res,400,'Choose an active form for each report type');
+  if(plans.some(plan=>plan.kind==='pit')&&!event.event_teams?.length)return fail(res,400,'Download event teams before assigning pit scouting.');
+  if(plans.some(plan=>plan.kind==='match')&&!event.matches?.length)return fail(res,400,'Download the match schedule before assigning match scouting.');
+  try{
+    const added=[],counts={};
+    for(const plan of plans){const generated=generateAssignments({event,scoutIds,kind:plan.kind,formId:plan.form.id,existing:[...rows(db,'assignments'),...added]});added.push(...generated);counts[plan.kind]=generated.length;}
+    db.assignments=[...rows(db,'assignments'),...added];event.excluded=rows(db,'memberships').filter(row=>row.team_id===event.team_id&&!scoutIds.includes(row.user_id)).map(row=>row.user_id);event.assignment_revision=(event.assignment_revision||0)+1;writeDB(db);
+    res.json({added:added.length,counts,assignment_revision:event.assignment_revision});
+  }catch(error){fail(res,400,error.message);}
+});
+
 function visible(db,store,row,uid) {
   if(store==='users')return row.id===uid||rows(db,'memberships').some(m=>m.user_id===row.id&&membership(db,uid,m.team_id));
   const tid=store==='teams'?row.id:row.team_id;
@@ -188,6 +229,8 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!rows(db,'forms').some(f=>f.id===row.form_id&&f.team_id===tid))return fail(res,400,'Choose a form in this workspace');
     row.submitted_by=req.user.username;
     if(original)return isDeepStrictEqual(original,{...body,submitted_by:req.user.username})?res.json(original):fail(res,409,'A different report already uses this ID. Your local copy is preserved.');
+    const limitError=submissionError(rows(db,'forms').find(f=>f.id===row.form_id),row,rows(db,'submissions'));
+    if(limitError)return fail(res,409,limitError);
   } else if(store==='pit_scouts') {
     if(row.user_id!==req.user.id&&!admin(db,req.user.id,tid))return fail(res,403,'Permission denied');
     if(original&&row.user_id!==original.user_id)return fail(res,400,'Scout identity cannot be changed');
@@ -204,7 +247,9 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!original||row.owner_id!==original.owner_id||row.number!==original.number)return fail(res,400,'Team identity cannot be changed');
   } else if(!admin(db,req.user.id,tid))return fail(res,403,'Administrator permission required');
   if(req.method==='DELETE'&&['forms','scout_events'].includes(store))return fail(res,409,'Archive this record instead. Scouting evidence and unfinished drafts must be retained.');
+  if(store==='forms'&&req.method!=='DELETE'&&row.max_submissions_per_team!=null&&(!Number.isInteger(row.max_submissions_per_team)||row.max_submissions_per_team<1||!row.allow_team_select))return fail(res,400,'Submission limits require team selection and a positive whole number');
   if(store==='scout_events') {
+    if(Object.hasOwn(body,'assignment_revision'))return fail(res,400,'Assignment revisions are managed by assignment writes');
     if(Object.hasOwn(body,'analytics_config')) {
       const expected=body.analytics_revision ?? 0,current=original?.analytics_revision ?? 0;
       if(!Number.isInteger(expected)||expected!==current)return fail(res,409,'Metric definitions changed. Reload the current definitions before saving; your edits were not overwritten.');
@@ -215,7 +260,17 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
   if(['assignments','picklists'].includes(store)) {
     if(!Number.isInteger(body.revision)||body.revision!==(original?.revision||0))return fail(res,409,'This record changed. Reload before saving; your edit was not overwritten.');
     if(store==='assignments'&&req.method!=='DELETE'&&!membership(db,row.scout_user_id,tid))return fail(res,400,'Assign a scout who belongs to this workspace');
+    if(store==='assignments'&&req.method!=='DELETE'){
+      const event=rows(db,'scout_events').find(event=>event.team_id===tid&&event.event_key===row.event_key);
+      const form=rows(db,'forms').find(form=>form.team_id===tid&&form.id===row.form_id&&!form.archived&&!form.archived_at);
+      if(!event||!form||(form.kind||'match')!==(row.report_kind||'match')||!/^\d+$/.test(String(row.team_number)))return fail(res,400,'Choose an event, team and matching form for this assignment');
+      if(row.report_kind!=='pit'&&!row.match_key)return fail(res,400,'Choose a match for this assignment');
+    }
     row.revision=(original?.revision||0)+1;
+    if(store==='assignments'){
+      const event=rows(db,'scout_events').find(event=>event.team_id===tid&&event.event_key===row.event_key);
+      if(event)event.assignment_revision=(event.assignment_revision||0)+1;
+    }
   }
   if(req.method==='DELETE')db[store]=rows(db,store).filter(r=>r.id!==key);
   else {db[store]=rows(db,store);const index=db[store].findIndex(r=>r.id===key);if(index<0)db[store].push(row);else db[store][index]=row;}
@@ -224,7 +279,7 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
 app.use('/api',(_req,res)=>fail(res,404,'Unknown API route'));
 // Removed unprefixed collection aliases; they must never bypass authentication.
 app.use((req,res,next)=>STORES.includes(req.path.split('/')[1])||req.path.startsWith('/session')?fail(res,404,'Unknown route'):next());
-app.use(express.static(DIST_DIR,{setHeaders(res,file){if(file.endsWith('.html')||file.endsWith('sw.js')||file.endsWith('deployment-status.json'))res.set('Cache-Control','no-cache');}}));
-app.use((req,res,next)=>{if(req.method!=='GET')return next();const index=path.join(DIST_DIR,'index.html');if(!fs.existsSync(index))return res.status(503).send('App build not found. Run npm run build first.');res.set('Cache-Control','no-cache');res.sendFile(index);});
+app.use(express.static(DIST_DIR,{etag:false,lastModified:false,cacheControl:false}));
+app.use((req,res,next)=>{if(req.method!=='GET')return next();const index=path.join(DIST_DIR,'index.html');if(!fs.existsSync(index))return res.status(503).send('App build not found. Run npm run build first.');res.set('Cache-Control','no-store, max-age=0');res.sendFile(index,{etag:false,lastModified:false,cacheControl:false});});
 app.use((err,_req,res,_next)=>{console.error(err.message);fail(res,err.status||500,'Request failed. Please try again.');});
 app.listen(Number(process.env.APP_PORT||3001),()=>{console.log(`Argus DB server running`);console.log(`Data file: ${DB_FILE}`);});

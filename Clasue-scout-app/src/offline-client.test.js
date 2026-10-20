@@ -154,6 +154,17 @@ test('a GET started before role invalidation cannot restore or return its old pr
  assert.equal((await f.store.all('cache')).length,0);
 });
 
+test('a release change rejects uncached in-flight reads even after switching accounts',async()=>{
+ const f=await setup();let release;
+ const client=createOfflineClient({storage:f.store,fetcher:()=>new Promise(resolve=>{release=()=>resolve(response([{id:'old-release'}]));})});
+ await client.setScope(owner);
+ const pendingRead=client.api('GET','/submissions');
+ await client.setScope({userId:'other',teamId:'42'});
+ await client.invalidateForRelease('release-new');release();
+ await assert.rejects(pendingRead,/changed|invalidated/i);
+ assert.equal((await f.store.all('cache')).length,0);
+});
+
 test('download preparation started under an old role cannot recreate snapshots or readiness',async()=>{
  const f=await setup(),releases=[];
  const client=createOfflineClient({storage:f.store,fetcher:()=>new Promise(resolve=>{releases.push(()=>resolve(response([{id:'old-role-record'}])));})});await client.setScope(owner);
@@ -162,4 +173,20 @@ test('download preparation started under an old role cannot recreate snapshots o
  assert.equal((await f.store.all('cache')).length,0);
  assert.equal(await f.store.get('meta','scouter:6390:prepared'),undefined);
  assert.equal(client.getState().readyAt,null);
+});
+
+test('new releases invalidate all read snapshots and readiness but preserve drafts, uploads and receipts',async()=>{
+ const f=await setup();
+ await f.store.put('cache',{key:'scouter:6390:/forms',scope:'scouter:6390:',store:'forms',data:[{id:'old'}]});
+ await f.store.put('cache',{key:'other:42:/forms',scope:'other:42:',store:'forms',data:[{id:'old-other'}]});
+ await f.store.put('meta',{key:'scouter:6390:prepared',at:'old'});
+ await f.store.put('drafts',{key:'keep-draft',value:{answers:{score:0}}});
+ await f.client.enqueue(report('keep-queued'));
+ await f.store.put('receipts',{key:'keep-receipt',row:report('keep-receipt'),userId:owner.userId,teamId:owner.teamId,store:'submissions'});
+ assert.equal(await f.client.invalidateForRelease('release-a'),true);
+ assert.equal((await f.store.all('cache')).length,0);assert.equal(await f.store.get('meta','scouter:6390:prepared'),undefined);
+ assert.ok(await f.store.get('drafts','keep-draft'));assert.equal((await f.store.all('queue')).length,1);assert.equal((await f.store.all('receipts')).length,1);
+ await f.store.put('cache',{key:'fresh',scope:'scouter:6390:',store:'forms',data:[]});
+ assert.equal(await f.client.invalidateForRelease('release-a'),false);assert.ok(await f.store.get('cache','fresh'));
+ assert.equal(await f.client.invalidateForRelease('release-b'),true);assert.equal((await f.store.all('cache')).length,0);
 });
