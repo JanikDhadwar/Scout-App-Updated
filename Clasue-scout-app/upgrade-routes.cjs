@@ -2,6 +2,7 @@ const { randomUUID } = require('node:crypto');
 const { rows, reject, requireMember, requireAdmin, admin, role, audit, realReports } = require('./domain.cjs');
 const assignments = require('./assignment-service.cjs');
 const members = require('./member-service.cjs');
+const coverage = require('./admin-coverage.cjs');
 const { changeReportState,validateReport } = require('./submission-service.cjs');
 const { analyticsForUser, sharedInputs } = require('./shared-analytics.cjs');
 const { refreshStates } = require('./match-handoffs.cjs');
@@ -50,12 +51,17 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, dbFile })
     const view = assignments.viewPlan(db, event);
     const { isCompleted } = require('./src/argus/workspace-model.js');
     const missing = view.assignments.filter(a => !a.completion && !a.schedule_cancelled && (a.report_kind === 'pit' || isCompleted(event.matches?.find(m => m.key === a.match_key))));
-    return { ...view, missing, completed: view.assignments.filter(a => a.completion).length,
+    return { ...view, team_coverage: coverage.teamCoverage(db, event, view.assignments), missing, completed: view.assignments.filter(a => a.completion).length,
       members: rows(db, 'memberships').filter(m => m.team_id === event.team_id),
       people:rows(db,'users').filter(u=>view.assignments.some(a=>a.scout_user_id===u.id||a.primary_scout_user_id===u.id)||rows(db,'audit_events').some(a=>a.team_id===event.team_id&&a.actor_id===u.id)).map(u=>({id:u.id,username:u.username})),
       handoffs: rows(db, 'match_handoffs').filter(h => h.team_id === event.team_id && h.event_key === event.event_key),
       history: rows(db, 'responsibility_history').filter(h => h.team_id === event.team_id && h.event_key === event.event_key).slice(-200).reverse(),
       training: rows(db,'practice_submissions').filter(r=>r.team_id===event.team_id).map(r=>({id:r.id,user_id:r.user_id,report_kind:r.report_kind,created_at:r.created_at})) };
+  });
+  route('post', '/api/admin/coverage', req => {
+    const db = readDB(), event = assignments.eventFor(db, req.body?.event_id, req.user.id);
+    const result = coverage.changeDismissal(db, event, req.body || {}, req.user.id);
+    writeDB(db); return result;
   });
   route('get', '/api/admin/members', req => {
     const db = readDB(); requireAdmin(db, req.user.id, req.query.team_id);

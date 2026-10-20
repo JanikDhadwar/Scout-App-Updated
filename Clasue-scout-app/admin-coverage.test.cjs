@@ -1,0 +1,34 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { fixture } = require('../scripts/qa-fixture.cjs');
+const { migrate } = require('./database.cjs');
+const { teamCoverage, changeDismissal } = require('./admin-coverage.cjs');
+
+test('coverage groups teams and preserves evidence through dismissals and restoration', () => {
+  const db = migrate(fixture()), event = db.scout_events[0];
+  db.submissions = [{ id: 'pit', team_id: event.team_id, event_key: event.event_key, scouted_team: 254, report_kind: 'pit' }];
+  const teams = teamCoverage(db, event);
+  assert.equal(teams.length, 4);
+  const team = teams.find(t => t.team_number === '254');
+  assert.equal(team.team_name, 'Cheesy Poofs'); assert.equal(team.pit_missing, false);
+  assert.equal(team.missing_matches.length, 3);
+  assert.equal(teams.find(t => t.team_number === '1678').pit_missing, true);
+  const before = structuredClone(db.submissions);
+  const input = { team_number: '254', match_key: '2026qa_qm1', dismissed: true, revision: 0 };
+  changeDismissal(db, event, input, 'qa-admin');
+  assert.equal(teamCoverage(db, event)[0].missing_matches.length, 2);
+  assert.equal(teamCoverage(db, event)[0].dismissed_matches.length, 1);
+  assert.deepEqual(db.submissions, before);
+  assert.throws(() => changeDismissal(db, event, input, 'qa-admin'), /changed/);
+  assert.throws(() => changeDismissal(db, event, { ...input, match_key: '2026qa_qm4' }, 'qa-admin'), /completed match/);
+  changeDismissal(db, event, { ...input, dismissed: false, revision: 1 }, 'qa-owner');
+  assert.equal(teamCoverage(db, event)[0].missing_matches.length, 3);
+  db.submissions.push({ ...before[0], id: 'match', report_kind: 'match', match_key: input.match_key });
+  assert.equal(teamCoverage(db, event)[0].missing_matches.length, 2);
+  assert.throws(() => changeDismissal(db, event, { ...input, revision: 2 }, 'qa-admin'), /completed match/);
+  db.submission_states.push({ id: 'match', removed: true });
+  assert.equal(teamCoverage(db, event)[0].missing_matches.length, 3);
+  db.submission_states.push({ id: 'pit', review_required: true });
+  assert.equal(teamCoverage(db, event)[0].pit_missing, true);
+  assert.equal(db.audit_events.filter(a => a.action.startsWith('coverage.')).length, 2);
+});

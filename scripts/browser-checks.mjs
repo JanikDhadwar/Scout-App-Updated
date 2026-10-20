@@ -73,7 +73,14 @@ try {
   await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'Manage ownership',exact:true}).click();await page.getByText(/Move or lock individual teams/).click();assert.ok(await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).isChecked());
  });
  await check('Admin missing reports, actor history, reversible report removal and shared publication',async()=>{
-  await route('/admin');await page.getByRole('heading',{name:'Admin control centre',exact:true}).waitFor();await page.getByRole('heading',{name:'Missing pit and completed-match reports',exact:true}).waitFor();
+  await route('/admin');await page.getByRole('heading',{name:'Admin control centre',exact:true}).waitFor();await page.getByRole('heading',{name:'Scouting by team',exact:true}).waitFor();
+  assert.equal(await page.locator('.a-coverage-team').count(),4);
+  const coverage=(await api(page,'/admin/overview?event_id=qa-event')).data.team_coverage;
+  const team=coverage.find(t=>t.missing_matches.length),row=page.locator('.a-coverage-team').filter({has:page.locator('summary strong').filter({hasText:`Team ${team.team_number} ·`})});
+  await row.locator(':scope > summary').click();await row.getByRole('button',{name:'Dismiss missed match',exact:true}).first().click();
+  await row.getByText('Dismissed matches (1)',{exact:true}).waitFor();await page.reload({waitUntil:'networkidle'});
+  const restoredRow=page.locator('.a-coverage-team').filter({has:page.locator('summary strong').filter({hasText:`Team ${team.team_number} ·`})});
+  await restoredRow.locator(':scope > summary').click();await restoredRow.getByText('Dismissed matches (1)',{exact:true}).click();await restoredRow.getByRole('button',{name:'Restore warning',exact:true}).click();await restoredRow.getByText('Dismissed matches (1)',{exact:true}).waitFor({state:'hidden'});
   await page.getByRole('button',{name:'Forms and reports',exact:true}).click();await page.getByLabel('Reason for removal or restoration').fill('QA removal recovery');const first=page.locator('.a-duty').filter({has:page.getByRole('button',{name:'Remove report',exact:true})}).first();await first.getByRole('button',{name:'Remove report',exact:true}).click();await page.getByRole('button',{name:'Restore report',exact:true}).first().waitFor();await page.getByRole('button',{name:'Restore report',exact:true}).first().click();
   await page.getByRole('button',{name:'Shared data',exact:true}).click();await page.getByRole('checkbox',{name:'QA match report: Autonomous pieces',exact:true}).check();await page.getByRole('button',{name:'Save approved measurements',exact:true}).click();await page.getByText(/Approved summaries saved/).waitFor();
   await page.getByRole('button',{name:'Activity',exact:true}).click();await page.getByText('report.restore',{exact:true}).first().waitFor();

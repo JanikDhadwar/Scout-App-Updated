@@ -99,6 +99,15 @@ test('upgraded API enforces roles, immutable removal, approved summaries, practi
     assert.equal((await admin('/memberships/qa-membership-1/remove', 'POST', {})).status, 403);
     assert.equal((await owner('/auth/transfer-ownership', 'POST', { team_id: 'qa-workspace', user_id: 'qa-member' })).status, 403);
     const missing = await admin('/admin/overview?event_id=qa-event'); assert.equal(missing.status, 200); assert.ok(missing.body.assignments.some(a => a.id === 'qa-assignment'));assert.ok(!missing.body.missing.some(a=>a.id==='qa-assignment'),'Future matches are pending, not missed');
+    const warning = { event_id: 'qa-event', team_number: '1678', match_key: '2026qa_qm2', dismissed: true, revision: 0 };
+    assert.equal((await scout('/admin/coverage', 'POST', warning)).status, 403);
+    assert.equal((await foreign('/admin/coverage', 'POST', warning)).status, 403);
+    assert.equal((await admin('/admin/coverage', 'POST', { ...warning, match_key: '2026qa_qm4' })).status, 409);
+    assert.equal((await admin('/admin/coverage', 'POST', warning)).status, 200);
+    assert.equal((await admin('/admin/coverage', 'POST', warning)).status, 409);
+    const covered = (await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678');
+    assert.ok(covered.dismissed_matches.some(s => s.match_key === warning.match_key));
+    assert.ok(!covered.missing_matches.some(s => s.match_key === warning.match_key));
     const preview = await admin('/assignment-plan/preview', 'POST', input); assert.equal(preview.status, 200);
     const applied = await admin('/assignment-plan/apply', 'POST', { ...preview.body.input, fingerprint: preview.body.fingerprint, request_id: 'api-plan' }); assert.equal(applied.status, 200);
     assert.equal((await admin('/assignment-plan/apply', 'POST', { ...preview.body.input, fingerprint: preview.body.fingerprint, request_id: 'api-plan' })).body.replayed, true);
@@ -135,6 +144,9 @@ test('upgraded API enforces roles, immutable removal, approved summaries, practi
     assert.equal((await scout('/admin/activity?team_id=qa-workspace')).status, 403);
     assert.ok((await admin('/admin/activity?team_id=qa-workspace')).body.entries.length > 0);
     await stop(); await start(); assert.equal((await owner('/auth/me')).status, 200, 'session survives process restart');
+    assert.ok((await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678').dismissed_matches.some(s => s.match_key === warning.match_key), 'Dismissals survive restart');
+    assert.equal((await admin('/admin/coverage', 'POST', { ...warning, dismissed: false, revision: 1 })).status, 200);
+    assert.ok((await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678').missing_matches.some(s => s.match_key === warning.match_key));
     assert.ok(fs.existsSync(`${dbFile}.pre-upgrade-v1.bak`));
   } finally { if (server?.exitCode === null) await stop(); fs.rmSync(directory, { recursive: true, force: true }); }
 });

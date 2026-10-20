@@ -6,7 +6,7 @@ const VERSION = 1;
 const COLLECTIONS = ['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements',
   'scout_events', 'pit_scouts', 'assignments', 'picklists', 'match_handoffs', 'report_tombstones',
   'team_allocations', 'assignment_plans', 'responsibility_history', 'audit_events', 'submission_states',
-  'ownership_transfers', 'practice_submissions', 'user_preferences', 'form_versions', 'notifications', 'notification_jobs'];
+  'coverage_dismissals', 'ownership_transfers', 'practice_submissions', 'user_preferences', 'form_versions', 'notifications', 'notification_jobs'];
 
 function migrate(input,copy=true) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw Error('Invalid database. Restore a verified backup; no data was changed.');
