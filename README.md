@@ -2,7 +2,7 @@
 
 **Argus** is the scouting workspace for FRC Team 6390 (Hephaustus), live at [6390scout.app](https://6390scout.app). It replaces paper scouting sheets with a phone-friendly app that works offline at competitions.
 
-Argus 2.0 adds event dashboards, team profiles, comparisons, saved picklists, assignments, offline drafts, presentations and PDF/PowerPoint exports. See [setup and workflow notes](docs/argus-2/usage.md) and [implementation checks](docs/argus-2/plan.md).
+Argus 4.0.0 adds event dashboards, team profiles, comparisons, saved picklists, assignments, offline drafts, presentations and PDF/PowerPoint exports. See [setup and workflow notes](docs/argus-2/usage.md) and [implementation checks](docs/argus-2/plan.md).
 
 ## What it is
 
@@ -155,3 +155,5 @@ npm test
 
 `npm start` serves the built app. Use `DB_FILE=/absolute/path/db.json` to choose
 the data location and `APP_PORT=3001` to choose the server port.
+
+Release numbers follow the [versioning guide](docs/argus-2/versioning.md). The current version is stored in `Clasue-scout-app/package.json`.

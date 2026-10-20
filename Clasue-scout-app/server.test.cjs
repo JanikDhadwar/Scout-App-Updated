@@ -20,7 +20,7 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
   try {
     await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Startup timeout')),10000);server.stdout.once('data',()=>{clearTimeout(timer);resolve();});server.once('error',reject);});
     const anonymous=client(),owner=client(),member=client(),outsider=client();
-    const health=await anonymous('/api/health');assert.equal(health.status,200);
+    const health=await anonymous('/api/health');assert.equal(health.status,200);assert.equal(health.data.version,require('./package.json').version);
     for(const url of ['/','/api/health','/api/release']){const result=await anonymous(url);assert.match(result.headers.get('cache-control'),/no-store/);assert.equal(result.headers.get('cloudflare-cdn-cache-control'),'no-store');assert.equal(result.headers.get('cdn-cache-control'),'no-store');assert.equal(result.headers.get('etag'),null);}
 
     assert.equal((await anonymous('/api/users')).status,401);

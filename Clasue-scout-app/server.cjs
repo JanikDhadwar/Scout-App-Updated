@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('node:fs');
 const path = require('node:path');
+const APP_VERSION = require('./package.json').version;
 // Keep local integration credentials outside source and browser build files.
 const privateEnv = process.env.ARGUS_ENV_FILE || (process.env.DB_FILE ? path.join(path.dirname(path.resolve(process.env.DB_FILE)), 'argus.env') : null);
 for (const file of [privateEnv,path.join(__dirname,'.env')].filter(Boolean)) if(fs.existsSync(file))process.loadEnvFile(file);
@@ -61,8 +62,8 @@ app.use('/api',(req,res,next)=>{
   }
   next();
 });
-app.get('/api/release',(_req,res)=>{try{const value=JSON.parse(fs.readFileSync(path.join(DIST_DIR,'release.json'),'utf8'));if(typeof value.buildId!=='string'||!/^[-a-zA-Z0-9]{1,100}$/.test(value.buildId))throw Error();res.json({buildId:value.buildId});}catch{fail(res,503,'Build version is unavailable.');}});
-app.get('/api/health',(_req,res)=>{readDB();const ok=process.env.NODE_ENV!=='production'||fs.existsSync(path.join(DIST_DIR,'index.html'));res.status(ok?200:503).json({ok,release:path.basename(path.dirname(__dirname))});});
+app.get('/api/release',(_req,res)=>{try{const value=JSON.parse(fs.readFileSync(path.join(DIST_DIR,'release.json'),'utf8'));if(typeof value.buildId!=='string'||!/^[-a-zA-Z0-9]{1,100}$/.test(value.buildId))throw Error();res.json({version:value.version||null,buildId:value.buildId});}catch{fail(res,503,'Build version is unavailable.');}});
+app.get('/api/health',(_req,res)=>{readDB();const ok=process.env.NODE_ENV!=='production'||fs.existsSync(path.join(DIST_DIR,'index.html'));res.status(ok?200:503).json({ok,version:APP_VERSION,release:path.basename(path.dirname(__dirname))});});
 app.use('/api',(req,res,next)=>{
   const token=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('argus_session='))?.slice(14);
   const session=sessions.get(token);

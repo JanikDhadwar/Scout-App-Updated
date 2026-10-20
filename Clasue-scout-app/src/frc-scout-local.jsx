@@ -1,3 +1,4 @@
+import { APP_VERSION } from './app-version.js';
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { conditionOperators, hasAnswer, visibleQuestions, visibleAnswers, validateConditions } from './form-conditions.js';
@@ -184,7 +185,7 @@ function AuthScreen({ onLogin }) {
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" />
         {err && <div role="alert" style={sx.err}>{err}</div>}
         <button type="submit" className="primary-button auth-submit" disabled={busy}>{busy?(mode==="login"?"Signing in…":"Creating account…"):mode==="login"?"Sign in":"Create account"}</button>
-      </form><span className="auth-footer">Match and pit scouting</span></section>
+      </form><span className="auth-footer">Argus {APP_VERSION} · Match and pit scouting</span></section>
     </div>
   );
 }

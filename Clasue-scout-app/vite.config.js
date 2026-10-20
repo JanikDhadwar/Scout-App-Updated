@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import process from 'node:process'
+import packageInfo from './package.json' with { type: 'json' }
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -9,7 +10,7 @@ const imageCache=`argus-images-${buildId}`
 const releaseAssets={
   name:'argus-release-assets',
   generateBundle(){
-    this.emitFile({type:'asset',fileName:'release.json',source:JSON.stringify({buildId,revision:/^[a-f0-9]{40,64}$/.test(process.env.ARGUS_REVISION||'')?process.env.ARGUS_REVISION:null})})
+    this.emitFile({type:'asset',fileName:'release.json',source:JSON.stringify({version:packageInfo.version,buildId,revision:/^[a-f0-9]{40,64}$/.test(process.env.ARGUS_REVISION||'')?process.env.ARGUS_REVISION:null})})
     this.emitFile({type:'asset',fileName:'argus-cache-cleanup.js',source:`self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key==='scout-images'||key.startsWith('argus-images-')&&key!==${JSON.stringify(imageCache)}).map(key=>caches.delete(key))))));`})
   }
 }
