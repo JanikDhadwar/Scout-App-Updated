@@ -78,7 +78,7 @@ app.post(['/api/auth/login','/api/auth/signup'],(req,res)=>{
   attempts.set(ip,{count:bucket?.until>now?bucket.count+1:1,until:bucket?.until>now?bucket.until:now+900000});
   const {username,password}=req.body||{};
   if(typeof username!=='string'||!username.trim()||username.length>80||typeof password!=='string'||password.length>1024||!password.trim())return fail(res,400,'Username and password are required');
-  const db=readDB(),found=rows(db,'users').find(u=>u.username.toLowerCase()===username.trim().toLowerCase());
+  const db=readDB(),found=rows(db,'users').find(u=>typeof u?.username==='string'&&u.username.toLowerCase()===username.trim().toLowerCase());
   if(req.path.endsWith('/signup')) {
     if(found)return fail(res,409,'Username is already registered');
     if(password.length<8)return fail(res,400,'Use at least 8 characters for your password');

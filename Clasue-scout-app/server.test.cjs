@@ -12,7 +12,8 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
   const dbFile=path.join(dir,'db.json');
   const legacyHash=value=>{let h=0;for(const c of value){h=((h<<5)-h)+c.charCodeAt(0);h|=0;}return h.toString(16);};
   const legacy={id:'legacy',username:'Legacy',password_hash:legacyHash('legacy-secret'),created_at:'2020-01-01'};
-  fs.writeFileSync(dbFile,JSON.stringify({users:[legacy],teams:[],memberships:[],forms:[],submissions:[],session:{},announcements:[],scout_events:[],pit_scouts:[],custom_data:{preserve:true}}));
+  const unnamedLegacy={id:'unnamed-legacy',password_hash:'legacy-value',unknown_field:{preserve:true}};
+  fs.writeFileSync(dbFile,JSON.stringify({users:[unnamedLegacy,legacy],teams:[],memberships:[],forms:[],submissions:[],session:{},announcements:[],scout_events:[],pit_scouts:[],custom_data:{preserve:true}}));
   const server=spawn(process.execPath,[path.join(__dirname,'server.cjs')],{env:{...process.env,APP_PORT:String(port),DB_FILE:dbFile,TBA_API_KEY:'',GROQ_API_KEY:''},stdio:'pipe'});
   const base=`http://127.0.0.1:${port}`;
   const client=()=>{let cookie='';return async(url,method='GET',body)=>{const res=await fetch(base+url,{method,headers:{...(cookie?{Cookie:cookie}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const set=res.headers.get('set-cookie');if(set)cookie=set.split(';')[0];const text=await res.text();let data;try{data=JSON.parse(text);}catch{data=text;}return{status:res.status,data,cookie:set,headers:res.headers};};};
@@ -25,6 +26,9 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
     assert.equal((await anonymous('/api/users')).status,401);
     assert.equal((await anonymous('/api/analyst/status')).status,401);
     assert.notEqual((await anonymous('/users')).status,200);
+    const legacySignup=await anonymous('/api/auth/signup','POST',{username:'New scout',password:'new-scout-secret'});
+    assert.equal(legacySignup.status,200,'A legacy record without a username must not block account creation');
+    assert.deepEqual(JSON.parse(fs.readFileSync(dbFile)).users.find(u=>u.id==='unnamed-legacy'),unnamedLegacy);
     const login=await owner('/api/auth/login','POST',{username:'Legacy',password:'legacy-secret'});assert.equal(login.status,200);assert.equal(login.data.id,'legacy');assert.equal(login.data.password_hash,undefined);assert.match(login.cookie,/HttpOnly/i);assert.match(login.cookie,/SameSite=Strict/i);
     assert.equal((await owner('/api/auth/me')).data.id,'legacy');
     assert.match(JSON.parse(fs.readFileSync(dbFile)).users.find(u=>u.id==='legacy').password_hash,/^scrypt\$/);
