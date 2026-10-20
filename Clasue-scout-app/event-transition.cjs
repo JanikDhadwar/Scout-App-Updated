@@ -5,7 +5,7 @@ function reject(message,status=409){throw Object.assign(new Error(message),{stat
 function activeEvent(db,teamId){
  const team=rows(db,'teams').find(row=>row.id===teamId);
  const events=rows(db,'scout_events').filter(row=>row.team_id===teamId&&!row.data_cleared_at);
- return events.find(row=>row.id===team?.active_event_id)||events.find(row=>!row.archived_at)||null;
+ return events.find(row=>row.id===team?.active_event_id&&!row.archived_at)||null;
 }
 function previewTransition(db,teamId,nextEventId){
  const team=rows(db,'teams').find(row=>row.id===teamId);
@@ -22,21 +22,13 @@ function previewTransition(db,teamId,nextEventId){
  const fingerprint=createHash('sha256').update(JSON.stringify({teamId,current,next,data,forms})).digest('hex');
  return {fingerprint,current:current?{id:current.id,event_key:current.event_key,event_name:current.event_name}:null,next:{id:next.id,event_key:next.event_key,event_name:next.event_name},counts:{...Object.fromEntries(stores.map(store=>[store,data[store].length])),forms:forms.filter(row=>!row.archived&&!row.archived_at).length},export:structuredClone({schemaVersion:1,event:current,...data,forms})};
 }
-function applyTransition(db,{teamId,nextEventId,expected,deleteForms}){
- if(typeof deleteForms!=='boolean')reject('Choose whether to keep or delete forms.',400);
+function applyTransition(db,{teamId,nextEventId,expected,preserveHistory}){
+ if(preserveHistory!==true)reject('Update Argus before changing events. Event changes now preserve historical data.',409);
  const previous=rows(db,'teams').find(row=>row.id===teamId)?.event_transition;
- if(previous&&previous.fingerprint===expected&&previous.nextEventId===nextEventId&&previous.deleteForms===deleteForms)return {team:rows(db,'teams').find(row=>row.id===teamId),event:rows(db,'scout_events').find(row=>row.id===nextEventId),deleted:previous.deleted};
+ if(previous&&previous.fingerprint===expected&&previous.nextEventId===nextEventId&&previous.preserveHistory)return {team:rows(db,'teams').find(row=>row.id===teamId),event:rows(db,'scout_events').find(row=>row.id===nextEventId),preserved:previous.preserved};
  const preview=previewTransition(db,teamId,nextEventId);
  if(typeof expected!=='string'||expected!==preview.fingerprint)reject('Event data changed. Reload the preview and export again before deleting.');
- const now=new Date().toISOString();
- if(preview.current){
-  db.report_tombstones=[...rows(db,'report_tombstones'),...rows(db,'submissions').filter(row=>row.team_id===teamId&&row.event_key===preview.current.event_key).map(row=>({id:row.id,team_id:teamId,event_key:row.event_key,deleted_at:now}))];
-  for(const store of stores)db[store]=rows(db,store).filter(row=>!(row.team_id===teamId&&row.event_key===preview.current.event_key));
-  const outgoing=rows(db,'scout_events').find(row=>row.id===preview.current.id);
-  Object.assign(outgoing,{archived_at:now,data_cleared_at:now,event_teams:[],matches:[],rankings:null,webcasts:[],assignment:{},analytics_config:{},official_fetched_at:null,assignment_revision:(outgoing.assignment_revision||0)+1,analytics_revision:(outgoing.analytics_revision||0)+1});
- }
- if(deleteForms)for(const form of rows(db,'forms').filter(row=>row.team_id===teamId&&!row.archived&&!row.archived_at))form.archived_at=now;
- const team=rows(db,'teams').find(row=>row.id===teamId);team.active_event_id=nextEventId;team.event_transition={fingerprint:expected,nextEventId,deleteForms,deleted:preview.counts};
- return {team,event:rows(db,'scout_events').find(row=>row.id===nextEventId),deleted:preview.counts};
+ const team=rows(db,'teams').find(row=>row.id===teamId);team.active_event_id=nextEventId;team.event_transition={fingerprint:expected,nextEventId,preserveHistory:true,preserved:preview.counts};
+ return {team,event:rows(db,'scout_events').find(row=>row.id===nextEventId),preserved:preview.counts};
 }
 module.exports={activeEvent,previewTransition,applyTransition};

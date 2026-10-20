@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const changed=()=>window.dispatchEvent(new Event('argus-workspace-updated'));
-export function HandoffInbox({api,teamId,userId,navigate}){
+export function HandoffInbox({api,teamId,userId,navigate,showHistory=true}){
  const [requests,setRequests]=useState([]),[online,setOnline]=useState(false),[busy,setBusy]=useState(''),[error,setError]=useState(''),signature=useRef(null);
  const load=useCallback(async()=>{try{const next=await api('GET',`/handoffs?team_id=${encodeURIComponent(teamId)}`);setRequests(next);setOnline(true);const key=next.map(row=>`${row.id}:${row.status}:${row.revision}`).join('|');if(signature.current!==null&&signature.current!==key)changed();signature.current=key;}catch{setOnline(false);}},[api,teamId]);
  useEffect(()=>{let active=true;const poll=()=>{if(active&&document.visibilityState!=='hidden')load();};Promise.resolve().then(poll);const timer=setInterval(poll,5000);window.addEventListener('online',poll);document.addEventListener('visibilitychange',poll);return()=>{active=false;clearInterval(timer);window.removeEventListener('online',poll);document.removeEventListener('visibilitychange',poll);};},[load]);
  async function respond(row,action){setBusy(row.id);setError('');try{await api('POST',`/handoffs/${encodeURIComponent(row.id)}/respond`,{action,revision:row.revision});changed();await load();}catch(e){setError(e.message);}finally{setBusy('');}}
  const incoming=requests.filter(row=>row.status==='pending'&&row.to_user_id===userId),outgoing=requests.filter(row=>row.status==='pending'&&row.from_user_id===userId),recent=requests.filter(row=>row.status!=='pending').slice(0,4);
+ if(!showHistory&&!incoming.length&&!outgoing.length)return null;
  if(!incoming.length&&!outgoing.length&&!recent.length&&!error)return null;
  return <section className="a-handoff-inbox a-panel a-stack" aria-label="Match handoffs"><div className="a-section-heading"><h2>Match handoffs</h2><span className="a-muted a-small">{online?'Connected to Argus':'Offline — handoffs unavailable'}</span></div>
   <div aria-live="polite" aria-atomic="true" className="a-sr-only">{incoming.length} incoming match handoff requests.</div>

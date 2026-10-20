@@ -7,6 +7,27 @@ import { createOfflineClient } from './offline-client.js';
 const owner={userId:'scouter',teamId:'6390'};
 const report=(id='report-1')=>({id,user_id:owner.userId,team_id:owner.teamId,form_id:'form-1',answers:{score:0,photo:'data:image/png;base64,test',climb:'No'}});
 const response=(data,status=200)=>({ok:status>=200&&status<300,status,json:async()=>structuredClone(data)});
+test('practice queue survives reload and can only upload to practice, never competition submissions',async()=>{
+  const factory=new IDBFactory(),storage=createOfflineStore('practice-isolation',factory),sent=[];
+  const offline=createOfflineClient({storage,fetcher:async()=>{throw new TypeError('Offline');}});
+  await offline.setScope(owner);
+  const row={...report('practice-only'),practice:true};
+  await storage.put('drafts',{key:'practice:draft',value:{answers:row.answers}});
+  await offline.enqueue(row,'practice:draft','practice');
+  await offline.sync();
+  assert.equal((await storage.all('queue'))[0].store,'practice');
+  assert.equal(await storage.get('drafts','practice:draft'),undefined);
+  await assert.rejects(offline.enqueue(row,null,'other-store'),/Unsupported queued report destination/i);
+  await assert.rejects(offline.enqueue(row,null,'submissions'),/already|conflict/i);
+  const restarted=createOfflineClient({storage:createOfflineStore('practice-isolation',factory),fetcher:async(url,options)=>{
+    if(options.method==='GET')return response(url.endsWith('/health')?{ok:true}:[]);
+    sent.push(url);return response(JSON.parse(options.body));
+  }});
+  await restarted.setScope(owner);await restarted.sync();await restarted.sync();
+  assert.deepEqual(sent,['/api/practice']);
+  assert.equal(restarted.getState().pending,0);
+  assert.deepEqual(await restarted.api('GET','/submissions'),[]);
+});
 async function setup() {
   const factory=new IDBFactory(),store=createOfflineStore('test',factory);
   const server=new Map();let mode='offline',calls=0;

@@ -1,15 +1,16 @@
 {
   "name": "scout-app",
   "private": true,
-  "version": "4.2.0",
+  "version": "5.0.0",
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
     "test:browser": "node ../scripts/run-browser-checks.cjs",
-    "test": "node --test ../scripts/deploy-status.test.cjs server.test.cjs analyst-service.test.cjs integration-store.test.cjs src/form-conditions.test.js src/offline-client.test.js src/argus/*.test.js",
+    "test": "node --test ../scripts/deploy-status.test.cjs *.test.cjs src/form-conditions.test.js src/offline-client.test.js src/argus/*.test.js",
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:active": "eslint src/frc-scout-local.jsx src/argus src/offline*.js src/form-conditions*.js src/use-report-draft.js src/report-media.jsx *.cjs vite.config.js",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,7 +23,8 @@
     "jspdf": "^4.2.1",
     "pptxgenjs": "^4.0.1",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "web-push": "3.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

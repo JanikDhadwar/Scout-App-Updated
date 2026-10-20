@@ -1,5 +1,7 @@
 # Event transitions and reference-led scouting screens
 
+Historical 4.x implementation record. **Superseded in 5.0:** event activation now preserves outgoing data; destructive legacy calls are rejected. See [current release notes](argus-5-release.md) and [event instructions](../../instructions/events-and-history.md).
+
 October 20, 2026. The user requested one event at a time, deletion of the outgoing event's data with an optional backup, optional removal of forms, removal of workspace terminology, and a denser dark scouting interface with a match-launch panel based on supplied references.
 
 ## Event changes

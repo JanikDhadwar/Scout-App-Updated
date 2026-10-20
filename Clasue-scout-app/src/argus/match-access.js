@@ -1,7 +1,7 @@
 export function matchOwners({event,match,assignments=[]}){
  if(!event||!match)return [];
  return ['red','blue'].flatMap(alliance=>(match.alliances?.[alliance]?.team_keys||[]).map(key=>{
-  const teamNumber=key.replace(/^frc/,''),explicit=assignments.filter(row=>row.team_id===event.team_id&&row.event_key===event.event_key&&row.match_key===match.key&&String(row.team_number)===teamNumber&&row.report_kind!=='pit'&&!row.archived_at);
+  const teamNumber=key.replace(/^frc/,''),explicit=assignments.filter(row=>row.team_id===event.team_id&&row.event_key===event.event_key&&row.match_key===match.key&&String(row.team_number)===teamNumber&&row.report_kind!=='pit'&&!row.archived_at&&!row.schedule_cancelled);
   const owners=explicit.length?[...new Set(explicit.map(row=>row.scout_user_id))]:Object.entries(event.assignment||{}).filter(([,row])=>Array.isArray(row?.teams)&&row.teams.map(String).includes(teamNumber)).map(([id])=>id);
   return {teamNumber,alliance,owners,assignment:explicit[0]||null,legacy:!explicit.length};
  }));

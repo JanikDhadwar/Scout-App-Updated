@@ -1,4 +1,6 @@
 export function assignedTeamNumbers(data,event,userId) {
+  const permanent=(data.team_allocations||[]).filter(a=>a.team_id===event?.team_id&&a.event_key===event?.event_key&&!a.archived_at);
+  if(permanent.length)return [...new Set(permanent.filter(a=>a.owner_user_id===userId).map(a=>String(a.team_number)))];
   const values=(data.assignments||[]).filter(row=>row.team_id===event?.team_id&&row.event_key===event?.event_key&&row.scout_user_id===userId&&!row.archived_at).map(row=>row.team_number);
   const legacy=event?.assignment?.[userId]?.teams;
   if(Array.isArray(legacy))values.push(...legacy);

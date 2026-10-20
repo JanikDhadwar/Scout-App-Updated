@@ -42,7 +42,7 @@ server: {
       },
       workbox: {
         cacheId: `argus-${buildId}`,
-        importScripts: ['/argus-cache-cleanup.js'],
+        importScripts: ['/argus-cache-cleanup.js','/argus-push.js'],
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/api\//],

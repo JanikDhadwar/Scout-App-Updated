@@ -2,7 +2,7 @@
 
 **Argus** is the scouting workspace for FRC Team 6390 (Hephaustus), live at [6390scout.app](https://6390scout.app). It replaces paper scouting sheets with a phone-friendly app that works offline at competitions.
 
-Argus 4.0.0 adds event dashboards, team profiles, comparisons, saved picklists, assignments, offline drafts, presentations and PDF/PowerPoint exports. See [setup and workflow notes](docs/argus-2/usage.md) and [implementation checks](docs/argus-2/plan.md).
+Argus 5.0.0 adds persistent team ownership, conflict-aware match duties, an Admin control centre, isolated practice, shared evidence controls, onboarding and offline help. Existing scouting drafts, synchronization, handoffs and strategy exports are retained. Start with the [instructions](instructions/contents.md), [release notes](docs/argus-2/argus-5-release.md) and [verified implementation status](docs/ARGUS_IMPLEMENTATION_PROGRESS.md).
 
 ## What it is
 
@@ -23,9 +23,7 @@ A web app for FIRST Robotics Competition scouting — collecting match and pit d
 - Express server (`server.cjs`) on port 3001 with a JSON-file database (`db.json`) — no external database needed
 - Live competition data from The Blue Alliance API
 
-## Demo login
-
-Try it on the login page — user `Example`, password `123`.
+Create an account and create or join your team. Demo accounts are not provisioned by default.
 
 ---
 # Argus — Debian self-hosting
@@ -86,8 +84,8 @@ Installation does not require Cloudflare credentials. To enable automatic edge-c
 ## What happens after a push
 
 `scout-update.timer` checks the configured branch every minute (and shortly
-after reboot). New commits trigger a fast-forward pull, `npm ci`, a production
-build, and a restart of `scout-app.service`. Multiple pushes between checks
+after reboot). New commits trigger a fast-forward pull, `npm ci`, tests, a production
+build, and a restart of `scout-app.service`. The updated deployment script adds the test gate; an already-running older updater adopts it on its next invocation. Multiple pushes between checks
 deploy the latest commit. No public GitHub webhook endpoint is needed. Each healthy
 release purges Cloudflare when credentials are configured, before deployment is marked complete. Browser and CDN
 responses use no-store; new builds refresh offline app caches without deleting
@@ -131,12 +129,14 @@ installer after changing your Node installation path or updating service setup.
 Live data is at `~/.local/share/scout-app/db.json` for the installation user,
 outside Git and all build directories. The installer copies the existing
 database only if the destination does not exist. Back up that file regularly.
-Database writes use a temporary file and rename to avoid partially written JSON.
-Login sessions are now per browser; existing users will need to log in again.
+Database writes use a synced temporary file and atomic rename. The first persisted
+schema upgrade preserves a `.pre-upgrade-v1.bak` backup. Session token hashes and
+push credentials live in private files beside the database, never in Git.
 
-This existing app implements login and roles in the browser, and its data API
-does not enforce authentication. Keep it on your trusted LAN/Tailscale or behind
-an authenticated proxy; it is not ready for unrestricted public access.
+The API enforces authenticated membership and server-side permissions. Use HTTPS,
+keep backups, protect the host and prefer Tailscale SSH for remote administration.
+No public terminal is embedded. After upgrading, review permanent ownership and
+publication settings before relying on generated duties or sharing measurements.
 
 Releases are retained under `~/.local/share/scout-app/releases` for recovery.
 Monitor disk usage and remove old releases only after checking that they are
@@ -151,6 +151,7 @@ npm run dev
 # API requests from Vite are proxied to port 3001.
 npm run build
 npm test
+npm run lint:active
 ```
 
 `npm start` serves the built app. Use `DB_FILE=/absolute/path/db.json` to choose

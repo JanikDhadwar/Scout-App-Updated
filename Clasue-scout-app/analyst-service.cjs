@@ -5,9 +5,10 @@ function evidenceFor(analytics,question) {
   const requested=new Set(String(question).match(/\b\d{1,5}\b/g)||[]);
   const candidates=requested.size?analytics.teams.filter(team=>requested.has(String(team.teamNumber))):analytics.teams;
   const teams=[...candidates].filter(team=>team.reportCount>0).sort((a,b)=>b.reportCount-a.reportCount).slice(0,8).map(team=>({
-    teamNumber:String(team.teamNumber),name:team.nickname,reportCount:team.reportCount,matchCount:team.matchCount,
+    teamNumber:String(team.teamNumber),name:team.nickname,reportCount:team.reportCount,matchCount:team.matchCount,pitReportCount:team.pitReportCount||0,
     coveragePercent:team.confidence.coveragePercent,disagreementCount:team.confidence.disagreements.length,freshness:team.confidence.freshness,
     metrics:Object.values(team.metrics).filter(metric=>metric.mean!=null).slice(0,10).map(metric=>({label:metric.label,unit:metric.unit,phase:metric.phase,mean:metric.mean,median:metric.median,stddev:metric.stddev,n:metric.n,missing:metric.missing,invalid:metric.invalid,sourceIds:metric.sourceIds.slice(0,8)})),
+    pitMeasurements:Object.values(team.pitMetrics||{}).filter(metric=>metric.mean!=null).slice(0,5).map(metric=>({label:metric.label,unit:metric.unit,mean:metric.mean,n:metric.n,sourceIds:metric.sourceIds.slice(0,8),note:'Pit observations only; excluded from match performance.'})),
     sourceIds:team.history.slice(-12).map(report=>report.id),
   }));
   return {event:analytics.event,teams,limitations:analytics.limitations,scopeNote:'At most eight teams, ten numeric fields per team and twelve report references per team. Scout names, free-text notes, photos and drawings are excluded.'};

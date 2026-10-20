@@ -13,7 +13,8 @@ export function Analyst({analytics,onOpenTeam,onCompare,onOpenReport,api,workspa
  useEffect(()=>{let active=true;client?.status().then(status=>{if(active)setProvider(status);}).catch(()=>{if(active)setProvider({configured:false});});return()=>{active=false;};},[client]);
  const useGroq=!!provider.configured&&mode!=='local';
  const numbers=(analytics?.teams||[]).slice(0,2).map(team=>team.teamNumber);
- const prompts=['Which teams need more scouting data?',...(numbers.length?[`Summarize team ${numbers[0]}`]:[]),...(numbers.length>1?[`Compare team ${numbers.join(' and ')}`]:[])];
+ const partnerMetric=analytics?.metrics?.find(m=>['higher','lower'].includes(m.direction)&&['number','scale'].includes(m.type));
+ const prompts=['Which teams need more scouting data?',...(numbers.length?[`Summarize team ${numbers[0]}`]:[]),...(numbers.length>1?[`Compare team ${numbers.join(' and ')}`]:[]),...(partnerMetric?[`Review alliance partners by ${partnerMetric.label}`]:[])];
  const [messages,setMessages]=useState([]);
  const [error,setError]=useState('');
  const scopeKey=`${analytics?.scope?.teamId || ''}:${analytics?.scope?.eventKey || ''}`;

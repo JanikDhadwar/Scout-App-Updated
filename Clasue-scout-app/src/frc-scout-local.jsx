@@ -144,6 +144,19 @@ export default function App() {
   async function switchWorkspace(){setTeam(null);setMem(null);await saveSession(user,null,null);}
   async function leaveWorkspace(){if(mem?.role==='owner'||!confirm('Leave this team? Your submitted reports remain with the team; drafts and pending reports stay scoped to this team.'))return;try{await apiCall('DELETE',`/memberships/${encodeURIComponent(mem.id)}`);await offline.invalidateReadCache();await offline.setScope({userId:user.id});await switchWorkspace();}catch(error){alert(error.message);}}
   async function refreshMem(){try{const rows=await fbSelect('memberships',{team_id:team.id,user_id:user.id});if(rows[0]){setMem(rows[0]);await saveSession(user,team,rows[0]);}}catch{ /* Keep the last confirmed role while offline. */ }}
+  useEffect(()=>{
+    if(!user||!team||!mem)return;
+    let active=true,running=false;
+    const check=async()=>{if(running||document.hidden)return;running=true;try{
+      const memberships=await apiCall('GET',`/memberships?${new URLSearchParams({team_id:team.id,user_id:user.id})}`);
+      if(!active)return;
+      const current=memberships.find(m=>m.user_id===user.id&&m.team_id===team.id);
+      if(!current){await offline.invalidateReadCache();if(active){setTeam(null);setMem(null);await saveSession(user,null,null);}}
+      else if(current.role!==mem.role){await offline.invalidateReadCache();if(active){setMem(current);await saveSession(user,team,current);window.dispatchEvent(new Event('argus-workspace-updated'));}}
+    }catch{/* Keep offline drafts and the last confirmed role; server checks every write. */}finally{running=false;}};
+    const timer=setInterval(check,30000);window.addEventListener('focus',check);window.addEventListener('online',check);window.addEventListener('argus-role-check',check);check();
+    return()=>{active=false;clearInterval(timer);window.removeEventListener('focus',check);window.removeEventListener('online',check);window.removeEventListener('argus-role-check',check);};
+  },[user,team,mem]);
   async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this team?':'Archive this team? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
   async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active teams you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
   if(booting)return <div className="argus-boot" role="status">Opening ARGUS…</div>;
@@ -614,8 +627,8 @@ function ConditionEditor({ question, earlier, onChange }) {
 }
 
 // ─── Form Filler ──────────────────────────────────────────────────────────────
-function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={} }) {
-  const localDraftKey=draftKey(user.id,team.id,form.id);
+export function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}, practice=false }) {
+  const localDraftKey=practice?`practice:${draftKey(user.id,team.id,form.id)}`:draftKey(user.id,team.id,form.id);
   const draft=useReportDraft(localDraftKey,()=>({id:uid(),questions_snapshot:structuredClone(form.questions||[]),form_title:form.title,answers:{},scoutedTeam:context.scouted_team==null?'':String(context.scouted_team),event_key:context.event_key || context.event?.event_key || '',match_key:context.match_key || '',match_number:context.match_number ?? '',alliance:context.alliance || '',assignment_id:context.assignment_id || null,report_kind:form.kind || reportKind || 'match'}));
   const questions=draft.value.questions_snapshot||form.questions||[];
   const ans=draft.value.answers || {};
@@ -628,7 +641,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
   const [eventTeams,setEventTeams]=useState([]);
   const [availableEvents,setAvailableEvents]=useState([]);
   const [assignmentData,setAssignmentData]=useState([]);
-  const isMatchForm=(form.kind||reportKind||'match')!=='pit';
+  const isMatchForm=!practice&&(form.kind||reportKind||'match')!=='pit';
   const reportEvent=availableEvents.find(event=>event.event_key===draft.value.event_key);
   const reportMatch=reportEvent?.matches?.find(match=>match.key===draft.value.match_key);
   const allowedReportRobots=assignedRobots({event:reportEvent,match:reportMatch,assignments:assignmentData,userId:user.id});
@@ -647,7 +660,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
         if(active){setAvailableEvents(owned);setEventTeams(ev?.event_teams || []);}
       } catch { /* Offline event metadata may not be downloaded yet. Manual context stays available. */ }
       // Load submission counts per team for this form
-      if (form.max_submissions_per_team) {
+      if (!practice&&form.max_submissions_per_team) {
         try {
           const counts = await apiCall('GET',`/form-submission-counts/${encodeURIComponent(form.id)}?event_key=${encodeURIComponent(draft.value.event_key||'')}`);
           const queued=await offline.pending();
@@ -659,7 +672,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
       }
     })();
     return ()=>{active=false;};
-  },[draft.value.event_key,team.id,form.id,form.max_submissions_per_team]);
+  },[draft.value.event_key,team.id,form.id,form.max_submissions_per_team,practice]);
 
   const shownQuestions = visibleQuestions(questions, ans);
   function set(id,v){ draft.change(current=>({...current,answers:visibleAnswers(questions,{...current.answers,[id]:v})}));setErr(''); }
@@ -667,7 +680,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
   async function submit() {
     if (busy) return;
     if (form.allow_team_select && !scoutedTeam) { setErr("Please select the team you are scouting."); return; }
-    if (form.max_submissions_per_team && scoutedTeam) {
+    if (!practice&&form.max_submissions_per_team && scoutedTeam) {
       const count = subCounts[scoutedTeam]||0;
       if (count >= form.max_submissions_per_team) { setErr(`Team #${scoutedTeam} has already been scouted ${count} times (max: ${form.max_submissions_per_team}).`); return; }
     }
@@ -679,7 +692,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
     try {
       if(isMatchForm){const [events,assignments]=await Promise.all([idbAll('scout_events'),idbAll('assignments')]);const event=events.find(event=>event.team_id===team.id&&event.event_key===sub.event_key);const accessError=matchReportError({event,assignments,userId:user.id,report:sub});if(accessError)throw new Error(accessError);}
       await draft.flush();
-      await offline.enqueue(sub,localDraftKey);
+      await offline.enqueue(practice?{...sub,practice:true,event_key:'practice',match_key:null,assignment_id:null}:sub,localDraftKey,practice?'practice':'submissions');
       setDone(true);
     } catch(error) { setErr(error.message || 'Could not save this report. Keep the page open and try again.'); }
     setBusy(false);
@@ -688,7 +701,7 @@ function FormFiller({ form, user, team, onDone, onCancel, reportKind, context={}
   if (done) return (
     <div className="panel success-panel">
       <div className="success-mark" aria-hidden="true">✓</div>
-      <h1>Report saved.</h1>
+      <h1>{practice?'Practice report saved.':'Report saved.'}</h1>
       <p>Saved on this device. Argus uploads it automatically when the server is reachable. Check the sync indicator for its upload status.</p>
       <button style={sx.btn(C.accent)} onClick={onDone}>Back to forms</button>
     </div>
@@ -873,36 +886,13 @@ function MyTeamTab({ team, eventKey }) {
   const [searchMatches,setSearchMatches]=useState([]);
 
 
-  const [autoEventKey, setAutoEventKey] = useState(null);
+  const autoEventKey = null; // Legacy badge stays inert; explicit workspace event wins.
   const [manualStreamUrl, setManualStreamUrl] = useState("");
   const [manualStreamInput, setManualStreamInput] = useState("");
   const [showStreamInput, setShowStreamInput] = useState(false);
 
-  // ── Auto-detect team's current active event from TBA ─────────────────────
-  useEffect(()=>{
-    if(!team.frc_team_number) return;
-    (async()=>{
-      try {
-        const year = new Date().getFullYear();
-        const events = await tbaFetch(`/team/frc${team.frc_team_number}/events/${year}/simple`);
-        if(!Array.isArray(events)||!events.length) return;
-        const today = Date.now()/1000;
-        const active = events.find(e=>{
-          const start = new Date(e.start_date+"T00:00:00").getTime()/1000;
-          const end   = new Date(e.end_date+"T23:59:59").getTime()/1000;
-          return today>=start && today<=end;
-        });
-        const upcoming = !active && events
-          .filter(e=>new Date(e.start_date+"T00:00:00").getTime()/1000 > today)
-          .sort((a,b)=>new Date(a.start_date)-new Date(b.start_date))[0];
-        const detected = (active||upcoming||null)?.key||null;
-        if(detected) setAutoEventKey(detected);
-      } catch { /* Keep the previous downloaded state. */ }
-    })();
-  },[team.frc_team_number]);
-
-  // Effective event key: auto-detected takes priority over manually set one
-  const effectiveEventKey = autoEventKey || currentEventKey;
+  // The explicit workspace event is shared across every scouting surface.
+  const effectiveEventKey = currentEventKey;
 
   // ── Live feed: auto-poll every 60s, pause when tab hidden ───────────────
   useEffect(()=>{
@@ -1447,12 +1437,8 @@ function ManageTab({ team, user, onTeamUpdate, onRoleChange }) {
   }
 
   async function transferOwnership(m){
-    if(!confirm(`Transfer ownership to ${m.username}? You will become an admin.`))return;
-    try{
-      await apiCall('POST','/auth/transfer-ownership',{team_id:team.id,user_id:m.user_id});
-      setMsg(`${m.username} is now the owner. Reloading…`);
-      setTimeout(()=>window.location.reload(),1500);
-    }catch{setErr("Failed to transfer ownership.");}
+    setMsg(`Use the secure transfer form to offer ownership to ${m.username}.`);
+    window.location.hash='/admin?tab=members';
   }
 
   async function kick(m){

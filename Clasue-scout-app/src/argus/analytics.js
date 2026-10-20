@@ -16,7 +16,7 @@ const completed = match => !!(match.actual_time || match.post_result_time || ['r
 export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=[],scope={},asOf=new Date().toISOString()}={}) {
  const teamId=scope.teamId,eventKey=scope.eventKey || event?.event_key;
  const scopedForms=forms.filter(form=>!teamId || form.team_id===teamId);
- const owned=reports.filter(report=>!teamId || report.team_id===teamId);
+ const owned=reports.filter(report=>(!teamId || report.team_id===teamId)&&!report.quality_review_required);
  const current=owned.filter(report=>eventKey && report.event_key===eventKey);
  const legacy=owned.filter(report=>!report.event_key);
  const directory=new Map((teams.length ? teams : event?.event_teams || []).map(team=>[String(team.team_number ?? team.number),team]));
@@ -141,10 +141,22 @@ export function presentationSections(analytics,team){
 }
 
 /** Local read-only query router. It never calls a model or executes note content. */
+export function partnerShortlist(analytics,metricId,exclude=[]){
+ const metric=analytics.metrics.find(m=>m.id===metricId&&['number','scale'].includes(m.type)&&['higher','lower'].includes(m.direction));
+ if(!metric)return [];
+ return analytics.teams.filter(team=>!exclude.map(String).includes(team.teamNumber)&&team.metrics[metricId]?.mean!=null)
+  .sort((a,b)=>(a.metrics[metricId].mean-b.metrics[metricId].mean)*(metric.direction==='higher'?-1:1)||Number(a.teamNumber)-Number(b.teamNumber));
+}
 export function answerQuestion(question,analytics){
  const query=String(question).toLowerCase(),numbers=[...new Set((query.match(/\b\d{1,5}\b/g)||[]))];
  const selected=analytics.teams.filter(team=>numbers.includes(team.teamNumber));
  const result=(text,teams,kind='calculation')=>({kind,text,teamNumbers:teams.map(team=>team.teamNumber),sourceIds:[...new Set(teams.flatMap(team=>team.history.map(report=>report.id)))],limitations:analytics.limitations});
+ if(/partner|alliance/.test(query)){
+  const metric=analytics.metrics.find(m=>query.includes(String(m.label).toLowerCase())&&['higher','lower'].includes(m.direction));
+  const ranked=metric?partnerShortlist(analytics,metric.id,numbers):[];
+  if(!ranked.length)return result('Insufficient information for an alliance shortlist. Name a measured field with an Admin-configured preferred direction. This compares evidence only; it does not predict alliance performance.',[],'insufficient');
+  return result(`Candidate review by ${metric.label} (${metric.unit||'question units'}, ${metric.direction} preferred):\n${ranked.slice(0,8).map(t=>`Team ${t.teamNumber}: mean ${formatValue(t.metrics[metric.id].mean)}, n=${t.metrics[metric.id].n}, ${t.confidence.coveragePercent==null?'coverage unknown':`${formatValue(t.confidence.coveragePercent)}% coverage`}`).join('\n')}\nThis is a single-metric evidence shortlist, not an overall robot score or predicted alliance result. Review pit capabilities, disagreements and missing data.`,ranked.slice(0,8));
+ }
  if(/coverage|more (scouting )?data|missing|confidence/.test(query))return result(analytics.teams.map(team=>`Team ${team.teamNumber}: ${team.reportCount} reports, ${team.matchCount} linked matches, ${team.confidence.coveragePercent==null?'coverage unknown':`${formatValue(team.confidence.coveragePercent)}% coverage`}; ${team.confidence.disagreements.length} disagreements.`).join('\n'),analytics.teams);
  if(selected.length && /compare|summari[sz]e|recent|strength|evidence|team|consistent/.test(query))return result(selected.map(team=>`Team ${team.teamNumber}: ${team.reportCount} event reports; ${team.matchCount} linked matches. ${Object.values(team.metrics).filter(metric=>metric.mean!=null).map(metric=>`${metric.label}: mean ${formatValue(metric.mean)}${metric.unit?` ${metric.unit}`:''}, SD ${formatValue(metric.stddev)}, n=${metric.n}`).join('; ') || 'No numeric observations.'} ${team.unlinkedReportCount} legacy reports excluded. ${/strength|evidence/.test(query)?team.notes.slice(-3).map(note=>`Scout observation [${note.reportId}]: ${String(note.value)}`).join(' '):''}`).join('\n'),selected);
  const phase=/autonomous|\bauto\b/.test(query)?'auto':/teleop/.test(query)?'teleop':/endgame/.test(query)?'endgame':null;

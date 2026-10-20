@@ -16,7 +16,7 @@ function matches(rule, source, answer) {
   if (rule.operator === 'unanswered') return !hasAnswer(answer);
   if (!hasAnswer(answer) || !hasAnswer(rule.value)) return false;
   const numeric = ['number', 'scale'].includes(source.type);
-  const normalize = v => numeric ? Number(v) : String(v).trim().toLowerCase();
+  const normalize = v => numeric ? Number(v) : source.type==='boolean'&&typeof v==='boolean'?(v?'yes':'no'):String(v).trim().toLowerCase();
   const actual = normalize(answer), expected = normalize(rule.value);
   if (numeric && (!Number.isFinite(actual) || !Number.isFinite(expected))) return false;
   switch (rule.operator) {

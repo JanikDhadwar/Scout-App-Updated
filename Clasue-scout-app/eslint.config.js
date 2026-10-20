@@ -18,4 +18,11 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    files: ['*.cjs'],
+    ...js.configs.recommended,
+    languageOptions: { sourceType:'commonjs', globals:globals.node },
+    rules: { ...js.configs.recommended.rules, 'no-unused-vars':['error',{argsIgnorePattern:'^_',caughtErrorsIgnorePattern:'^_',ignoreRestSiblings:true}] },
+  },
+  { files:['src/argus/deploy-cache.test.js'], languageOptions:{globals:globals.node} },
 ])

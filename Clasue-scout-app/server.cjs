@@ -10,10 +10,16 @@ const { isDeepStrictEqual } = require('node:util');
 const { askGroq, DEFAULT_MODEL } = require('./analyst-service.cjs');
 const { createIntegrationStore } = require('./integration-store.cjs');
 const { checkConnections } = require('./connection-check.cjs');
-const { generateAssignments, submissionError } = require('./scouting-rules.cjs');
+const { submissionError } = require('./scouting-rules.cjs');
 const {activeEvent,previewTransition,applyTransition}=require('./event-transition.cjs');
 const {matchReportError}=require('./src/argus/match-access.js');
 const handoffs=require('./match-handoffs.cjs');
+const { createDatabase } = require('./database.cjs');
+const { createSessions } = require('./private-sessions.cjs');
+const domain = require('./domain.cjs');
+const assignmentsService = require('./assignment-service.cjs');
+const submissionService = require('./submission-service.cjs');
+const { registerUpgradeRoutes } = require('./upgrade-routes.cjs');
 const scoutPresence=new Map();
 const app = express();
 app.disable('x-powered-by');
@@ -22,17 +28,14 @@ const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'db.json');
 const DIST_DIR = path.join(__dirname, 'dist');
 const integrations=createIntegrationStore(path.join(path.dirname(DB_FILE),'argus-integrations.private.json'));
 function integrationKey(req,name,workspaceId=req.headers['x-argus-workspace']){return (typeof workspaceId==='string'&&membership(readDB(),req.user.id,workspaceId)?integrations.key(workspaceId,name):undefined)||process.env[name];}
-const STORES = ['users','teams','memberships','forms','submissions','announcements','scout_events','pit_scouts','assignments','picklists'];
-const sessions = new Map(), attempts = new Map();
-const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+const STORES = ['users','teams','memberships','forms','submissions','announcements','scout_events','pit_scouts','assignments','picklists','team_allocations'];
+const database = createDatabase(DB_FILE);
+const sessions = createSessions(path.join(path.dirname(DB_FILE), 'argus-sessions.private.json')), attempts = new Map();
 function readDB() {
-  if (!fs.existsSync(DB_FILE)) return { ...Object.fromEntries(STORES.map(s=>[s,[]])), session:{} };
-  return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  return database.read();
 }
 function writeDB(db) {
-  fs.mkdirSync(path.dirname(DB_FILE), {recursive:true});
-  fs.writeFileSync(`${DB_FILE}.tmp`, JSON.stringify(db,null,2), {mode:0o600});
-  fs.renameSync(`${DB_FILE}.tmp`, DB_FILE);
+  database.write(db);
 }
 function rows(db, store) { return Array.isArray(db[store]) ? db[store] : []; }
 function publicUser(u) { return {id:u.id, username:u.username, created_at:u.created_at}; }
@@ -125,16 +128,10 @@ app.post('/api/auth/deactivate-account',(req,res)=>{
   if(rows(db,'teams').some(t=>t.owner_id===req.user.id&&!t.archived_at))return fail(res,409,'Transfer ownership or archive your active workspaces before deactivating your account');
   rows(db,'users').find(u=>u.id===req.user.id).disabled_at=new Date().toISOString();
   db.memberships=rows(db,'memberships').filter(m=>m.user_id!==req.user.id);
-  writeDB(db);for(const [token,session] of sessions)if(session.userId===req.user.id)sessions.delete(token);
+  writeDB(db);sessions.revoke(req.user.id);
   res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});
 });
-app.post('/api/auth/transfer-ownership',(req,res)=>{
-  const {team_id,user_id}=req.body||{},db=readDB();
-  if(role(db,req.user.id,team_id)!=='owner')return fail(res,403,'Owner permission required');
-  const target=membership(db,user_id,team_id);if(!target)return fail(res,400,'Choose a member of this team');
-  membership(db,req.user.id,team_id).role='admin';target.role='owner';rows(db,'teams').find(t=>t.id===team_id).owner_id=user_id;
-  writeDB(db);res.json({ok:true});
-});
+registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, dbFile:DB_FILE });
 app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:!!integrationKey(req,'GROQ_API_KEY',workspaceId)});});
 app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{res.json(integrations.save(workspaceId,values));}catch{fail(res,400,'Could not save private settings. Check the key format and server storage permissions.');}});
 const connectionChecks=new Map();
@@ -162,9 +159,8 @@ app.post('/api/analyst/ask',async(req,res)=>{
   if(analystRequests.size>1000)for(const [id,bucket]of analystRequests)if(bucket.until<now)analystRequests.delete(id);
   analystRequests.set(req.user.id,{count:count+1,until:previous?.until>now?previous.until:now+60000});
   try{
-    const {analyticsForData}=await import('./src/argus/analytics.js');
-    const data={forms:rows(db,'forms').filter(row=>row.team_id===workspaceId),submissions:rows(db,'submissions').filter(row=>row.team_id===workspaceId&&visible(db,'submissions',row,req.user.id)),matches:event.matches||[]};
-    const analytics=analyticsForData(data,{id:workspaceId},event);
+    const { analyticsForUser } = require('./shared-analytics.cjs');
+    const analytics=await analyticsForUser(db,event,req.user.id);
     const answer=await askGroq({analytics,question:question.trim(),key:integrationKey(req,'GROQ_API_KEY',workspaceId),model:integrationKey(req,'GROQ_MODEL',workspaceId)||DEFAULT_MODEL});
     res.json(answer);
   }catch(error){return fail(res,502,error.name==='TimeoutError'?'Groq took too long. Try the local analyst.':error.message?.startsWith('Groq')?error.message:'The AI service could not answer. Try the local analyst.');}
@@ -178,37 +174,15 @@ app.get('/api/tba/*path',async(req,res)=>{
 app.get('/api/form-submission-counts/:formId',(req,res)=>{
   const db=readDB(),form=rows(db,'forms').find(row=>row.id===req.params.formId);
   if(!form||!membership(db,req.user.id,form.team_id))return fail(res,404,'Form not found');
-  const counts={};for(const report of rows(db,'submissions'))if(report.team_id===form.team_id&&report.form_id===form.id&&(report.event_key||'')===(req.query.event_key||'')&&/^\d+$/.test(String(report.scouted_team)))counts[report.scouted_team]=(counts[report.scouted_team]||0)+1;
+  const counts={};for(const report of domain.realReports(db))if(report.team_id===form.team_id&&report.form_id===form.id&&(report.event_key||'')===(req.query.event_key||'')&&/^\d+$/.test(String(report.scouted_team)))counts[report.scouted_team]=(counts[report.scouted_team]||0)+1;
   res.json(counts);
 });
-app.post('/api/assignments/generate',(req,res)=>{
-  const {event_id,report_kind,form_id,pit_form_id,match_form_id,assignment_revision}=req.body||{},db=readDB();
-  const event=rows(db,'scout_events').find(row=>row.id===event_id);
-  if(!event||!admin(db,req.user.id,event.team_id))return fail(res,403,'Administrator permission required for this event');
-  if(event.archived_at)return fail(res,409,'Restore this event before generating assignments.');
-  const activeTeam=rows(db,'teams').find(team=>team.id===event.team_id);
-  if(activeTeam?.active_event_id&&activeTeam.active_event_id!==event.id)return fail(res,409,'Generate assignments for the active event only.');
-  if(assignment_revision!==(event.assignment_revision||0))return fail(res,409,'Assignments changed. Refresh before generating again.');
-  const scoutIds=req.body.scout_ids===undefined?rows(db,'memberships').filter(row=>row.team_id===event.team_id).map(row=>row.user_id):req.body.scout_ids;
-  if(!['pit','match','both'].includes(report_kind)||!Array.isArray(scoutIds)||!scoutIds.length||scoutIds.some(id=>!membership(db,id,event.team_id)))return fail(res,400,'Select workspace scouts and a report type');
-  const kinds=report_kind==='both'?['pit','match']:[report_kind];
-  const plans=kinds.map(kind=>({kind,form:rows(db,'forms').find(row=>row.id===(report_kind==='both'?(kind==='pit'?pit_form_id:match_form_id):form_id)&&row.team_id===event.team_id&&!row.archived&&!row.archived_at&&(row.kind||'match')===kind)}));
-  if(plans.some(plan=>!plan.form))return fail(res,400,'Choose an active form for each report type');
-  if(plans.some(plan=>plan.kind==='pit')&&!event.event_teams?.length)return fail(res,400,'Download event teams before assigning pit scouting.');
-  if(plans.some(plan=>plan.kind==='match')&&!event.matches?.length)return fail(res,400,'Download the match schedule before assigning match scouting.');
-  try{
-    const added=[],counts={};
-    for(const plan of plans){const generated=generateAssignments({event,scoutIds,kind:plan.kind,formId:plan.form.id,existing:[...rows(db,'assignments'),...added]});added.push(...generated);counts[plan.kind]=generated.length;}
-    db.assignments=[...rows(db,'assignments'),...added];event.excluded=rows(db,'memberships').filter(row=>row.team_id===event.team_id&&!scoutIds.includes(row.user_id)).map(row=>row.user_id);event.assignment_revision=(event.assignment_revision||0)+1;writeDB(db);
-    res.json({added:added.length,counts,assignment_revision:event.assignment_revision});
-  }catch(error){fail(res,400,error.message);}
-});
-
 app.get('/api/handoffs',(req,res)=>{
  const teamId=req.query.team_id,db=readDB();if(!membership(db,req.user.id,teamId))return fail(res,403,'Team membership required');
  const now=Date.now();scoutPresence.set(`${teamId}:${req.user.id}`,now);
  for(const [key,time] of scoutPresence)if(time<now-60000)scoutPresence.delete(key);
- const result=rows(db,'match_handoffs').filter(row=>row.team_id===teamId&&(row.from_user_id===req.user.id||row.to_user_id===req.user.id)).slice(-80).reverse().map(row=>({...row,status:row.status==='pending'&&row.expires_at<=now?'expired':row.status,from_username:rows(db,'users').find(user=>user.id===row.from_user_id)?.username||'Scout',to_username:rows(db,'users').find(user=>user.id===row.to_user_id)?.username||'Scout'}));
+ if(handoffs.refreshStates(db,now))writeDB(db);
+ const result=rows(db,'match_handoffs').filter(row=>row.team_id===teamId&&(row.from_user_id===req.user.id||row.to_user_id===req.user.id)).slice(-80).reverse().map(row=>({...row,from_username:rows(db,'users').find(user=>user.id===row.from_user_id)?.username||'Scout',to_username:rows(db,'users').find(user=>user.id===row.to_user_id)?.username||'Scout'}));
  res.json(result);
 });
 app.get('/api/handoffs/context',(req,res)=>{
@@ -229,9 +203,9 @@ app.get('/api/event-transition/preview',(req,res)=>{
  try{res.json(previewTransition(db,team_id,next_event_id));}catch(error){fail(res,error.status||500,error.message);}
 });
 app.post('/api/event-transition',(req,res)=>{
- const {team_id,next_event_id,expected,delete_forms}=req.body||{},db=readDB();
+ const {team_id,next_event_id,expected,preserve_history}=req.body||{},db=readDB();
  if(!admin(db,req.user.id,team_id))return fail(res,403,'Team administrator permission required');
- try{const result=applyTransition(db,{teamId:team_id,nextEventId:next_event_id,expected,deleteForms:delete_forms});writeDB(db);res.json({...result,team:publicTeam(db,result.team,req.user.id)});}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
+ try{const result=applyTransition(db,{teamId:team_id,nextEventId:next_event_id,expected,preserveHistory:preserve_history});domain.audit(db,{teamId:team_id,actorId:req.user.id,action:'event.activate',targetId:next_event_id});writeDB(db);res.json({...result,team:publicTeam(db,result.team,req.user.id)});}catch(error){if(!error.status)throw error;fail(res,error.status,error.message);}
 });
 function visible(db,store,row,uid) {
   if(store==='users')return row.id===uid||rows(db,'memberships').some(m=>m.user_id===row.id&&membership(db,uid,m.team_id));
@@ -241,14 +215,15 @@ function visible(db,store,row,uid) {
 }
 app.get('/api/:store{/:id}',(req,res)=>{
   const {store,id}=req.params;if(!STORES.includes(store))return fail(res,store==='session'?403:404,'Collection is unavailable');
-  const db=readDB();let result=rows(db,store).filter(r=>visible(db,store,r,req.user.id));
+  const db=readDB();let result=rows(db,store).filter(r=>visible(db,store,r,req.user.id)&&(store!=='submissions'||!domain.reportRemoved(db,r.id)));
   for(const [key,value]of Object.entries(req.query)){if(['password','password_hash'].includes(key))return fail(res,400,'Private field filters are not supported');result=result.filter(r=>String(r[key])===String(value));}
-  result=result.map(r=>store==='users'?publicUser(r):store==='teams'?publicTeam(db,r,req.user.id):r);
+  result=result.map(r=>store==='users'?publicUser(r):store==='teams'?publicTeam(db,r,req.user.id):store==='submissions'&&rows(db,'submission_states').some(s=>s.id===r.id&&s.review_required)?{...r,quality_review_required:true}:r);
   if(id){const row=result.find(r=>r.id===id);return row?res.json(row):fail(res,404,'Record not found');}res.json(result);
 });
 app.all('/api/:store{/:id}',(req,res,next)=>{
   if(!['POST','PATCH','DELETE'].includes(req.method))return next();
   const {store,id}=req.params;if(!STORES.includes(store)||store==='users')return fail(res,403,'Collection cannot be changed here');
+  if(store==='team_allocations')return fail(res,403,'Use the ownership editor to change team allocations');
   const body=req.body||{},db=readDB(),key=id||body.id;
   if(typeof key!=='string'||!key||key.length>200||['__proto__','prototype','constructor'].includes(key))return fail(res,400,'A valid record id is required');
   const original=rows(db,store).find(r=>r.id===key);
@@ -263,29 +238,33 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(rows(db,'scout_events').some(event=>event.team_id===tid&&event.event_key===row.event_key&&event.data_cleared_at))return fail(res,409,'This event was cleared. Your local report is preserved; export it from Device and sync.');
     if(store==='submissions'&&rows(db,'report_tombstones').some(report=>report.id===key&&report.team_id===tid))return fail(res,409,'This report ID belongs to a cleared event. Your local copy is preserved.');
     const team=rows(db,'teams').find(team=>team.id===tid),current=activeEvent(db,tid);
-    if(team?.active_event_id&&row.event_key&&row.event_key!==current?.event_key)return fail(res,409,'Only the active event accepts new data. Your local copy is preserved.');
+    if(store!=='submissions'&&team?.active_event_id&&row.event_key&&row.event_key!==current?.event_key)return fail(res,409,'Only the active event accepts new operational changes. Your local copy is preserved.');
   }
   if(store==='submissions') {
     if(req.method!=='POST')return fail(res,409,'Reports are immutable. Preserve the original and submit a new correction.');
     if(row.user_id!==req.user.id)return fail(res,403,'Report identity must match your account');
     if(!rows(db,'forms').some(f=>f.id===row.form_id&&f.team_id===tid))return fail(res,400,'Choose a form in this workspace');
     row.submitted_by=req.user.username;
+    if(domain.reportRemoved(db,key))return fail(res,409,'This report was removed by an administrator. Its ID remains reserved.');
     if(original)return isDeepStrictEqual(original,{...body,submitted_by:req.user.username})?res.json(original):fail(res,409,'A different report already uses this ID. Your local copy is preserved.');
     const form=rows(db,'forms').find(form=>form.id===row.form_id);
+    const validationError=submissionService.validateReport(db,form,row);if(validationError)return fail(res,400,validationError);
     if(form.kind&&row.report_kind&&form.kind!==row.report_kind)return fail(res,400,'Use the report type configured for this form.');
     if((form.kind||'match')!=='pit'){
       const event=rows(db,'scout_events').find(event=>event.team_id===tid&&event.event_key===row.event_key);
       const accessError=matchReportError({event,assignments:rows(db,'assignments'),userId:req.user.id,report:row});
-      if(accessError)return fail(res,403,accessError);
+      const pastDuty=rows(db,'responsibility_history').some(change=>change.team_id===tid&&change.event_key===row.event_key&&change.assignment_id===row.assignment_id&&(change.to_user_id===req.user.id||change.from_user_id===req.user.id));
+      const duty=rows(db,'assignments').find(a=>a.id===row.assignment_id&&a.team_id===tid&&a.event_key===row.event_key&&a.match_key===row.match_key&&String(a.team_number)===String(row.scouted_team)&&a.form_id===row.form_id);
+      if(accessError&&!(pastDuty&&duty))return fail(res,403,accessError);
     }
-    const limitError=submissionError(rows(db,'forms').find(f=>f.id===row.form_id),row,rows(db,'submissions'));
+    const limitError=submissionError(rows(db,'forms').find(f=>f.id===row.form_id),row,domain.realReports(db));
     if(limitError)return fail(res,409,limitError);
   } else if(store==='pit_scouts') {
     if(row.user_id!==req.user.id&&!admin(db,req.user.id,tid))return fail(res,403,'Permission denied');
     if(original&&row.user_id!==original.user_id)return fail(res,400,'Scout identity cannot be changed');
   } else if(store==='memberships') {
     if(req.method==='DELETE'&&original?.user_id===req.user.id&&original.role!=='owner') { /* Members may leave. */ }
-    else if(role(db,req.user.id,tid)!=='owner')return fail(res,403,'Owner permission required');
+    else if(role(db,req.user.id,tid)!=='owner')return fail(res,403,'Use Admin member management for ordinary members');
     if(!original)return fail(res,403,'Join a team through the join-team endpoint');
     if(row.user_id!==original.user_id||row.team_id!==original.team_id||row.username!==original.username)return fail(res,400,'Membership identity cannot be changed');
     if(original.role==='owner'||row.role==='owner')return fail(res,409,'Use transfer-ownership before changing the owner');
@@ -294,15 +273,22 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(role(db,req.user.id,tid)!=='owner')return fail(res,403,'Owner permission required');
     if(req.method==='DELETE')return fail(res,409,'Team deletion would orphan scouting records. Archive the workspace instead.');
     if(!original||row.owner_id!==original.owner_id||row.number!==original.number)return fail(res,400,'Team identity cannot be changed');
-    if(Object.hasOwn(body,'active_event_id')||Object.hasOwn(body,'event_transition'))return fail(res,409,'Use Change event to switch events and review outgoing data.');
+    if(Object.hasOwn(body,'active_event_id')&&body.active_event_id!==original.active_event_id||Object.hasOwn(body,'event_transition')&&!isDeepStrictEqual(body.event_transition,original.event_transition))return fail(res,409,'Use Change event to switch events and retain history.');
   } else if(!admin(db,req.user.id,tid))return fail(res,403,'Administrator permission required');
   if(req.method==='DELETE'&&['forms','scout_events'].includes(store))return fail(res,409,'Archive this record instead. Scouting evidence and unfinished drafts must be retained.');
   if(store==='forms'&&req.method!=='DELETE'&&row.max_submissions_per_team!=null&&(!Number.isInteger(row.max_submissions_per_team)||row.max_submissions_per_team<1||!row.allow_team_select))return fail(res,400,'Submission limits require team selection and a positive whole number');
+  if(store==='forms'&&req.method!=='DELETE'){
+    const invalid=submissionService.validateForm(row);if(invalid)return fail(res,400,invalid);
+    if(original)db.form_versions=[...rows(db,'form_versions'),{id:crypto.randomUUID(),form_id:original.id,team_id:tid,questions:original.questions||[],revision:original.revision||0}];
+    row.revision=(original?.revision||0)+1;
+  }
   if(store==='scout_events') {
     if(original?.data_cleared_at)return fail(res,409,'This event was cleared and cannot be changed.');
     if(Object.hasOwn(body,'data_cleared_at'))return fail(res,400,'Event clearing is managed by Change event.');
     if(original&&row.event_key!==original.event_key)return fail(res,409,'Use Change event instead of replacing an event key.');
     if(Object.hasOwn(body,'assignment_revision'))return fail(res,400,'Assignment revisions are managed by assignment writes');
+    if(original&&(Object.hasOwn(body,'assignment')||Object.hasOwn(body,'excluded')))return fail(res,409,'Use the permanent team ownership editor');
+    if(original&&Object.hasOwn(body,'shared_summary_policy'))return fail(res,409,'Use the approved summaries editor');
     if(Object.hasOwn(body,'analytics_config')) {
       const expected=body.analytics_revision ?? 0,current=original?.analytics_revision ?? 0;
       if(!Number.isInteger(expected)||expected!==current)return fail(res,409,'Metric definitions changed. Reload the current definitions before saving; your edits were not overwritten.');
@@ -314,6 +300,13 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!Number.isInteger(body.revision)||body.revision!==(original?.revision||0))return fail(res,409,'This record changed. Reload before saving; your edit was not overwritten.');
     if(store==='assignments'&&req.method!=='DELETE'&&!membership(db,row.scout_user_id,tid))return fail(res,400,'Assign a scout who belongs to this workspace');
     if(store==='assignments'&&req.method!=='DELETE'){
+      if(original&&['event_key','match_key','team_number','report_kind'].some(field=>String(row[field]||'')!==String(original[field]||'')))return fail(res,409,'Assignment identity cannot change. Create a separate duty instead.');
+      if(original&&(row.scout_user_id!==original.scout_user_id||row.form_id!==original.form_id)&&(!body.admin_reason||typeof body.admin_reason!=='string'||body.admin_reason.length>500))return fail(res,400,'Enter a reason for changing responsibility or form.');
+      row.primary_scout_user_id=original?.primary_scout_user_id||original?.scout_user_id||row.scout_user_id;
+      row.allocation_id=original?.allocation_id||null;
+      row.handoff_id=original?.handoff_id||null;
+      row.source=original?.source||'manual';
+      if(original&&(row.scout_user_id!==original.scout_user_id||row.form_id!==original.form_id)){row.source='manual';row.handoff_id=null;}
       const event=rows(db,'scout_events').find(event=>event.team_id===tid&&event.event_key===row.event_key);
       const form=rows(db,'forms').find(form=>form.team_id===tid&&form.id===row.form_id&&!form.archived&&!form.archived_at);
       if(!event||!form||(form.kind||'match')!==(row.report_kind||'match')||!/^\d+$/.test(String(row.team_number)))return fail(res,400,'Choose an event, team and matching form for this assignment');
@@ -332,6 +325,11 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
   }
   if(req.method==='DELETE')db[store]=rows(db,store).filter(r=>r.id!==key);
   else {db[store]=rows(db,store);const index=db[store].findIndex(r=>r.id===key);if(index<0)db[store].push(row);else db[store][index]=row;}
+  if(store==='assignments')assignmentsService.history(db,row,original?.scout_user_id||null,req.user.id,req.method==='DELETE'?'removed':'manual');
+  if(store==='submissions'&&body.questions_snapshot){const form=rows(db,'forms').find(f=>f.id===body.form_id);if(!isDeepStrictEqual(body.questions_snapshot,form.questions||[])&&!rows(db,'form_versions').some(v=>v.form_id===form.id&&isDeepStrictEqual(v.questions,body.questions_snapshot)))db.submission_states=[...rows(db,'submission_states'),{id:key,team_id:tid,review_required:true,revision:0,removed:false}];}
+  if(store==='scout_events'&&original&&Object.hasOwn(body,'matches'))assignmentsService.reconcile(db,row,req.user.id);
+  if(['forms','memberships','assignments','scout_events','picklists'].includes(store))domain.audit(db,{teamId:tid,eventKey:row.event_key,actorId:req.user.id,action:`${store}.${req.method.toLowerCase()}`,targetId:key,detail:store==='assignments'?{reason:body.admin_reason||null}:undefined});
+  if(store==='submissions')handoffs.refreshStates(db);
   writeDB(db);res.json(req.method==='DELETE'?{ok:true}:row);
 });
 app.use('/api',(_req,res)=>fail(res,404,'Unknown API route'));

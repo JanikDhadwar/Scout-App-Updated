@@ -38,6 +38,8 @@ jobs:
         run: npm ci --include=dev --no-fund
       - name: Test application and deployment status
         run: npm test
+      - name: Lint active application and services
+        run: npm run lint:active
       - name: Build release
         run: npm run build
       - name: Record verification summary

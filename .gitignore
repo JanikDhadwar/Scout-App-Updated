@@ -31,3 +31,7 @@ argus.env
 argus-connections.private.json
 argus-integrations.private.json
 argus-integrations.private.json.tmp
+argus-sessions.private.json
+argus-sessions.private.json.tmp
+argus-push.private.json
+argus-push.private.json.tmp

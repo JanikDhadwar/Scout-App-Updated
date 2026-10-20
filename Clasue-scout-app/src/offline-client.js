@@ -1,4 +1,5 @@
-const CACHEABLE = new Set(['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements', 'scout_events', 'pit_scouts', 'assignments', 'picklists']);
+const CACHEABLE = new Set(['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements', 'scout_events', 'pit_scouts', 'assignments', 'picklists', 'team_allocations']);
+const cacheablePath = (store, path) => CACHEABLE.has(store) || store === 'assignment-plan' || store === 'practice' || store === 'preferences' || store === 'events' && /\/analytics(?:\?|$)/.test(path);
 export class RequestError extends Error {
   constructor(message, status = 0) { super(message); this.status = status; }
 }
@@ -82,7 +83,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
   async function combine(path, data, owner, includeReceipts=true) {
     const url = new URL(path, 'https://scout.local');
     const [store, id] = url.pathname.slice(1).split('/');
-    if (store !== 'submissions') return data;
+    if (store !== 'submissions' && store !== 'practice') return data;
     const rows = await localRows(store, owner, includeReceipts);
     if (id) return data || rows.find(row=>row.id===id) || null;
     const merged = new Map([...rows, ...(Array.isArray(data)?data:[])].map(row=>[row.id,row]));
@@ -97,10 +98,10 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     const store = url.pathname.split('/')[1];
     const key = keyFor(normalized, owner);
     try {
-      if(owner && CACHEABLE.has(store) && state.connection==='offline') throw new RequestError('Using downloaded data.');
+      if(owner && cacheablePath(store,normalized) && state.connection==='offline') throw new RequestError('Using downloaded data.');
       const data = await request('GET', normalized);
       requireCurrentRead(owner,version);
-      if (owner && CACHEABLE.has(store)) {
+      if (owner && cacheablePath(store,normalized)) {
         try {
           await storage.put('cache', { key, store, scope:keyFor('',owner), data });
           if(normalized==='/submissions') for(const receipt of await storage.all('receipts')) {
@@ -114,7 +115,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
       return result;
     } catch (error) {
       if (error.status && error.status < 500) throw error;
-      if (!owner || !CACHEABLE.has(store)) throw error;
+      if (!owner || !cacheablePath(store,normalized)) throw error;
       let cached = await storage.get('cache', key);
       if (!cached) {
         // A complete downloaded collection can also answer filtered/item reads.
@@ -175,21 +176,22 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     })().finally(()=>{ flight=null; });
     return flight;
   }
-  async function saveQueued(row, draftKey) {
+  async function saveQueued(row, draftKey, store = 'submissions') {
+    if (!['submissions','practice'].includes(store)) throw new Error('Unsupported queued report destination.');
     if (!scope || row.user_id !== scope.userId || row.team_id !== scope.teamId) throw new Error('Sign in to the report’s team before saving.');
     if (new Blob([JSON.stringify(row)]).size > 9.5 * 1024 * 1024) throw new Error('This report has too many large photos. Use smaller images before submitting.');
     const existing = await storage.get('queue',row.id) || await storage.get('receipts',row.id);
     if (existing) {
-      if (!belongs(existing,scope) || JSON.stringify(existing.row) !== JSON.stringify(row)) throw new RequestError('A different report already uses this ID. Your draft and original report are preserved.',409);
+      if (!belongs(existing,scope) || existing.store !== store || JSON.stringify(existing.row) !== JSON.stringify(row)) throw new RequestError('A different report already uses this ID. Your draft and original report are preserved.',409);
       return existing.row;
     }
-    try { await storage.enqueue({ key:row.id, row, store:'submissions', userId:scope.userId, teamId:scope.teamId, queuedAt:new Date().toISOString(), error:null },draftKey); } catch(error) { update({storageError:'Device storage could not save this report. Your draft is preserved.',error:'Device storage could not save this report. Your draft is preserved.'}); throw error; }
+    try { await storage.enqueue({ key:row.id, row, store, userId:scope.userId, teamId:scope.teamId, queuedAt:new Date().toISOString(), error:null },draftKey); } catch(error) { update({storageError:'Device storage could not save this report. Your draft is preserved.',error:'Device storage could not save this report. Your draft is preserved.'}); throw error; }
     await refresh();
     void sync().catch(error=>update({error:error.message}));
     return row;
   }
-  function enqueue(row,draftKey) {
-    const saving = enqueueFlight.then(()=>saveQueued(row,draftKey));
+  function enqueue(row,draftKey,store='submissions') {
+    const saving = enqueueFlight.then(()=>saveQueued(row,draftKey,store));
     enqueueFlight = saving.catch(()=>{});
     return saving;
   }
