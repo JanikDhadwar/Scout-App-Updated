@@ -8,7 +8,7 @@ No production database is available here; all tests must use temporary fixtures.
 
 5.0.0 implemented and verified for this increment. Critical ownership/security
 foundations and the supporting workflows below are implemented and fixture-tested.
-Publication is in progress. The entire approved roadmap is **not**
+Committed locally; publication is blocked by GitHub write permissions. The entire approved roadmap is **not**
 declared finished: extended acceptance and enhancement work is listed below.
 
 ## Phase checklist
@@ -22,6 +22,7 @@ declared finished: extended acceptance and enhancement work is listed below.
 - [x] Isolated practice, basic progress, analyst/strategy and server data-quality integration.
 - [x] Role onboarding/help/instructions and in-app/opt-in push reminder infrastructure.
 - [x] Final unit/API/offline/browser/build/lint verification for this increment.
+- [x] Commit verified stable changes locally (`af7f46a`, release implementation).
 - [ ] Commit and push verified stable changes; record revision and limitations.
 
 ## Baseline verification
@@ -178,10 +179,19 @@ live phone/provider behavior is not claimed verified.
 
 ## Remaining work and next action
 
-No blocking user decision; no production database was accessed. Commit and push
-with a lease after confirming the remote
-has not changed. A push can trigger the existing production updater; actual host
-health and production migration remain outside this fixture environment.
+No production database was accessed. Release implementation is committed at
+`af7f46ac92bdd76602271d985c66d0830e2fa7c4`. Both terminal `git push origin HEAD:main`
+and the connected GitHub integration's tree creation were rejected with HTTP 403
+(permission denied / resource not accessible by integration). Neither changed the
+remote. Main remained `618b962` at the last check. No deployment occurred.
+
+The next action is to restore repository Contents/write access to the Git credential
+or integration, then run `git push origin main` from this checkout after reviewing
+the latest remote. Do not force-push over concurrent work. A portable delta bundle
+will be saved at `/workspace/ARGUS-5.0.bundle`, containing both the implementation
+commit and this status update. The bundle needs the baseline repository history.
+A push may trigger the existing updater; actual host health and production migration
+remain outside this fixture environment.
 
 - [ ] Validate opt-in push on actual Android/iOS devices, denied permission,
   installation/background behavior and provider failure/revocation in production.
