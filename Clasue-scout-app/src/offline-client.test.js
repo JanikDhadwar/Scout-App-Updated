@@ -7,6 +7,12 @@ import { createOfflineClient } from './offline-client.js';
 const owner={userId:'scouter',teamId:'6390'};
 const report=(id='report-1')=>({id,user_id:owner.userId,team_id:owner.teamId,form_id:'form-1',answers:{score:0,photo:'data:image/png;base64,test',climb:'No'}});
 const response=(data,status=200)=>({ok:status>=200&&status<300,status,json:async()=>structuredClone(data)});
+test('Match13 service errors do not mark Argus offline, while a network failure still does',async()=>{
+ let networkFailure=false;const client=createOfflineClient({storage:createOfflineStore('ratings-online',new IDBFactory()),fetcher:async url=>{if(networkFailure)throw new TypeError('Network lost');return url.includes('/match13/')?response({error:'Provider unavailable'},503):response({ok:true});}});
+ await client.api('GET','/health');assert.equal(client.getState().connection,'online');
+ await assert.rejects(client.api('GET','/match13/rating?team=254&year=2026'),/Provider unavailable/);assert.equal(client.getState().connection,'online');
+ networkFailure=true;await assert.rejects(client.api('GET','/match13/rating?team=254&year=2026'));assert.equal(client.getState().connection,'offline');
+});
 test('practice queue survives reload and can only upload to practice, never competition submissions',async()=>{
   const factory=new IDBFactory(),storage=createOfflineStore('practice-isolation',factory),sent=[];
   const offline=createOfflineClient({storage,fetcher:async()=>{throw new TypeError('Offline');}});

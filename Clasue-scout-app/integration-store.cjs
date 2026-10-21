@@ -1,6 +1,6 @@
 const fs=require('node:fs');
 const path=require('node:path');
-const fields=['TBA_API_KEY','GROQ_API_KEY','GROQ_MODEL'];
+const fields=['TBA_API_KEY','GROQ_API_KEY','GROQ_MODEL','MATCH13_API_KEY'];
 function createIntegrationStore(filename) {
   function read(){if(!fs.existsSync(filename))return {};try{const value=JSON.parse(fs.readFileSync(filename,'utf8'));if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{throw new Error('Private integration settings could not be read. Existing settings were preserved.');}}
   function key(workspaceId,name){return read()[workspaceId]?.[name];}

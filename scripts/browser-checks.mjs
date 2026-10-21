@@ -31,24 +31,38 @@ try {
   assert.equal(await page.locator('.a-topbar a[href="#/events"]').count(),0);
   await route('/help');await page.getByRole('button',{name:'Replay welcome guide',exact:true}).click();await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
  });
- await check('Statbotics rankings show sourced values, team lookup, pagination and service errors',async()=>{
+ await check('Match13 rankings show sourced values, team lookup, pagination and service errors',async()=>{
   let mode='success';
   const intercept=async request=>{
-   if(mode==='error')return request.fulfill({status:502,json:{error:'Statbotics is temporarily unavailable. Try again later.'}});
+   if(mode==='error')return request.fulfill({status:502,json:{error:'Match13 is temporarily unavailable. Try again later.'}});
    const query=new URL(request.request().url()).searchParams,offset=Number(query.get('offset')||0),team=Number(query.get('team')||254);
-   await request.fulfill({json:{source:'Statbotics',year:2026,offset,fetched_at:'2026-10-20T12:00:00Z',has_more:!query.has('team')&&offset===0,rows:[{team,year:2026,name:'QA external team',epa:0,rank:offset+3,total:4000,matches:null,wins:0,losses:0,ties:0}]}});
+   await request.fulfill({json:{source:'Match13',year:2026,offset,total:4000,fetched_at:'2026-10-20T12:00:00Z',has_more:!query.has('team')&&offset===0,rows:[{team,year:2026,xp:0,auto:0,teleop:0,endgame:0,rank:offset+3,total:4000,matches:null,wins:0,losses:0,ties:0}]}});
   };
-  await page.route('**/api/statbotics/rankings?*',intercept);
+  await page.route('**/api/match13/rankings?*',intercept);
   try{
    await route('/teams');await page.locator('summary').filter({hasText:/^Global rankings$/}).click();
-   const panel=page.getByRole('region',{name:'Statbotics global rankings',exact:true});
+   const panel=page.getByRole('region',{name:'Match13 global rankings',exact:true});
    await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();
-   await panel.getByRole('region',{name:'Global EPA rankings',exact:true}).waitFor();assert.match(await panel.innerText(),/3 \/ 4000/);
+   await panel.getByRole('region',{name:'Global XP rankings',exact:true}).waitFor();assert.match(await panel.innerText(),/3 \/ 4000/);
    for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`global-rankings-${width}.png`),fullPage:true});}
    await panel.getByRole('button',{name:'Next 50',exact:true}).click();await panel.getByText('53 / 4000',{exact:true}).waitFor();
-   await panel.getByLabel('Team number (optional)',{exact:true}).fill('6390');await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('link',{name:'6390 QA external team',exact:true}).waitFor();assert.equal(await panel.getByRole('button',{name:'Next 50',exact:true}).count(),0);
-   mode='error';await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('alert').filter({hasText:'Statbotics is temporarily unavailable'}).waitFor();assert.equal(await panel.getByRole('table').count(),0);
-  }finally{await page.unroute('**/api/statbotics/rankings?*',intercept);await page.setViewportSize({width:1440,height:1000});}
+   await panel.getByLabel('Team number (optional)',{exact:true}).fill('6390');await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('link',{name:'Team 6390',exact:true}).waitFor();assert.equal(await panel.getByRole('button',{name:'Next 50',exact:true}).count(),0);
+   mode='error';await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('alert').filter({hasText:'Match13 is temporarily unavailable'}).waitFor();assert.equal(await panel.getByRole('table').count(),0);
+  }finally{await page.unroute('**/api/match13/rankings?*',intercept);await page.setViewportSize({width:1440,height:1000});}
+ });
+ await check('Match13 profile components, geographic ranks and pit predictions include offseason and handle outages',async()=>{
+  let outage=false;
+  const rating=async r=>{const q=new URL(r.request().url()).searchParams;await r.fulfill({json:{rating:{team:Number(q.get('team')),year:2026,xp:203.2,auto:40.3,teleop:162.2,endgame:0.7,rank:58},fetched_at:'2026-10-21T12:00:00Z'}});};
+  const regions=r=>r.fulfill({json:{complete:true,world:{name:'World',rank:58,total:3708},country:{name:'USA',rank:44,total:2934},district:{name:'Pacific Northwest',rank:5,total:126},state:{name:'Washington',rank:5,total:86}}});
+  const predictions=r=>r.fulfill(outage?{status:502,json:{error:'Match13 is temporarily unavailable.'}}:{json:{event:'2026qa',matches:[{key:'2026qa_qm4',teams:[254,6390,1678,2056],redScore:100,blueScore:90,redWinProbability:0.75}],fetched_at:'2026-10-21T12:00:00Z'}});
+  await page.route('**/api/match13/rating?*',rating);await page.route('**/api/match13/regions?*',regions);await page.route('**/api/match13/predictions?*',predictions);
+  try{
+   await route('/teams/254');const profile=page.getByRole('region',{name:'Match13 ratings for team 254',exact:true});await profile.getByText('203.2',{exact:true}).waitFor();await profile.getByText('#44 / 2934',{exact:true}).waitFor();assert.match(await profile.innerText(),/Includes offseason/);
+   for(const width of widths){await page.setViewportSize({width,height:1000});await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,'match13-profile-'+width+'.png'),fullPage:true});}
+   await route('/display');await page.getByText('75% alliance win chance',{exact:true}).waitFor();await page.getByText('Red: 100',{exact:true}).waitFor();await page.getByText('Blue: 90',{exact:true}).waitFor();
+   for(const width of widths){await page.setViewportSize({width,height:1000});await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,'match13-pit-'+width+'.png'),fullPage:true});}
+   outage=true;await page.getByRole('button',{name:'Refresh predictions',exact:true}).click();await page.getByRole('status').filter({hasText:'Match13 is temporarily unavailable.'}).waitFor();assert.equal(await page.getByText('75% alliance win chance',{exact:true}).count(),0);await page.getByRole('region',{name:'Team upcoming matches',exact:true}).waitFor();
+  }finally{await page.unroute('**/api/match13/rating?*',rating);await page.unroute('**/api/match13/regions?*',regions);await page.unroute('**/api/match13/predictions?*',predictions);await page.setViewportSize({width:1440,height:1000});}
  });
  await check('compact phone navigation retains tools, disclosures and modal keyboard access',async()=>{
   await page.setViewportSize({width:390,height:844});await route('/dashboard');

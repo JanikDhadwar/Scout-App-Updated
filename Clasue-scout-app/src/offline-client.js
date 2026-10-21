@@ -46,7 +46,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
   }
   async function request(method, path, body) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), method === 'GET' ? 5000 : 20000);
+    const timer = setTimeout(() => controller.abort(), method === 'GET' ? path.startsWith('/match13/regions?')?45000:path.startsWith('/match13/')?12000:5000 : 20000);
     try {
       const response = await fetcher(`/api${path}`, {
         method, credentials:'same-origin', cache:'no-store', signal:controller.signal,
@@ -62,7 +62,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
       update({ connection:'online' });
       return data;
     } catch (error) {
-      if (!error.status || error.status >= 500) update({ connection:'offline' });
+      if (!error.status || error.status >= 500&&!path.startsWith('/match13/')) update({ connection:'offline' });
       if (error instanceof RequestError) throw error;
       throw new RequestError('Server unreachable. Your saved reports will upload when it reconnects.');
     } finally { clearTimeout(timer); }

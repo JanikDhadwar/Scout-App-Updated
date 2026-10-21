@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isCompleted, matchLabel } from "./workspace-model.js";
+import {Match13Rating,Match13Predictions,PredictionValue} from './match13.jsx';
 
 export function PitDisplaySettings({ workspace, role, api, onSaved }) {
   const [number, setNumber] = useState(
@@ -240,6 +241,8 @@ export function PitDisplay({ workspace, event, api }) {
         </section>
         <section className="a-panel a-stack">
           <h2>Upcoming matches</h2>
+          <Match13Rating api={api} workspaceId={workspace.id} team={number} year={eventKey?.slice(0,4)}/>
+          <Match13Predictions api={api} workspaceId={workspace.id} eventKey={eventKey} team={number}>{predictionFor=><>
           <div
             className="a-table-wrap"
             role="region"
@@ -251,7 +254,7 @@ export function PitDisplay({ workspace, event, api }) {
                 <tr>
                   <th>Match</th>
                   <th>Time</th>
-                  <th>Alliances</th>
+                  <th>Alliances and prediction</th>
                 </tr>
               </thead>
               <tbody>
@@ -277,12 +280,14 @@ export function PitDisplay({ workspace, event, api }) {
                             .join(", ")}
                         </div>
                       ))}
+                      <p className="a-muted a-small">Match13 estimate</p><PredictionValue prediction={predictionFor(match)}/>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          </>}</Match13Predictions>
           {!matches.length && (
             <p className="a-empty">
               {!schedule.length

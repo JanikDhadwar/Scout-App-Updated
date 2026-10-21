@@ -1,5 +1,35 @@
 import { visibleQuestions, hasAnswer } from '../form-conditions.js';
 
+const externalNumber=value=>typeof value==='number'&&Number.isFinite(value)?value:null;
+export function normalizeMatch13Team(row){
+ if(!Number.isInteger(row?.teamNumber)||row.teamNumber<1||!Number.isInteger(row.year))return null;
+ return {team:row.teamNumber,year:row.year,xp:externalNumber(row.xp),auto:externalNumber(row.xAuto),teleop:externalNumber(row.xTele),endgame:externalNumber(row.xEnd),epa:externalNumber(row.epa),rank:Number.isInteger(row.rank)&&row.rank>0?row.rank:null};
+}
+export function normalizeMatch13Prediction(row){
+ if(typeof row?.key!=='string'||!row.teams||typeof row.teams!=='object')return null;
+ const teams=Object.keys(row.teams).map(Number);if(!teams.length||teams.length>6||teams.some(n=>!Number.isInteger(n)||n<1))return null;
+ const probability=externalNumber(row.pred?.winProb);
+ return {key:row.key,teams,redScore:externalNumber(row.pred?.redScore),blueScore:externalNumber(row.pred?.blueScore),redWinProbability:probability!=null&&probability>=0&&probability<=1?probability:null};
+}
+export function match13PredictionForMatch(predictions,match,team){
+ const row=predictions?.find(p=>p.key===match?.key);if(!row)return null;
+ const teams=color=>(match.alliances?.[color]?.team_keys||[]).map(key=>Number(String(key).replace(/^frc/,'')));
+ const red=teams('red'),blue=teams('blue');
+ if(JSON.stringify([...red,...blue].sort((a,b)=>a-b))!==JSON.stringify([...row.teams].sort((a,b)=>a-b)))return null;
+ const alliance=red.includes(Number(team))?'red':blue.includes(Number(team))?'blue':null;if(!alliance)return null;
+ return {...row,alliance,winProbability:row.redWinProbability==null?null:alliance==='red'?row.redWinProbability:1-row.redWinProbability};
+}
+export function match13RegionalRanks(ratings,metadata,team,districtTeams=[],districtName='District'){
+ const target=ratings.find(r=>r.team===Number(team)),location=metadata.find(m=>Number(m.team_number)===Number(team));
+ const complete=ratings.every(r=>metadata.some(m=>Number(m.team_number)===r.team));
+ const rank=(name,subset)=>!target||!subset.some(r=>r.team===target.team)||target.rank==null?null:{name,rank:1+subset.filter(r=>r.rank!=null&&r.rank<target.rank).length,total:subset.length};
+ const country=location?.country,state=location?.state_prov;
+ return {complete,world:target?{name:'World',rank:target.rank,total:ratings.length}:null,
+ country:country?rank(country,ratings.filter(r=>metadata.some(m=>Number(m.team_number)===r.team&&m.country===country))):null,
+ state:country&&state?rank(state,ratings.filter(r=>metadata.some(m=>Number(m.team_number)===r.team&&m.country===country&&m.state_prov===state))):null,
+ district:districtTeams.length?rank(districtName,ratings.filter(r=>districtTeams.includes(r.team))):null};
+}
+
 // External model estimates stay separate from report-derived scouting calculations.
 export function normalizeStatboticsTeam(row) {
  if(!Number.isInteger(row?.team)||row.team<1||!Number.isInteger(row.year))return null;

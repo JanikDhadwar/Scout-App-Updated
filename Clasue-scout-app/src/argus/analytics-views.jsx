@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { formatValue, presentationSections } from "./analytics.js";
 import "./analytics-views.css";
+import {Match13Rating} from './match13.jsx';
 
 const phases = {
   auto: "Autonomous",
@@ -752,6 +753,7 @@ function Confidence({ team, onOpenReport }) {
 
 export function TeamProfile({
   analytics,
+  api,workspaceId,
   assignedScout,
   teamNumber,
   onCompare,
@@ -770,7 +772,7 @@ export function TeamProfile({
   if (!team)
     return (
       <div className="a-panel a-empty">
-        Select a team from the directory to view its scouting evidence.
+        <h1>Team {teamNumber}</h1><Match13Rating api={api} workspaceId={workspaceId} team={teamNumber} year={analytics.event?.key?.slice(0,4)}/><p>No scouting evidence is available for this team in the selected event.</p><a href="#/teams">Back to teams</a>
       </div>
     );
   const metric = team.metrics[metricId],
@@ -840,6 +842,7 @@ export function TeamProfile({
           )}
         </div>
       </header>
+      <Match13Rating api={api} workspaceId={workspaceId} team={team.teamNumber} year={analytics.event?.key?.slice(0,4)}/>
       <dl className="av-facts av-top-facts">
         <div>
           <dt>Event reports</dt>

@@ -36,6 +36,7 @@ import "./workspace.css";
 import './upgrade.css';
 import './mobile-workspace.css';
 import { IntegrationSettings } from "./integration-settings.jsx";
+import {Match13Settings} from './match13.jsx';
 import { APP_VERSION } from "../app-version.js";
 import { EventTransition } from "./event-transition.jsx";
 import { HandoffInbox } from "./match-handoffs.jsx";
@@ -516,6 +517,7 @@ export default function ArgusWorkspace({
   if (section === "teams" && id)
     body = (
       <TeamProfile
+        api={api} workspaceId={workspace.id}
         assignedScout={['owner','admin'].includes(role)?assignmentRoster(scoped,event).teams.find(t=>t.number===Number(id))?.ownerName:undefined}
         analytics={analytics}
         teamNumber={id}
@@ -528,7 +530,7 @@ export default function ArgusWorkspace({
   else if (section === "teams")
     body = (
       <TeamDirectory
-        api={api} season={event?.event_key?.slice(0,4)}
+        api={api} workspaceId={workspace.id} season={event?.event_key?.slice(0,4)}
         analytics={analytics}
         onOpenTeam={openTeam}
         onCompare={compare}
@@ -575,7 +577,7 @@ export default function ArgusWorkspace({
     body = (
       <>
         <TeamDirectory
-          api={api} season={event?.event_key?.slice(0,4)}
+          api={api} workspaceId={workspace.id} season={event?.event_key?.slice(0,4)}
           analytics={analytics}
           onOpenTeam={openTeam}
           onCompare={compare}
@@ -723,6 +725,7 @@ export default function ArgusWorkspace({
           <p className="a-muted">Your team, account and this device.</p>
         </header>
         <IntegrationSettings api={api} workspaceId={workspace.id} role={role} />
+        <Match13Settings api={api} workspaceId={workspace.id} role={role}/>
         <section className="a-panel a-stack">
           <h2>{workspace.name || `Team ${workspace.number}`}</h2>
           <p>
