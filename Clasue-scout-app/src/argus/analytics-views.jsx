@@ -752,6 +752,7 @@ function Confidence({ team, onOpenReport }) {
 
 export function TeamProfile({
   analytics,
+  assignedScout,
   teamNumber,
   onCompare,
   onPresent,
@@ -809,6 +810,7 @@ export function TeamProfile({
             {analytics.event?.name || "No event selected"}
           </p>
           <h1>Team {team.teamNumber}</h1>
+          {assignedScout&&<p><strong>Assigned scout:</strong> {assignedScout} · <a href={`#/admin?tab=assignments&team=${team.teamNumber}`}>View assignment</a></p>}
           {team.nickname && <p className="av-team-name">{team.nickname}</p>}
         </div>
         <div className="av-actions">

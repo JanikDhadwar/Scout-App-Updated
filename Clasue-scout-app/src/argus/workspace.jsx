@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { analyticsForData, formatValue } from "./analytics.js";
+import { assignmentRoster } from './assignment-roster.js';
 import {
   buildSearchIndex,
   destinations,
@@ -515,6 +516,7 @@ export default function ArgusWorkspace({
   if (section === "teams" && id)
     body = (
       <TeamProfile
+        assignedScout={['owner','admin'].includes(role)?assignmentRoster(scoped,event).teams.find(t=>t.number===Number(id))?.ownerName:undefined}
         analytics={analytics}
         teamNumber={id}
         onCompare={compare}
@@ -610,7 +612,7 @@ export default function ArgusWorkspace({
   else if (section === 'analyst') body = <div className="a-stack"><header><h1>Scouting analyst</h1><p className="a-muted">{analytics.evidenceScope||'Your authorized event evidence'}</p></header><Analyst api={api} workspaceId={workspace.id} eventKey={event?.event_key} analytics={analytics} onOpenTeam={openTeam} onCompare={compare} onOpenReport={openReport}/></div>;
   else if (section === "events")
     body = (
-      <EventData {...common} selectedId={event?.id} onSelect={selectEvent} />
+      <EventData {...common} />
     );
   else if (section === "analytics")
     body = (

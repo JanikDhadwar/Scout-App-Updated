@@ -471,7 +471,6 @@ export function EventData({
   api,
   onRefresh,
   navigate,
-  onSelect,
 }) {
   const [key, setKey] = useState(""),
     [name, setName] = useState(""),
@@ -491,14 +490,15 @@ export function EventData({
       setError("Enter a valid event key and event name.");
       return;
     }
-    if (events.some((row) => row.event_key === key.trim())) {
-      setError("This event is already saved. Choose it from the event list.");
+    const existing=events.find((row) => row.event_key === key.trim());
+    if (existing) {
+      navigate(`/events/${encodeURIComponent(existing.id)}`);
       return;
     }
     setSaving(true);
     setError("");
     try {
-      await api("POST", "/scout_events", {
+      const saved=await api("POST", "/scout_events", {
         id: crypto.randomUUID(),
         team_id: workspace.id,
         event_key: key.trim(),
@@ -509,8 +509,8 @@ export function EventData({
       });
       setKey("");
       setName("");
-      setMessage("Event added. Choose it below to review changing events.");
       await onRefresh?.();
+      navigate(`/events/${encodeURIComponent(saved.id)}`);
     } catch (err) {
       setError(messageFor(err));
     } finally {
@@ -603,27 +603,7 @@ export function EventData({
         )}
         <Feedback error={error} message={message} />
       </section>
-      <section className="a-panel a-stack">
-        <h2>Choose the active event</h2>
-        {events.length ? (
-          <ul>
-            {events.map((row) => (
-              <li key={row.id}>
-                <button
-                  className="a-button"
-                  disabled={row.id === event?.id}
-                  onClick={() => onSelect(row.id)}
-                >
-                  {row.event_name || row.event_key}
-                  {row.archived_at ? " (Archived)" : ""}
-                </button>{" "}
-                <span className="a-muted">{row.event_key}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="a-empty">No events have been added.</p>
-        )}
+      <section className="a-panel a-stack" aria-label="Manual event setup">
         {canEdit ? (
           <form className="a-stack" onSubmit={create}>
             <details className="a-disclosure">
