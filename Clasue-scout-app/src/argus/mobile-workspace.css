@@ -1,0 +1,47 @@
+/* Task-first phone layout. Detailed tools and evidence remain one tap away. */
+.a-compact-details{min-width:0}
+.a-compact-details>summary{display:none}
+.a-more-dialog{padding:0;width:min(560px,calc(100% - 16px));max-width:none;max-height:calc(100dvh - 32px);border:1px solid var(--a-border);border-radius:10px;background:var(--a-surface);color:var(--a-text)}
+.a-more-dialog::backdrop{background:#0009}
+.a-more-content{padding:16px}
+.a-more-content>header{justify-content:space-between;margin-bottom:16px}
+.a-more-content h2{margin:0;font-size:20px}
+.a-more-content a{display:flex;align-items:center;min-height:44px;padding:10px 12px;color:var(--a-text);text-decoration:none;border-radius:5px}
+.a-more-content a:hover,.a-more-content a:focus-visible{background:var(--a-raised)}
+.a-more-content details{border-top:1px solid var(--a-border);margin-top:12px}
+.a-more-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.a-more-shortcuts a{border:1px solid var(--a-border)}
+@media(max-width:620px){
+ .argus-app .a-main{padding:12px 12px calc(84px + env(safe-area-inset-bottom))!important}
+ .argus-app .a-stack{gap:12px}
+ .argus-app .a-panel{padding:12px}
+ .a-topbar{min-height:56px;gap:8px}
+ .a-topbar-tools{flex-wrap:nowrap}
+ .a-topbar-tools>.a-event-select{max-width:none;flex:1;overflow-wrap:anywhere}
+ .a-event-select>span{display:block;max-width:none;font-size:12px}
+ .a-topbar .a-search-trigger{min-width:44px;min-height:44px;justify-content:center}
+ .a-sync{min-height:44px;max-width:98px;font-size:11px;flex-shrink:0}
+ .a-dashboard-heading{gap:10px}
+ .a-dashboard-heading h1{font-size:23px;line-height:1.2}
+ .a-dashboard-heading .a-primary{width:auto;min-height:44px}
+ .a-compact-details{border-block:1px solid var(--a-border)}
+ .a-compact-details>summary{display:list-item;cursor:pointer;min-height:44px;padding:12px 0;font-size:14px;font-weight:600}
+ .a-compact-details[open]>summary{margin-bottom:8px}
+ .a-page-tools .a-section-links{display:grid;grid-template-columns:1fr 1fr;border:0;gap:4px 12px;margin:0 0 8px}
+ .a-page-tools .a-section-links a{font-size:13px;padding:8px;min-height:44px}
+ .a-next-assignment{order:-1}
+ .a-assignment-team{margin-top:12px;font-size:24px}
+ .a-workflow-links{display:grid;grid-template-columns:1fr 1fr;gap:8px!important}
+ .a-workflow-links a{padding:10px 8px;border:1px solid var(--a-border);border-radius:5px;font-size:13px}
+ .a-scoreboard{gap:8px;padding-bottom:8px}
+ .a-scoreboard dd span{font-size:12px;max-width:none}
+ .a-scoreboard dt{font-size:12px}
+ .a-mobile-nav a,.a-mobile-nav button{font-size:11px;gap:4px;min-height:44px}
+ .a-mobile-nav svg{width:20px;height:20px}
+ .a-data-credit{margin-top:16px;font-size:12px}
+ .a-notice{padding:12px;margin-bottom:12px}
+ .a-setup-guide summary{min-height:44px;padding-block:8px}
+ .a-setup-guide summary span{margin-left:4px}
+ .a-report-meta{gap:12px}
+ .a-more-dialog{margin:auto 8px calc(76px + env(safe-area-inset-bottom));max-height:calc(100dvh - 100px - env(safe-area-inset-bottom));overflow:auto}
+}

@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { OwnershipManager } from './assignment-hub.jsx';
 import { matchLabel } from './workspace-model.js';
 import { Assignments as DutyEditor } from './operations.jsx';
+import { CoverageBoard } from './coverage-board.jsx';
+const adminSections=[['attention','Needs attention'],['members','Members'],['assignments','Assignments'],['reports','Forms and reports'],['sharing','Shared data'],['activity','Activity']];
 
 function Members({ data, workspace, user, role, api, onRefresh }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [message, setMessage] = useState('');
@@ -54,33 +56,34 @@ function Activity({ workspace, api, data }) {
 export default function AdminCentre(props) {
   const { event, role, api, data, onRefresh } = props;
   const [busy, setBusy] = useState(false);
+  const overviewRequest=useRef(0);
+  const cancelOverview=useCallback(()=>{overviewRequest.current++;},[]);
   const [tab, setTab] = useState(()=>new URLSearchParams(location.hash.split('?')[1]||'').get('tab')||'attention'), [overview, setOverview] = useState(null), [error, setError] = useState('');
-  const load = useCallback(async () => { if (!event || !['owner', 'admin'].includes(role)) return; try { setOverview(await api('GET', `/admin/overview?event_id=${encodeURIComponent(event.id)}`)); setError(''); } catch (e) { setError(e.message); } }, [api, event, role]);
-  useEffect(() => { Promise.resolve().then(load); }, [load]);
+  const load = useCallback(async () => { if (!event || !['owner', 'admin'].includes(role)) return; const request=++overviewRequest.current;try { const result=await api('GET', `/admin/overview?event_id=${encodeURIComponent(event.id)}`);if(request===overviewRequest.current){setOverview(result);setError('');} } catch (e) { if(request===overviewRequest.current)setError(e.message); } }, [api, event, role]);
+  useEffect(() => { const refreshVisible=()=>{if(document.visibilityState!=='hidden')load();};Promise.resolve().then(refreshVisible);const timer=setInterval(refreshVisible,15000);window.addEventListener('online',refreshVisible);return()=>{clearInterval(timer);window.removeEventListener('online',refreshVisible);cancelOverview();}; }, [load,cancelOverview]);
   async function dismiss(team, slot, dismissed) {
     setBusy(true); setError('');
     try { await api('POST', '/admin/coverage', { event_id: event.id, team_number: team.team_number, match_key: slot.match_key, dismissed, revision: slot.dismissal?.revision || 0 }); await load(); }
     catch (e) { setError(e.message); } finally { setBusy(false); }
   }
+  async function dismissTeam(team,dismissed){
+    setBusy(true);setError('');
+    try{await api('POST','/admin/coverage',{scope:'team',event_id:event.id,team_number:team.team_number,dismissed,expected_revision:team.revision});await load();}
+    catch(e){setError(e.message);}finally{setBusy(false);}
+  }
   const refresh = async () => { await onRefresh(); await load(); };
   if (!['owner', 'admin'].includes(role)) return <section className="a-panel"><h1>Administrator access required</h1><p>The backend also rejects protected requests.</p></section>;
   const name = id => (data.memberships || []).find(m => m.user_id === id)?.username || overview?.people?.find(p=>p.id===id)?.username || (id ? 'Former member — reassign' : 'Unassigned');
-  return <div className="a-stack"><header><h1>Admin control centre</h1><p className="a-muted">{event?.event_name || 'Activate an event in Settings to review scouting progress.'}</p></header><nav className="a-admin-tabs" aria-label="Admin sections">{[['attention', 'Needs attention'], ['members', 'Members'], ['assignments', 'Assignments'], ['reports', 'Forms and reports'], ['sharing', 'Shared data'], ['activity', 'Activity']].map(([id, label]) => <button className="a-button" key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>{label}</button>)}</nav>{error && <p role="alert" className="a-danger">{error}</p>}
+  return <div className="a-stack"><header><h1>Admin control centre</h1><p className="a-muted">{event?.event_name || 'Activate an event in Settings to review scouting progress.'}</p></header><nav className="a-admin-tabs" aria-label="Admin sections">{adminSections.map(([id, label]) => <button className="a-button" key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>{label}</button>)}</nav><label className="a-admin-section">Admin section<select aria-label="Admin section" className="a-input" value={tab} onChange={e=>setTab(e.target.value)}>{adminSections.map(([id,label])=><option value={id} key={id}>{label}</option>)}</select></label>{error && <p role="alert" className="a-danger">{error}</p>}
     {tab === 'members' ? <Members {...props} onRefresh={refresh} /> : tab === 'reports' ? <Reports {...props} onRefresh={refresh} /> : tab === 'activity' ? <Activity {...props} /> : !event ? <section className="a-panel"><p>No active event.</p><a className="a-button" href="#/events">Manage events</a></section> : tab === 'assignments' ? <><OwnershipManager key={event.id} {...props} onSaved={load} /><details className="a-panel a-disclosure"><summary>Adjust one-match or pit responsibility</summary><DutyEditor {...props} onRefresh={refresh}/></details></> : tab === 'sharing' ? <Sharing key={`${event.id}:${event.sharing_revision || 0}`} {...props} /> : <>
-      <section className="a-panel a-stack"><div className="a-row"><h2>Scouting progress</h2><button className="a-button" onClick={load}>Refresh overview</button></div><p>{overview?.completed || 0} of {overview?.assignments.filter(a => !a.schedule_cancelled).length || 0} duties server confirmed. Pit visits are separate from reports.</p>{!!overview?.unowned.length && <p className="a-danger">Teams without a permanent owner: {overview.unowned.join(', ')}</p>}
-        <h3>Scouting by team</h3><p className="a-muted">Red: no pit report. Yellow: missed completed matches. Open a team to review matches. Dismissing a match clears its warning; it does not add a report or change analytics.</p>
-        {!overview && <p role="status">Loading scouting progress…</p>}
-        {overview?.team_coverage?.map(team => <details className="a-disclosure a-coverage-team" key={team.team_number}>
-          <summary><strong className={team.pit_missing ? 'a-coverage-red' : team.missing_matches.length ? 'a-coverage-yellow' : ''}>Team {team.team_number}{team.team_name ? ` · ${team.team_name}` : ''}</strong><span className="a-coverage-flags">{team.pit_missing && <span className="a-coverage-red">● Pit not scouted</span>}{!!team.missing_matches.length && <span className="a-coverage-yellow">● {team.missing_matches.length} missed {team.missing_matches.length === 1 ? 'match' : 'matches'}</span>}{!team.pit_missing && !team.missing_matches.length && <span className="a-muted">No outstanding warnings</span>}</span></summary>
-          {team.pit_missing && <p className="a-coverage-red">No pit scouting report for this team at this event.</p>}
-          {team.missing_matches.map(slot => <div className="a-duty" key={slot.match_key}><div><strong>{matchLabel(event.matches?.find(m => m.key === slot.match_key))}</strong><p>Responsible: {name(slot.duty?.scout_user_id)}</p>{slot.duty?.primary_scout_user_id && slot.duty.primary_scout_user_id !== slot.duty.scout_user_id && <p className="a-muted">Permanent owner at assignment: {name(slot.duty.primary_scout_user_id)}</p>}</div><div className="a-row"><button className="a-button" onClick={() => setTab('assignments')}>Review assignment</button><button className="a-button" disabled={busy} onClick={() => dismiss(team, slot, true)}>Dismiss missed match</button></div></div>)}
-          {!!team.dismissed_matches.length && <details className="a-disclosure"><summary>Dismissed matches ({team.dismissed_matches.length})</summary>{team.dismissed_matches.map(slot => <div className="a-duty" key={slot.match_key}><div><strong>{matchLabel(event.matches?.find(m => m.key === slot.match_key))}</strong><p className="a-muted">Dismissed by {name(slot.dismissal.actor_id)} · No report submitted</p></div><button className="a-button" disabled={busy} onClick={() => dismiss(team, slot, false)}>Restore warning</button></div>)}</details>}
-        </details>)}
-        {overview && !overview.team_coverage?.length && <p>No event teams downloaded. Download teams in Settings to review coverage.</p>}
-      </section>
-      <section className="a-panel a-stack"><h2>Coverage conflicts and gaps</h2>{overview?.conflicts.length ? overview.conflicts.map((c, i) => <article className="a-duty" key={`${c.match_key}:${i}`}><div><strong>{matchLabel(event.matches?.find(m => m.key === c.match_key))} · {c.kind.replaceAll('_', ' ')}</strong><p>{name(c.user_id)} · Teams {c.team_numbers.join(', ')}</p></div><a className="a-button" href={`#/matches/${encodeURIComponent(c.match_key)}`}>Review match and handoffs</a></article>) : <p>No conflicts in the downloaded schedule.</p>}<a className="a-button" href="#/assignments">Open assignment editor</a></section>
-      <section className="a-panel a-stack"><h2>Handoff history</h2>{overview?.handoffs.length ? overview.handoffs.slice().reverse().slice(0, 40).map(h => <article className="a-duty" key={h.id}><div><strong>Team {h.team_number} · {matchLabel(event.matches?.find(m => m.key === h.match_key))}</strong><p>{name(h.from_user_id)} → {name(h.to_user_id)} · {h.status}</p></div></article>) : <p>No handoffs at this event.</p>}</section>
-      <section className="a-panel"><h2>Practice progress</h2><p>Completion records practice submissions, not a certification of scouting accuracy.</p><ul>{(data.memberships || []).map(m => <li key={m.id}>{m.username}: {[...new Set((overview?.training || []).filter(r => r.user_id === m.user_id).map(r => r.report_kind))].join(' and ') || 'No practice submitted'}</li>)}</ul></section>
+      {!overview&&<p role="status">Loading scouting progress…</p>}
+      {overview&&<CoverageBoard key={event.id} teams={overview.team_coverage||[]} event={event} name={name} busy={busy} error={error} onDismiss={dismiss} onDismissTeam={dismissTeam} onAssignments={()=>setTab('assignments')} onRefresh={load}/>}
+      <details className="a-disclosure a-admin-support"><summary>More progress details</summary><div className="a-stack">
+      <details className="a-panel a-disclosure"><summary>Duty totals and unowned teams</summary><p>{overview?.completed || 0} of {overview?.assignments.filter(a => !a.schedule_cancelled).length || 0} duties server confirmed. Dismissed warnings do not change this total.</p>{!!overview?.unowned.length&&<p>Teams without a permanent owner: {overview.unowned.join(', ')}</p>}</details>
+      <details className="a-panel a-disclosure"><summary>Coverage conflicts and gaps</summary>{overview?.conflicts.length ? overview.conflicts.map((c, i) => <article className="a-duty" key={`${c.match_key}:${i}`}><div><strong>{matchLabel(event.matches?.find(m => m.key === c.match_key))} · {c.kind.replaceAll('_', ' ')}</strong><p>{name(c.user_id)} · Teams {c.team_numbers.join(', ')}</p></div><a className="a-button" href={`#/matches/${encodeURIComponent(c.match_key)}`}>Review match and handoffs</a></article>) : <p>No conflicts in the downloaded schedule.</p>}<a className="a-button" href="#/assignments">Open assignment editor</a></details>
+      <details className="a-panel a-disclosure"><summary>Handoff history</summary>{overview?.handoffs.length ? overview.handoffs.slice().reverse().slice(0, 40).map(h => <article className="a-duty" key={h.id}><div><strong>Team {h.team_number} · {matchLabel(event.matches?.find(m => m.key === h.match_key))}</strong><p>{name(h.from_user_id)} → {name(h.to_user_id)} · {h.status}</p></div></article>) : <p>No handoffs at this event.</p>}</details>
+      <details className="a-panel a-disclosure"><summary>Practice progress</summary><p>Completion records practice submissions, not a certification of scouting accuracy.</p><ul>{(data.memberships || []).map(m => <li key={m.id}>{m.username}: {[...new Set((overview?.training || []).filter(r => r.user_id === m.user_id).map(r => r.report_kind))].join(' and ') || 'No practice submitted'}</li>)}</ul></details>
+      </div></details>
     </>}
   </div>;
 }

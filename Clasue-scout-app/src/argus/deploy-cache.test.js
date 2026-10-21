@@ -40,3 +40,11 @@ test('deploy only completes after healthy activation and edge purge, with explic
  const active=script.slice(script.indexOf('if sudo -n'));
  assert.ok(active.indexOf('activated-revision')<active.indexOf('finish_cache'));
 });
+
+test('deploy tests and lints the candidate before building or activating it',()=>{
+ const script=fs.readFileSync(new URL('../../../deploy.sh',import.meta.url),'utf8');
+ const install=script.indexOf('\nnpm ci '),tests=script.indexOf('\nnpm test\n'),lint=script.indexOf('\nnpm run lint:active\n'),build=script.indexOf('\nARGUS_REVISION='),activate=script.indexOf('\nactivate "$release"');
+ assert.ok(install>=0&&tests>install&&lint>tests&&build>lint&&activate>build);
+ assert.ok(script.includes('set -Eeuo pipefail'));
+ assert.ok(script.includes('Clasue-scout-app instructions scripts | tar'),'Candidate includes instruction sources and test helpers.');
+});

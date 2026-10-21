@@ -13,6 +13,7 @@ import {
   buildSearchIndex,
   destinations,
   mainDestinations,
+  sidebarDestinations,
   navigationGroup,
   sectionLinks,
   searchIndex,
@@ -27,10 +28,12 @@ import {
 import { EventData, MetricConfiguration } from "./operations.jsx";
 import { ReportLibrary } from "./report-library.jsx";
 import { SetupGuidance } from "./setup-guidance.jsx";
+import { MobileMore, SectionTools } from './workspace-navigation.jsx';
 import { PitDisplay, PitDisplaySettings } from "./restored-features.jsx";
 import { offline } from "../offline.js";
 import "./workspace.css";
 import './upgrade.css';
+import './mobile-workspace.css';
 import { IntegrationSettings } from "./integration-settings.jsx";
 import { APP_VERSION } from "../app-version.js";
 import { EventTransition } from "./event-transition.jsx";
@@ -79,6 +82,7 @@ export function RouteIcon({ name }) {
   const paths = {
     dashboard: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
     match: "M7 3h10v4H7zM5 5H3v16h18V5h-2M7 12h10M7 16h6",
+    assignments: "M9 5h10v16H5V5h2M9 3h6v4H9zM8 12l2 2 4-4M8 18h8",
     pit: "m4 20 5-5m5-5 6-6M4 5l3-2 4 4-2 3 5 5 3-2 4 4-2 3-4-1-5-5-5-5z",
     teams:
       "M16 21v-3a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v3M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 1a4 4 0 0 1 0 7m1 4a4 4 0 0 1 3 4v2",
@@ -595,7 +599,7 @@ export default function ArgusWorkspace({
       <PitDisplay workspace={effectiveWorkspace} event={event} api={api} />
     );
   else if (section === "assignments") body = <AssignmentHub {...common} />;
-  else if (section === 'admin') body = <AdminCentre {...common} />;
+  else if (section === 'admin') body = <AdminCentre key={`${workspace.id}:${event?.id}:${role}`} {...common} />;
   else if (section === 'practice') body = <Practice {...common} />;
   else if (section === 'help') body = <Help {...common} />;
   else if (section === 'evidence') body = <Evidence key={`${event?.id}:${id}`} {...common} reportId={decodeURIComponent(id||'')} />;
@@ -870,8 +874,7 @@ export default function ArgusWorkspace({
           </small>
         </div>
         <nav aria-label="Main navigation">
-          {destinations
-            .filter(([key]) => key !== "display" && (key!=='admin'||['owner','admin'].includes(role)))
+          {sidebarDestinations
             .map(([key, label]) => (
               <a
                 key={key}
@@ -978,17 +981,7 @@ export default function ArgusWorkspace({
           )}
           {!loading && (
             <>
-              <nav className="a-section-links" aria-label="Section tools">
-                  {(['admin','practice','help','reminders','assignments','analyst'].includes(section)?[]:sectionLinks[activeGroup] || []).map(([key, label]) => (
-                  <a
-                    key={key}
-                    href={`#/${key}`}
-                    aria-current={section === key ? "page" : undefined}
-                  >
-                    {label}
-                  </a>
-                ))}
-              </nav>
+              <SectionTools section={section} links={(sectionLinks[activeGroup] || []).filter(([key])=>key!=='admin'||['owner','admin'].includes(role))}/>
                 {['dashboard','events','settings'].includes(section)&&<SetupGuidance
                 key={`${user.id}:${workspace.id}`}
                 userId={user.id}
@@ -1042,50 +1035,14 @@ export default function ArgusWorkspace({
         <button
           aria-expanded={more}
           aria-controls="mobile-more"
+          aria-haspopup="dialog"
           onClick={() => setMore((value) => !value)}
         >
           <RouteIcon name="more" />
           More
         </button>
       </nav>
-      {more && (
-        <div id="mobile-more" className="a-mobile-more">
-          <div className="a-row">
-            <strong>More in Argus</strong>
-            <button className="a-button" onClick={() => setMore(false)}>
-              Close
-            </button>
-          </div>
-          {mainDestinations
-            .filter(
-              ([key]) =>
-                !["dashboard", "assignments", "match", "teams"].includes(key),
-            )
-            .map(([key, label]) => (
-              <a key={key} href={`#/${key}`}>
-                {label}
-              </a>
-            ))}
-          {[
-            ["matches", "Match schedule"],
-            ["pit", "Pit scouting"],
-            ["display", "Pit display"],
-            ["analytics", "Analytics"],
-            ["strategy", "Strategy"],
-            ["reports", "Reports"],
-            ["analyst", "Scouting analyst"],
-            ["practice", "Practice scouting"],
-            ["help", "Help and guide"],
-            ["reminders", "Reminders"],
-            ["history", "Event history"],
-            ...(['owner','admin'].includes(role)?[["admin","Admin control centre"]]:[]),
-          ].map(([key, label]) => (
-            <a key={key} href={`#/${key}`} onClick={() => setMore(false)}>
-              {label}
-            </a>
-          ))}
-        </div>
-      )}
+      <MobileMore open={more} onClose={()=>setMore(false)} role={role}/>
       <>
         {transitionId && (
           <EventTransition

@@ -4,6 +4,8 @@ const net=require('node:net');
 const {spawn}=require('node:child_process');
 const {createFixture}=require('./qa-fixture.cjs');
 const appDirectory=path.resolve(__dirname,'../Clasue-scout-app');
+const nodeEnv=process.env.QA_NODE_ENV||'test';
+if(!['test','production'].includes(nodeEnv))throw new Error('QA_NODE_ENV must be test or production.');
 const exited=child=>new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',(code,signal)=>resolve({code,signal}));});
 (async()=>{
  const fixture=createFixture();
@@ -11,7 +13,7 @@ const exited=child=>new Promise((resolve,reject)=>{child.once('error',reject);ch
  if(!fs.existsSync(path.join(appDirectory,'dist/index.html')))throw new Error('Run npm run build before browser QA.');
  const baseURL=`http://127.0.0.1:${port}`;
  console.log(`Browser QA fixture: ${fixture.dbFile}\nBrowser QA URL: ${baseURL}`);
- const server=spawn(process.execPath,[path.join(appDirectory,'server.cjs')],{cwd:appDirectory,env:{...process.env,APP_PORT:String(port),DB_FILE:fixture.dbFile,TBA_API_KEY:'',GROQ_API_KEY:'',NODE_ENV:'test'},stdio:['ignore','pipe','pipe'],windowsHide:true});
+ const server=spawn(process.execPath,[path.join(appDirectory,'server.cjs')],{cwd:appDirectory,env:{...process.env,APP_PORT:String(port),DB_FILE:fixture.dbFile,TBA_API_KEY:'',GROQ_API_KEY:'',NODE_ENV:nodeEnv},stdio:['ignore','pipe','pipe'],windowsHide:true});
  let serverOutput='';server.stdout.on('data',data=>{serverOutput+=data;});server.stderr.on('data',data=>{serverOutput+=data;});const stopped=exited(server);
  try{
   let ready=false;const deadline=Date.now()+20000;

@@ -21,12 +21,31 @@ const check=async(name,run)=>{try{await run();results.push({name,status:'passed'
 const widths=[1440,1280,1024,768,390,360];
 try {
  await login(page,'qa_owner');
+ if(process.env.QA_NODE_ENV==='production'){
+  const session=(await context.cookies()).find(cookie=>cookie.name==='argus_session');assert.ok(session?.secure&&session.httpOnly&&session.sameSite==='Strict','Production sessions require Secure, HttpOnly and SameSite=Strict.');
+ }
  const teams=await api(page,'/teams');assert.ok(teams.data.some(t=>t.id==='qa-workspace'&&t.name==='QA robotics'),'Synthetic fixture required.');
  await check('role-aware onboarding, replay, main routes and no topbar event switch',async()=>{
   await route('/dashboard');await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
   for(const destination of ['assignments','admin','practice','help','analyst','teams','matches','analytics','strategy','events','settings']){await route(`/${destination}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();}
   assert.equal(await page.locator('.a-topbar a[href="#/events"]').count(),0);
   await route('/help');await page.getByRole('button',{name:'Replay welcome guide',exact:true}).click();await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
+ });
+ await check('compact phone navigation retains tools, disclosures and modal keyboard access',async()=>{
+  await page.setViewportSize({width:390,height:844});await route('/dashboard');
+  assert.equal(await page.locator('.a-sidebar nav a').count(),5);
+  for(const route of ['assignments','analyst','practice','help','history','reminders','admin'])assert.equal(await page.locator(`.a-sidebar nav a[href="#/${route}"]`).count(),0);
+  const summary=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Event summary'})});
+  assert.equal(await summary.getAttribute('open'),null);await summary.locator(':scope > summary').click();assert.ok(await summary.locator('.a-scoreboard').isVisible());await summary.locator(':scope > summary').click();
+  const observations=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Scouting observations'})});assert.equal(await observations.getAttribute('open'),null);
+  await page.screenshot({path:path.join(artifacts,'compact-home-390.png'),fullPage:true});
+  await page.getByRole('button',{name:'More',exact:true}).click();const more=page.getByRole('dialog',{name:'More',exact:true});await more.waitFor();
+  await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('#mobile-more')));
+  await more.getByText('Analysis tools',{exact:true}).click();await more.getByRole('link',{name:'Scouting analyst',exact:true}).click();await more.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Scouting analyst',exact:true}).waitFor();
+  const tools=page.locator('.a-page-tools');assert.equal(await tools.getAttribute('open'),null);await tools.locator(':scope > summary').click();await page.getByRole('navigation',{name:'Section tools'}).getByRole('link',{name:'Analytics',exact:true}).click();
+  await page.getByRole('button',{name:'More',exact:true}).click();await page.keyboard.press('Escape');await more.waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('.a-mobile-nav button[aria-controls="mobile-more"]').getAttribute('aria-expanded')==='false');
+  await page.getByRole('button',{name:'More',exact:true}).click();await page.setViewportSize({width:1280,height:1000});await more.waitFor({state:'hidden'});
+  await route('/dashboard');assert.ok(await page.locator('.a-scoreboard').isVisible());
  });
  await check('sidebar preference and keyboard search',async()=>{
   await page.setViewportSize({width:1280,height:700});await page.getByRole('button',{name:'Hide menu',exact:true}).click();await page.reload({waitUntil:'networkidle'});assert.ok(await page.locator('.a-sidebar').isHidden());await page.getByRole('button',{name:'Show menu',exact:true}).click();
@@ -74,13 +93,20 @@ try {
  });
  await check('Admin missing reports, actor history, reversible report removal and shared publication',async()=>{
   await route('/admin');await page.getByRole('heading',{name:'Admin control centre',exact:true}).waitFor();await page.getByRole('heading',{name:'Scouting by team',exact:true}).waitFor();
-  assert.equal(await page.locator('.a-coverage-team').count(),4);
+  assert.equal(await page.locator('.a-coverage-tile').count(),4);
+  const beforeReports=(await api(page,'/submissions')).data;
   const coverage=(await api(page,'/admin/overview?event_id=qa-event')).data.team_coverage;
-  const team=coverage.find(t=>t.missing_matches.length),row=page.locator('.a-coverage-team').filter({has:page.locator('summary strong').filter({hasText:`Team ${team.team_number} ·`})});
-  await row.locator(':scope > summary').click();await row.getByRole('button',{name:'Dismiss missed match',exact:true}).first().click();
-  await row.getByText('Dismissed matches (1)',{exact:true}).waitFor();await page.reload({waitUntil:'networkidle'});
-  const restoredRow=page.locator('.a-coverage-team').filter({has:page.locator('summary strong').filter({hasText:`Team ${team.team_number} ·`})});
-  await restoredRow.locator(':scope > summary').click();await restoredRow.getByText('Dismissed matches (1)',{exact:true}).click();await restoredRow.getByRole('button',{name:'Restore warning',exact:true}).click();await restoredRow.getByText('Dismissed matches (1)',{exact:true}).waitFor({state:'hidden'});
+  const team=coverage.find(t=>t.status==='red'&&t.missing_matches.length),tile=()=>page.locator('.a-coverage-tile').filter({has:page.locator('strong').filter({hasText:team.team_number})});
+  await tile().click();const teamDialog=page.getByRole('dialog',{name:new RegExp('Team '+team.team_number)});
+  await teamDialog.getByText('Permanent owner:',{exact:true}).waitFor();assert.ok(await teamDialog.getByText(/Responsible:/).first().isVisible());
+  await teamDialog.getByRole('button',{name:'Dismiss missed match',exact:true}).first().click();await teamDialog.getByText('Dismissed matches (1)',{exact:true}).waitFor();
+  await teamDialog.getByRole('button',{name:'Dismiss team warnings',exact:true}).click();await teamDialog.getByText('No outstanding warnings',{exact:true}).waitFor();
+  await teamDialog.getByRole('button',{name:'Close',exact:true}).click();assert.ok((await tile().getAttribute('class')).includes('is-green'));
+  assert.deepEqual((await api(page,'/submissions')).data,beforeReports,'Dismissals do not invent data');
+  await page.reload({waitUntil:'networkidle'});await tile().click();await teamDialog.getByText('No outstanding warnings',{exact:true}).waitFor();
+  await teamDialog.getByRole('button',{name:'Restore team warnings',exact:true}).click();await teamDialog.getByText('Pit not scouted',{exact:true}).waitFor();
+  await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('.a-coverage-dialog')));
+  await page.keyboard.press('Escape');await teamDialog.waitFor({state:'hidden'});assert.ok((await tile().getAttribute('class')).includes('is-red'));
   await page.getByRole('button',{name:'Forms and reports',exact:true}).click();await page.getByLabel('Reason for removal or restoration').fill('QA removal recovery');const first=page.locator('.a-duty').filter({has:page.getByRole('button',{name:'Remove report',exact:true})}).first();await first.getByRole('button',{name:'Remove report',exact:true}).click();await page.getByRole('button',{name:'Restore report',exact:true}).first().waitFor();await page.getByRole('button',{name:'Restore report',exact:true}).first().click();
   await page.getByRole('button',{name:'Shared data',exact:true}).click();await page.getByRole('checkbox',{name:'QA match report: Autonomous pieces',exact:true}).check();await page.getByRole('button',{name:'Save approved measurements',exact:true}).click();await page.getByText(/Approved summaries saved/).waitFor();
   await page.getByRole('button',{name:'Activity',exact:true}).click();await page.getByText('report.restore',{exact:true}).first().waitFor();
@@ -102,8 +128,28 @@ try {
   await context.setOffline(true);await route('/help?topic=offline-and-sync');await page.getByRole('article',{name:'Offline and synchronization'}).waitFor();await context.setOffline(false);
  });
  await check('responsive task/Admin/help screens, five mobile destinations and dialog focus',async()=>{
-  for(const width of widths){await page.setViewportSize({width,height:1000});for(const section of ['dashboard','assignments','admin','practice','help','analyst','strategy','events','settings']){await route(`/${section}`);await page.screenshot({path:path.join(artifacts,`${section}-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${section} overflow at ${width}`);}}
+  for(const width of widths){await page.setViewportSize({width,height:1000});for(const section of ['dashboard','assignments','admin','practice','help','analyst','strategy','events','settings']){await route(`/${section}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();if(section==='admin')await page.locator('.a-coverage-tile').first().waitFor();await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(artifacts,`${section}-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${section} overflow at ${width}`);}}
   assert.equal(await page.locator('.a-mobile-nav a,.a-mobile-nav button').count(),5);assert.ok(await page.locator('.a-mobile-nav a[href="#/assignments"]').isVisible());
+ });
+ await check('large-event coverage is searchable, paginated and fits a phone without a long match list',async()=>{
+  const pattern='**/api/admin/overview?event_id=qa-event';
+  await page.route(pattern,async request=>{const response=await request.fetch(),body=await response.json();const source=body.team_coverage[0];body.team_coverage=Array.from({length:48},(_,index)=>({...source,team_number:String(9000+index),team_name:`QA test team ${index+1}`,missing_matches:Array.from({length:13},(_,slot)=>({...source.missing_matches[0],match_key:`2026qa_qm${slot+10}`}))}));await request.fulfill({response,json:body});});
+  try{
+   await page.setViewportSize({width:360,height:844});await route('/dashboard');await route('/admin');await page.getByRole('button',{name:/Team 9000/}).waitFor();assert.equal(await page.locator('.a-coverage-tile').count(),6);
+   await page.getByRole('button',{name:'Next teams',exact:true}).click();await page.getByRole('button',{name:/Team 9006/}).waitFor();
+   await page.getByLabel('Find team',{exact:true}).fill('9047');await page.getByRole('button',{name:/Team 9047/}).waitFor();assert.equal(await page.locator('.a-coverage-tile').count(),1);await page.getByLabel('Find team',{exact:true}).fill('');
+   await page.getByLabel('Show team coverage',{exact:true}).selectOption('green');assert.equal(await page.locator('.a-coverage-tile').count(),0);await page.getByLabel('Show team coverage',{exact:true}).selectOption('all');
+   await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});
+   const bottom=await page.locator('.a-coverage-pages').evaluate(el=>el.getBoundingClientRect().bottom);assert.ok(bottom<=844-65,`Phone team controls require scrolling: ${bottom}`);
+   await page.screenshot({path:path.join(artifacts,'coverage-48-teams-360.png')});
+   await page.getByRole('button',{name:/Team 9000/}).click();const details=page.getByRole('dialog',{name:/Team 9000/}),missed=details.getByRole('region',{name:'Missed matches',exact:true});
+   assert.equal(await missed.locator('.a-coverage-match-row').count(),4);await missed.getByRole('button',{name:'Next matches',exact:true}).click();await missed.getByText('2026qa_qm14',{exact:true}).waitFor();
+   await details.evaluate(el=>{el.scrollTop=0;});const dismissBox=await details.getByRole('button',{name:'Dismiss team warnings',exact:true}).boundingBox();assert.ok(dismissBox.y>=0&&dismissBox.y+dismissBox.height<=844,'Team action is reachable without scrolling through missed matches');
+   assert.ok(await details.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'The paged team detail fits the phone');await page.screenshot({path:path.join(artifacts,'coverage-13-missing-matches-360.png')});
+   await details.getByRole('button',{name:'Close',exact:true}).click();
+   await page.getByLabel('Admin section',{exact:true}).selectOption('members');await page.getByRole('heading',{name:'Members and roles',exact:true}).waitFor();await page.getByLabel('Admin section',{exact:true}).selectOption('attention');
+   await page.setViewportSize({width:1440,height:1000});await page.waitForFunction(()=>document.querySelectorAll('.a-coverage-tile').length===12);assert.equal(await page.locator('.a-coverage-tile').count(),12);
+  }finally{await page.unroute(pattern);}
  });
  await check('non-destructive event activation and old-client rejection retain historical data',async()=>{
   await context.setOffline(false);await page.setViewportSize({width:1280,height:1000});const before=(await api(page,'/submissions')).data;await api(page,'/scout_events','POST',{id:'qa-next',team_id:'qa-workspace',event_key:'2026next',event_name:'QA Next Event',event_teams:[],matches:[]});await page.reload({waitUntil:'networkidle'});await route('/events');await page.getByRole('button',{name:'QA Next Event',exact:true}).click();const modal=page.getByRole('dialog',{name:'Change active event',exact:true});await modal.getByRole('button',{name:'Activate event and keep history',exact:true}).waitFor();await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('dialog')));await page.keyboard.press('Escape');assert.equal((await api(page,'/teams/qa-workspace')).data.active_event_id,'qa-event');

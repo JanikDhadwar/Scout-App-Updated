@@ -56,7 +56,7 @@ function fail(res,status,message) {return res.status(status).json({error:message
 function login(req,res,u) {
   if(req.authAttemptKey)attempts.delete(req.authAttemptKey);
   const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{userId:u.id,expires:Date.now()+7*86400000});
-  res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure || process.env.COOKIE_SECURE==='true',maxAge:7*86400000,path:'/'});
+  res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure || process.env.COOKIE_SECURE==='true' || process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});
   return res.json(publicUser(u));
 }
 app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store, max-age=0','CDN-Cache-Control':'no-store','Cloudflare-CDN-Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin'});next();});

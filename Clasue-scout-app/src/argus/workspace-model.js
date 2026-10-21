@@ -24,6 +24,13 @@ export const mainDestinations = [
   ["teams", "Teams"],
   ["settings", "Settings"],
 ];
+export const sidebarDestinations = [
+  ['dashboard', 'Home'],
+  ['match', 'Scouting'],
+  ['teams', 'Teams'],
+  ['events', 'Event'],
+  ['settings', 'Settings'],
+];
 export function navigationGroup(section) {
   if (["match", "pit", "assignments"].includes(section)) return "match";
   if (
@@ -34,6 +41,7 @@ export function navigationGroup(section) {
       "compare",
       "present",
       "strategy",
+      "analyst",
     ].includes(section)
   )
     return "teams";
@@ -53,6 +61,7 @@ export const sectionLinks = {
     ["analytics", "Analytics"],
     ["strategy", "Strategy"],
     ["reports", "Reports"],
+    ["analyst", "Scouting analyst"],
   ],
   events: [
     ["events", "Event setup"],
@@ -66,6 +75,10 @@ export const sectionLinks = {
     ["myteam", "My team"],
     ["news", "Team news"],
     ["sync", "Device and sync"],
+    ["practice", "Practice"],
+    ["reminders", "Reminders"],
+    ["history", "Event history"],
+    ["admin", "Admin control centre"],
   ],
 };
 export const matchLabel = (match) =>

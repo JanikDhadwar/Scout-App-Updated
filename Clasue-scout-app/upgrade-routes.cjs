@@ -60,7 +60,7 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, dbFile })
   });
   route('post', '/api/admin/coverage', req => {
     const db = readDB(), event = assignments.eventFor(db, req.body?.event_id, req.user.id);
-    const result = coverage.changeDismissal(db, event, req.body || {}, req.user.id);
+    const result = req.body?.scope==='team'?coverage.changeTeamDismissal(db,event,req.body,req.user.id):coverage.changeDismissal(db, event, req.body || {}, req.user.id);
     writeDB(db); return result;
   });
   route('get', '/api/admin/members', req => {

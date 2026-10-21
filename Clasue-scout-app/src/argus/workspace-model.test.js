@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, navigationGroup, sectionLinks } from './workspace-model.js';
+import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, sidebarDestinations, navigationGroup, sectionLinks } from './workspace-model.js';
 
 test('five main destinations retain routes for related tools',()=>{
  assert.equal(mainDestinations.length,5);
@@ -12,6 +12,15 @@ test('five main destinations retain routes for related tools',()=>{
 });
 
 test('pit assignments and unavailable schedule rows have no completed match',()=>{assert.equal(isCompleted(undefined),false);assert.equal(isCompleted(null),false);assert.equal(isCompleted({}),false);});
+
+test('sidebar contains only main areas while every secondary page remains in its section',()=>{
+ assert.deepEqual(sidebarDestinations.map(([key])=>key),['dashboard','match','teams','events','settings']);
+ for(const section of ['assignments','pit','matches','analytics','strategy','analyst','practice','help','history','reminders','admin','display']){
+  const parent=navigationGroup(section);
+  assert.ok(sectionLinks[parent]?.some(([key])=>key===section),`${section} stays accessible under ${parent}`);
+  assert.ok(!sidebarDestinations.some(([key])=>key===section));
+ }
+});
 
 test('assignments complete only from matching submitted records, not unrelated or opened forms',()=>{
  const a={id:'a',team_id:'w',event_key:'e',match_key:'e_qm1',team_number:254,scout_user_id:'u'};

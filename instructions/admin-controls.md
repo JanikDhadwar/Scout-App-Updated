@@ -1,12 +1,14 @@
 # Admin control centre
 
-Open Admin control centre from the navigation or More menu.
+Open Settings → Page tools → Admin control centre, or More → Team tools and help on a phone.
 
 Needs attention shows missing pit reports, completed-match reports, current responsible scouts, permanent-owner context, unowned teams, conflicts, handoffs and practice progress.
 
-Scouting by team lists each downloaded event team once with its number and name. A red team label and “Pit not scouted” mean there is no active, reviewed pit report. Yellow “missed matches” shows completed matches without a report; open the team to see which matches and the assigned scout. Red takes precedence on the team label when both kinds are missing, and both labels remain visible. Future matches are pending, not missed. Coverage checks the downloaded schedule, including slots without generated duties.
+Scouting by team shows a compact grid of team numbers and names. Search by name/number, filter by status, or use Previous teams / Next teams instead of scrolling a long match list. Phones show six teams per page; larger screens show twelve. Green means no outstanding warnings: pit and completed-match reports are present, or an Admin explicitly dismissed the missing evidence. Yellow means pit coverage is present or dismissed but completed matches are missing. Red means pit evidence is missing and not dismissed. An unavailable schedule is labelled unknown, never fully scouted. Future matches are pending, not missed.
 
-Admins and Owners can dismiss an individual missed match. This clears its warning without creating a report or changing analytics or server-confirmed duty counts. Dismissed matches remain available under the team with a Restore warning action. Changes are saved across reloads and recorded in Activity. A later real report resolves that slot normally. Refresh the overview if another admin changes the same warning.
+Select a team to see its permanent owner, pit scout, missed matches and the responsible scout for each match, including accepted handoffs. Admins and Owners can use Dismiss team warnings to clear both pit and currently missed-match warnings, turning the tile green when the schedule is available. This never creates a report or changes analytics or server-confirmed duty totals. Restore team warnings reverses the dismissal. Individual matches also retain dismiss/restore controls. Dismissed evidence remains labelled as missing inside the detail window. Changes persist across reloads and are recorded in Activity. Newly completed unscouted matches raise warnings again. Stale changes are rejected; refresh and review rather than overwriting another admin's work.
+
+Duty totals, unowned teams, conflicts, handoff history and practice progress remain available in collapsed sections below the grid. The default view concentrates on team status.
 
 Members manages ordinary membership. Only Owners can promote/demote Admins or offer ownership transfer.
 

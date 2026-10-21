@@ -1,6 +1,20 @@
 # Argus handoff
 
-Updated: October 19, 2026.
+Updated: October 20, 2026.
+
+## Latest work: compact mobile and admin coverage
+
+Release follow-up: 97 tests now pass. Offline help uses canonical LF content with Windows/Linux source checks, and deployment now requires active-module lint as well as tests before build/activation. A failed candidate check leaves the currently serving release in place. Target-server shell/rollback verification remains outstanding; do not push or deploy without authorization.
+
+Production-mode local staging also passed all 15 Edge workflows with Secure/HttpOnly/SameSite=Strict session-cookie assertions. Use `QA_NODE_ENV=production` with the fixture runner to repeat it. Team detail windows now page missed/dismissed matches (four per phone page, six desktop), with team actions above the list. A 13-missed-match phone case fits without scrolling through a long list. A public read-only check of the existing live homepage returned HTTP 200, no-store and Cloudflare DYNAMIC; this does not verify the uncommitted code on the real server. Completing actual Debian updater/startup/rollback checks still requires the server's access details; choosing local staging does not grant or create that access.
+
+The current local changes add a compact team-status grid in Admin control centre. Red means missing pit evidence, yellow means missed played matches after pit warnings are resolved, and green means covered or explicitly dismissed. Unknown schedules are not called complete. Colour is paired with distinct symbols and accessible labels. Team details show responsible scouts and missed matches. Admin/Owner dismiss and restore actions are server-authorized, revision-checked, audited, persistent and never invent reports or change analytics. New missed matches raise new warnings.
+
+Phones use six teams per page, a single Admin section picker and collapsed secondary progress panels. Desktop uses twelve teams per page. Search/filter/paging avoid a long match list. The sidebar now lists five main areas; secondary pages remain in Page tools and the grouped phone More dialog. Phone dashboard summaries/charts and compact-match handoff tools start collapsed, while incoming handoff requests and primary scouting actions remain available.
+
+See [implementation, verification and remaining launch checks](docs/argus-2/compact-admin-and-mobile.md). The full test suite currently passes 95 tests; fixture-only Edge checks cover 15 workflows, including a synthetic 48-team rendering, phone viewport fit, offline recovery, real downloads and dismissal persistence. Active-module lint and production/PWA build are checked. Native PowerPoint rendering and actual production hosting/deployment checks remain unverified; do not describe the unseen production installation as certified ready.
+
+The current checkout declares `web-push@3.6.7` but the local dependency tree lacked it. This session's local server/test commands use a temporary installation through `NODE_PATH`; no manifest/lockfile changes were made. A normal fresh install with `npm ci` installs it. If restarting in this same environment without npm, install the declared dependencies or supply that dependency path. The local Windows database durability fix opens the temporary fsync handle as `r+` rather than read-only; migration and restart checks pass.
 
 ## Current state
 

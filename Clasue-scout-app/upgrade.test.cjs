@@ -108,6 +108,14 @@ test('upgraded API enforces roles, immutable removal, approved summaries, practi
     const covered = (await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678');
     assert.ok(covered.dismissed_matches.some(s => s.match_key === warning.match_key));
     assert.ok(!covered.missing_matches.some(s => s.match_key === warning.match_key));
+    const teamWarning=(await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t=>t.team_number==='2056');
+    const teamRequest={scope:'team',event_id:'qa-event',team_number:teamWarning.team_number,dismissed:true,expected_revision:teamWarning.revision};
+    const realBefore=(await owner('/submissions')).body;
+    assert.equal((await scout('/admin/coverage','POST',teamRequest)).status,403);
+    assert.equal((await foreign('/admin/coverage','POST',teamRequest)).status,403);
+    assert.equal((await admin('/admin/coverage','POST',teamRequest)).body.status,'green');
+    assert.equal((await admin('/admin/coverage','POST',teamRequest)).status,409);
+    assert.deepEqual((await owner('/submissions')).body,realBefore,'Team dismissal never invents reports');
     const preview = await admin('/assignment-plan/preview', 'POST', input); assert.equal(preview.status, 200);
     const applied = await admin('/assignment-plan/apply', 'POST', { ...preview.body.input, fingerprint: preview.body.fingerprint, request_id: 'api-plan' }); assert.equal(applied.status, 200);
     assert.equal((await admin('/assignment-plan/apply', 'POST', { ...preview.body.input, fingerprint: preview.body.fingerprint, request_id: 'api-plan' })).body.replayed, true);
@@ -147,6 +155,9 @@ test('upgraded API enforces roles, immutable removal, approved summaries, practi
     assert.ok((await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678').dismissed_matches.some(s => s.match_key === warning.match_key), 'Dismissals survive restart');
     assert.equal((await admin('/admin/coverage', 'POST', { ...warning, dismissed: false, revision: 1 })).status, 200);
     assert.ok((await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t => t.team_number === '1678').missing_matches.some(s => s.match_key === warning.match_key));
+    const teamAfterRestart=(await admin('/admin/overview?event_id=qa-event')).body.team_coverage.find(t=>t.team_number==='2056');
+    assert.equal(teamAfterRestart.status,'green');assert.equal(teamAfterRestart.pit_missing,true);
+    assert.equal((await owner('/admin/coverage','POST',{...teamRequest,dismissed:false,expected_revision:teamAfterRestart.revision})).body.status,'red');
     assert.ok(fs.existsSync(`${dbFile}.pre-upgrade-v1.bak`));
   } finally { if (server?.exitCode === null) await stop(); fs.rmSync(directory, { recursive: true, force: true }); }
 });

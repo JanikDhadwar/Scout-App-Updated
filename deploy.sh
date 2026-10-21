@@ -96,6 +96,9 @@ npm ci --include=dev --no-audit --no-fund
 stage=test
 report running
 npm test
+stage=lint
+report running
+npm run lint:active
 stage=build
 report running
 ARGUS_REVISION="$revision" npm run build

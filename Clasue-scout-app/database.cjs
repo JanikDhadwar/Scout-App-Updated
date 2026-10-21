@@ -58,7 +58,7 @@ function createDatabase(filename) {
       }
     }
     fs.writeFileSync(`${filename}.tmp`, JSON.stringify(validated, null, 2), { mode: 0o600 });
-    const descriptor=fs.openSync(`${filename}.tmp`,'r');try{fs.fsyncSync(descriptor);}finally{fs.closeSync(descriptor);}
+    const descriptor=fs.openSync(`${filename}.tmp`,'r+');try{fs.fsyncSync(descriptor);}finally{fs.closeSync(descriptor);}
     fs.renameSync(`${filename}.tmp`, filename);
   }
   return { read, write };
