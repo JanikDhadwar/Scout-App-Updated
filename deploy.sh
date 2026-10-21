@@ -88,7 +88,7 @@ stage=archive
 report running
 release=$(mktemp -d "$SCOUT_STATE_DIR/releases/$revision.XXXXXX")
 echo "Building $revision in $release"
-git archive "$revision" Clasue-scout-app instructions scripts | tar -x -C "$release"
+git archive "$revision" deploy.sh Clasue-scout-app instructions scripts | tar -x -C "$release"
 cd "$release/Clasue-scout-app"
 stage=install
 report running

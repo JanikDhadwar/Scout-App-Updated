@@ -47,4 +47,7 @@ test('deploy tests and lints the candidate before building or activating it',()=
  assert.ok(install>=0&&tests>install&&lint>tests&&build>lint&&activate>build);
  assert.ok(script.includes('set -Eeuo pipefail'));
  assert.ok(script.includes('Clasue-scout-app instructions scripts | tar'),'Candidate includes instruction sources and test helpers.');
+ const archive=script.match(/^git archive "\$revision" (.+?) \| tar -x -C "\$release"$/m);
+ assert.ok(archive,'Release packaging uses an explicit tracked-file archive.');
+ assert.ok(archive[1].split(/\s+/).includes('deploy.sh'),'Candidate must include deploy.sh because deployment regression tests read it from the staged release root.');
 });
