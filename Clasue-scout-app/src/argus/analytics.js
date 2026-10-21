@@ -1,5 +1,17 @@
 import { visibleQuestions, hasAnswer } from '../form-conditions.js';
 
+// External model estimates stay separate from report-derived scouting calculations.
+export function normalizeStatboticsTeam(row) {
+ if(!Number.isInteger(row?.team)||row.team<1||!Number.isInteger(row.year))return null;
+ const number=value=>typeof value==='number'&&Number.isFinite(value)?value:null;
+ const integer=value=>Number.isInteger(value)&&value>=0?value:null;
+ const points=row.epa?.total_points;
+ return {team:row.team,year:row.year,name:typeof row.name==='string'?row.name.slice(0,120):'',
+  epa:number(typeof points==='object'&&points!==null?points.mean:points),
+  rank:integer(row.epa?.ranks?.total?.rank),total:integer(row.epa?.ranks?.total?.team_count),
+  matches:integer(row.record?.count),wins:integer(row.record?.wins),losses:integer(row.record?.losses),ties:integer(row.record?.ties)};
+}
+
 const finite = value => (typeof value === 'number' || typeof value === 'string' && value.trim() !== '') && Number.isFinite(Number(value));
 const median = values => { const sorted=[...values].sort((a,b)=>a-b), half=Math.floor(sorted.length/2);return sorted.length ? sorted.length%2 ? sorted[half] : (sorted[half-1]+sorted[half])/2 : null; };
 const stamp = value => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;

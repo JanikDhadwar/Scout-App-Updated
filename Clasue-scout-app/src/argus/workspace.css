@@ -51,3 +51,5 @@ body{font-family:'Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-size:1
 .a-report-library .a-table-wrap table{min-width:720px}.a-report-library .a-table-wrap th:first-child{min-width:145px}.a-report-library .a-table-wrap td{overflow-wrap:normal}.a-report-library .a-table-wrap .a-button{white-space:nowrap}.a-pit-visits .a-table-wrap table{min-width:560px}
 
 .a-coverage-team{border-top:1px solid var(--a-border);min-width:0}.a-coverage-team summary{overflow-wrap:anywhere}.a-coverage-flags{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;font-weight:400;margin-top:6px}.a-coverage-red{color:#ff8793}.a-coverage-yellow{color:#f4ce68}.a-coverage-team .a-duty{flex-wrap:wrap;gap:12px}.a-coverage-team .a-row{flex-wrap:wrap}
+.a-global-rankings table { min-width: 660px; }
+.a-global-rankings th:nth-child(2) { min-width: 180px; }

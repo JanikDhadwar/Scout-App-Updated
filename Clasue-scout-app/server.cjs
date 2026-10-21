@@ -21,6 +21,7 @@ const assignmentsService = require('./assignment-service.cjs');
 const submissionService = require('./submission-service.cjs');
 const { registerUpgradeRoutes } = require('./upgrade-routes.cjs');
 const scoutPresence=new Map();
+const statbotics=require('./statbotics-service.cjs').createStatboticsClient(),statboticsRequests=new Map();
 const app = express();
 app.disable('x-powered-by');
 app.disable('etag');
@@ -170,6 +171,14 @@ app.get('/api/tba/*path',async(req,res)=>{
   if(!/^(event\/\w+(?:\/(?:teams\/simple|matches(?:\/simple)?|rankings))?|events\/\d{4}\/simple|team\/frc\d+(?:\/simple|\/events\/\d{4}\/simple|\/event\/\w+\/status)?)$/.test(route))return fail(res,400,'Unsupported official data request');
   if(!integrationKey(req,'TBA_API_KEY'))return fail(res,503,'Official data needs an API key. Ask the workspace owner to connect event data in Settings.');
   try {const result=await fetch(`https://www.thebluealliance.com/api/v3/${route}`,{headers:{'X-TBA-Auth-Key':integrationKey(req,'TBA_API_KEY'),'User-Agent':'Argus-Scouting/2.0'},signal:AbortSignal.timeout(10000)});if(!result.ok)return fail(res,result.status===404?404:502,'Official data request failed');res.json(await result.json());}catch{return fail(res,502,'Official data is temporarily unreachable');}
+});
+app.get('/api/statbotics/rankings',async(req,res)=>{
+ const now=Date.now(),previous=statboticsRequests.get(req.user.id),bucket=previous?.until>now?previous:{count:0,until:now+60000};
+ if(bucket.count>=30)return fail(res,429,'Wait a minute before loading more global rankings.');
+ if(statboticsRequests.size>1000)for(const [id,value]of statboticsRequests)if(value.until<now)statboticsRequests.delete(id);
+ bucket.count++;statboticsRequests.set(req.user.id,bucket);
+ try{res.json(await statbotics.rankings(req.query));}
+ catch(error){return fail(res,error.status||502,error.status?error.message:'Statbotics is temporarily unavailable or returned an unexpected format. Try again later.');}
 });
 app.get('/api/form-submission-counts/:formId',(req,res)=>{
   const db=readDB(),form=rows(db,'forms').find(row=>row.id===req.params.formId);

@@ -12,7 +12,7 @@ This is product versioning using the familiar three-number format. Major release
 
 `Clasue-scout-app/package.json` is the version source. The sidebar, signed-out page, workspace footer, health API and generated release metadata all read it. The lockfile must match. Unique build IDs and commit hashes remain separate: they identify the precise deployed build, including repeated builds of the same version, and continue to control offline cache refresh.
 
-Before publishing a release, choose its number based on the combined changes since the last published version, then run one of these from `Clasue-scout-app`:
+Every update must change the version number, however small. Choose the increment based on the size of the delivered change, then run one of these from `Clasue-scout-app`:
 
 ```bash
 npm version patch --no-git-tag-version
@@ -20,7 +20,7 @@ npm version minor --no-git-tag-version
 npm version major --no-git-tag-version
 ```
 
-Run only the command matching the release. It updates package.json and package-lock.json together. Run the required tests/build, then commit and push only with deployment authorization. Do not bump the number for each draft edit or test build. Future fixes after 4.0.0 ships should start at 4.0.1; the sign-up repair included before that release remains part of 4.0.0.
+Run only the command matching the update. It updates package.json and package-lock.json together. A single feature and its implementation fixes share one increment while being developed; every subsequent delivered change gets a new version. Run the required tests/build, then commit and push only with deployment authorization.
 
 ## Validation
 

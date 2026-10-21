@@ -31,6 +31,25 @@ try {
   assert.equal(await page.locator('.a-topbar a[href="#/events"]').count(),0);
   await route('/help');await page.getByRole('button',{name:'Replay welcome guide',exact:true}).click();await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
  });
+ await check('Statbotics rankings show sourced values, team lookup, pagination and service errors',async()=>{
+  let mode='success';
+  const intercept=async request=>{
+   if(mode==='error')return request.fulfill({status:502,json:{error:'Statbotics is temporarily unavailable. Try again later.'}});
+   const query=new URL(request.request().url()).searchParams,offset=Number(query.get('offset')||0),team=Number(query.get('team')||254);
+   await request.fulfill({json:{source:'Statbotics',year:2026,offset,fetched_at:'2026-10-20T12:00:00Z',has_more:!query.has('team')&&offset===0,rows:[{team,year:2026,name:'QA external team',epa:0,rank:offset+3,total:4000,matches:null,wins:0,losses:0,ties:0}]}});
+  };
+  await page.route('**/api/statbotics/rankings?*',intercept);
+  try{
+   await route('/teams');await page.locator('summary').filter({hasText:/^Global rankings$/}).click();
+   const panel=page.getByRole('region',{name:'Statbotics global rankings',exact:true});
+   await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();
+   await panel.getByRole('region',{name:'Global EPA rankings',exact:true}).waitFor();assert.match(await panel.innerText(),/3 \/ 4000/);
+   for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`global-rankings-${width}.png`),fullPage:true});}
+   await panel.getByRole('button',{name:'Next 50',exact:true}).click();await panel.getByText('53 / 4000',{exact:true}).waitFor();
+   await panel.getByLabel('Team number (optional)',{exact:true}).fill('6390');await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('link',{name:'6390 QA external team',exact:true}).waitFor();assert.equal(await panel.getByRole('button',{name:'Next 50',exact:true}).count(),0);
+   mode='error';await panel.getByRole('button',{name:'Load global rankings',exact:true}).click();await panel.getByRole('alert').filter({hasText:'Statbotics is temporarily unavailable'}).waitFor();assert.equal(await panel.getByRole('table').count(),0);
+  }finally{await page.unroute('**/api/statbotics/rankings?*',intercept);await page.setViewportSize({width:1440,height:1000});}
+ });
  await check('compact phone navigation retains tools, disclosures and modal keyboard access',async()=>{
   await page.setViewportSize({width:390,height:844});await route('/dashboard');
   assert.equal(await page.locator('.a-sidebar nav a').count(),5);

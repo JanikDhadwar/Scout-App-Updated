@@ -28,6 +28,8 @@ The local analyst is deterministic and read-only. The user authorized the option
 
 ## Verification and delivery
 
+Every delivered change, however small, must increment the app version in `Clasue-scout-app/package.json` and its lockfile. Use patch for fixes and small refinements, minor for compatible new features, and major for major overhauls or incompatible changes. Never reuse the previous version for a new update.
+
 Run `npm test` and `npm run build` in `Clasue-scout-app`. Run focused ESLint on changed active modules. `npm run test:browser` creates a temporary fixture database and local server, then runs browser checks without touching the real database. Edge is the default QA browser. Never run mutable browser tests against a production server.
 
 Check desktop, tablet and phone screenshots at 1440, 1280, 1024, 768, 390 and 360px. Verify offline reload and reconnection, roles, assignment context, picklist persistence, presentation keyboard controls and real downloads. Inspect exported PDF pages; report any lack of native PowerPoint rendering honestly. Keep implementation and validation notes in `docs/argus-2`.

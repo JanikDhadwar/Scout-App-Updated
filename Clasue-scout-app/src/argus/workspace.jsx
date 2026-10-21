@@ -526,6 +526,7 @@ export default function ArgusWorkspace({
   else if (section === "teams")
     body = (
       <TeamDirectory
+        api={api} season={event?.event_key?.slice(0,4)}
         analytics={analytics}
         onOpenTeam={openTeam}
         onCompare={compare}
@@ -572,6 +573,7 @@ export default function ArgusWorkspace({
     body = (
       <>
         <TeamDirectory
+          api={api} season={event?.event_key?.slice(0,4)}
           analytics={analytics}
           onOpenTeam={openTeam}
           onCompare={compare}

@@ -25,6 +25,7 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
 
     assert.equal((await anonymous('/api/users')).status,401);
     assert.equal((await anonymous('/api/analyst/status')).status,401);
+    assert.equal((await anonymous('/api/statbotics/rankings?year=2026')).status,401);
     assert.notEqual((await anonymous('/users')).status,200);
     const legacySignup=await anonymous('/api/auth/signup','POST',{username:'New scout',password:'new-scout-secret'});
     assert.equal(legacySignup.status,200,'A legacy record without a username must not block account creation');
@@ -39,6 +40,8 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
     assert.equal((await member('/api/auth/join-team','POST',{number:'6390',password:'wrong'})).status,403);
     const joined=await member('/api/auth/join-team','POST',{number:'6390',password:team.password});assert.equal(joined.status,200);assert.equal(joined.data.team.password,undefined);
     await outsider('/api/auth/signup','POST',{username:'Other',password:'other-secret'});const otherTeam=(await outsider('/api/auth/create-team','POST',{number:'42',name:'Other'})).data.team;
+    assert.equal((await owner('/api/statbotics/rankings?year=invalid')).status,400);
+    assert.equal((await owner('/api/statbotics/rankings?year=2026&team=https://example.com')).status,400);
     assert.equal((await member('/api/teams')).data.length,1);assert.equal((await member('/api/teams')).data[0].password,undefined);assert.equal((await member(`/api/teams/${otherTeam.id}`)).status,404);
     assert.equal((await member(`/api/memberships/${joined.data.mem.id}`,'PATCH',{role:'owner'})).status,403);
     assert.equal((await member('/api/memberships','POST',{...joined.data.mem,role:'admin'})).status,403);
