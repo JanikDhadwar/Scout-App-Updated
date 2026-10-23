@@ -22,9 +22,11 @@ const widths=[1440,1280,1024,768,390,360];
 try {
  await check('public welcome, account entry and offline public reload',async()=>{
   await page.goto(baseURL,{waitUntil:'networkidle'});
-  await page.getByRole('heading',{name:'Your team’s scouting, from the stands to alliance selection.',exact:true}).waitFor();
+  await page.getByRole('heading',{name:'Scout every match. Make every decision count.',exact:true}).waitFor();
   assert.equal(await page.getByLabel('Username',{exact:true}).count(),0);
   await page.getByRole('heading',{name:'Built by the Flusters',exact:true}).waitFor();
+  for(const label of ['Match scouting','Compare and choose','Pit display','Event workspace']){await page.getByRole('button',{name:label,exact:true}).click();assert.ok(await page.locator('#product-preview img').evaluate(image=>image.complete&&image.naturalWidth>0));}
+  await page.getByRole('button',{name:'Compare and choose',exact:true}).click();await page.getByText('Read the sample comparison data',{exact:true}).click();await page.getByRole('region',{name:'Sample comparison data',exact:true}).waitFor();
   for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`welcome-${width}.png`),fullPage:true});}
   await page.getByRole('link',{name:'Start now',exact:true}).first().click();
   await page.getByRole('heading',{name:'Create an account',exact:true}).waitFor();
@@ -43,7 +45,7 @@ try {
  }
  const teams=await api(page,'/teams');assert.ok(teams.data.some(t=>t.id==='qa-workspace'&&t.name==='QA robotics'),'Synthetic fixture required.');
  await check('role-aware onboarding, replay, main routes and no topbar event switch',async()=>{
-  await route('/dashboard');await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
+  await route('/welcome');await page.getByRole('link',{name:'Open workspace',exact:true}).first().click();await page.locator('.argus-app').waitFor();await route('/dashboard');await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
   for(const destination of ['assignments','admin','practice','help','analyst','teams','matches','analytics','strategy','events','settings']){await route(`/${destination}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();}
   assert.equal(await page.locator('.a-topbar a[href="#/events"]').count(),0);
   await route('/help');await page.getByRole('button',{name:'Replay welcome guide',exact:true}).click();await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();

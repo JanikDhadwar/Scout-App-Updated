@@ -723,6 +723,7 @@ export default function ArgusWorkspace({
         <header className="a-page-heading">
           <h1>Settings</h1>
           <p className="a-muted">Your team, account and this device.</p>
+          <a className="a-button" href="#/welcome">About Argus</a>
         </header>
         <IntegrationSettings api={api} workspaceId={workspace.id} role={role} />
         <Match13Settings api={api} workspaceId={workspace.id} role={role}/>

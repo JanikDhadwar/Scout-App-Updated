@@ -106,7 +106,7 @@ export default function App() {
     return()=>{stopped=true;clearInterval(timer);window.removeEventListener('online',check);document.removeEventListener('visibilitychange',check);};
   },[]);
   useEffect(()=>{
-    if(user&&team&&['#/login','#/signup','#/welcome'].includes(publicRoute))window.location.replace('#/dashboard');
+    if(user&&team&&['#/login','#/signup'].includes(publicRoute))window.location.replace('#/dashboard');
   },[user,team,publicRoute]);
   async function saveSession(u,t,m){if(u)localStorage.setItem(SESSION_KEY,JSON.stringify({user:{id:u.id,username:u.username},team:t||null,mem:m||null}));else localStorage.removeItem(SESSION_KEY);}
   useEffect(()=>{
@@ -170,7 +170,7 @@ export default function App() {
   async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this team?':'Archive this team? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
   async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active teams you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
   if(booting)return <div className="argus-boot" role="status">Opening ARGUS…</div>;
-  if(!user&&!['#/login','#/signup'].includes(publicRoute))return <WelcomeScreen/>;
+  if(publicRoute==='#/welcome'||!user&&!['#/login','#/signup'].includes(publicRoute))return <WelcomeScreen signedIn={!!user&&!!team}/>;
   if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main id="account-main" tabIndex={-1} className="workspace-main">{!user?<AuthScreen key={publicRoute} initialMode={publicRoute==='#/signup'?'signup':'login'} onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
   const renderLegacy=(view,context={})=>view==='match'||view==='pit'?<FormsTab key={`${view}:${context.match_key||''}:${context.scouted_team||''}`} team={team} user={user} role={role} syncState={syncState} reportKind={view} context={context} onPending={()=>{offline.refresh();window.dispatchEvent(new Event('scout-report-saved'));}}/>:view==='news'?<AnnouncementsTab team={team} user={user} role={role}/>:view==='myteam'?<MyTeamTab key={context.event_key} team={team} eventKey={context.event_key}/>:view==='manage'?<ManageTab team={team} user={user} onTeamUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} onRoleChange={refreshMem}/>:view==='sync'?<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>{window.location.hash='/settings';}}/>:null;
