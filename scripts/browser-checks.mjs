@@ -16,10 +16,27 @@ const results=[],errors=[];
 page.on('pageerror',error=>errors.push(error.message));
 const route=async(destination,target=page)=>{await target.evaluate(value=>{location.hash=value;},destination);await target.waitForTimeout(200);};
 const api=(target,url,method='GET',body)=>target.evaluate(async({url,method,body})=>{const r=await fetch(`/api${url}`,{method,headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});return{status:r.status,data:await r.json()};},{url,method,body});
-const login=async(target,username)=>{await target.goto(baseURL,{waitUntil:'networkidle'});await target.getByLabel('Username',{exact:true}).fill(username);await target.getByLabel('Password',{exact:true}).fill('ArgusQA2026!');await target.locator('.auth-submit').click();await target.locator('.argus-app').waitFor();};
+const login=async(target,username)=>{await target.goto(`${baseURL}/#/login`,{waitUntil:'networkidle'});await target.getByLabel('Username',{exact:true}).fill(username);await target.getByLabel('Password',{exact:true}).fill('ArgusQA2026!');await target.locator('.auth-submit').click();await target.locator('.argus-app').waitFor();};
 const check=async(name,run)=>{try{await run();results.push({name,status:'passed'});}catch(error){results.push({name,status:'failed',error:error.message});await page.screenshot({path:path.join(artifacts,`failure-${results.length}.png`),fullPage:true}).catch(()=>{});}finally{await context.setOffline(false);await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});console.log(JSON.stringify(results.at(-1)));}};
 const widths=[1440,1280,1024,768,390,360];
 try {
+ await check('public welcome, account entry and offline public reload',async()=>{
+  await page.goto(baseURL,{waitUntil:'networkidle'});
+  await page.getByRole('heading',{name:'Your team’s scouting, from the stands to alliance selection.',exact:true}).waitFor();
+  assert.equal(await page.getByLabel('Username',{exact:true}).count(),0);
+  await page.getByRole('heading',{name:'Built by the Flusters',exact:true}).waitFor();
+  for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`welcome-${width}.png`),fullPage:true});}
+  await page.getByRole('link',{name:'Start now',exact:true}).first().click();
+  await page.getByRole('heading',{name:'Create an account',exact:true}).waitFor();
+  await page.getByRole('link',{name:'About Argus',exact:true}).click();
+  await page.getByRole('link',{name:'Log in',exact:true}).first().click();
+  await page.getByRole('heading',{name:'Sign in',exact:true}).waitFor();
+  await page.goBack();await page.locator('.argus-public').waitFor();
+  await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
+  await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
+  await context.setOffline(true);await page.reload({waitUntil:'domcontentloaded'});await page.locator('.argus-public').waitFor();
+  await context.setOffline(false);await page.setViewportSize({width:1440,height:1000});
+ });
  await login(page,'qa_owner');
  if(process.env.QA_NODE_ENV==='production'){
   const session=(await context.cookies()).find(cookie=>cookie.name==='argus_session');assert.ok(session?.secure&&session.httpOnly&&session.sameSite==='Strict','Production sessions require Secure, HttpOnly and SameSite=Strict.');
@@ -98,6 +115,19 @@ try {
   for(const [label,extension] of [['Export PDF','pdf'],['Export PowerPoint','pptx']]){const [file]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:label,exact:true}).click()]);await file.saveAs(path.join(artifacts,`team-254.${extension}`));assert.ok(fs.statSync(path.join(artifacts,`team-254.${extension}`)).size>1000);}
   await page.keyboard.press('Escape');
  });
+ await check('season-independent alliance sheet generates a separate persistent picklist without AI',async()=>{
+  const requests=[];const capture=request=>{if(/groq|\/analyst\//i.test(request.url()))requests.push(request.url());};page.on('request',capture);
+  try{
+   await route('/analytics');await page.getByLabel('Alliance role for Autonomous pieces',{exact:true}).selectOption('scoring');await page.getByRole('button',{name:'Save metric definitions',exact:true}).click();
+   await page.waitForFunction(async()=>{const row=await(await fetch('/api/scout_events/qa-event')).json();return row.analytics_config['qa-match-form:auto'].category==='scoring';});
+   await route('/strategy');const sheet=page.getByRole('region',{name:'Scoring selection sheet',exact:true});await sheet.waitFor();assert.equal(await sheet.locator('tbody tr').first().locator('th').innerText(),'1678');assert.ok((await sheet.innerText()).includes('Small sample'));assert.ok(!(await sheet.locator('tbody').innerText()).includes('6390'));
+   for(const width of widths){await page.setViewportSize({width,height:1000});await page.screenshot({path:path.join(artifacts,`alliance-sheet-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);}
+   await page.setViewportSize({width:1440,height:1000});await page.getByRole('button',{name:'Create scoring picklist',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();
+   const lists=(await api(page,'/picklists')).data;const generated=lists.find(l=>l.name==='Scoring selection');assert.ok(generated);assert.equal(generated.entries[0].team_number,1678);assert.ok(lists.some(l=>l.id==='qa-picklist'));
+   await route('/dashboard');await route('/strategy');await page.getByLabel('Saved picklist').selectOption(generated.id);assert.equal(await page.getByLabel('Picklist name',{exact:true}).inputValue(),'Scoring selection');
+   await route('/analyst');await page.getByRole('button',{name:'Summarize team 254',exact:true}).click();await page.getByText('Verified local calculation',{exact:true}).waitFor();assert.deepEqual(requests,[]);
+  }finally{page.off('request',capture);}
+ });
  await check('one-match handoff acceptance preserves permanent owners and other matches',async()=>{
   const receiverContext=await browser.newContext({viewport:{width:390,height:1000},serviceWorkers:'allow'}),receiver=await receiverContext.newPage();
   try{await login(receiver,'qa_idle');await api(receiver,'/handoffs?team_id=qa-workspace');await api(page,'/handoffs?team_id=qa-workspace');await route('/matches/2026qa_qm4');
@@ -114,7 +144,7 @@ try {
   await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await route('/match?event_key=2026qa&match_key=2026qa_qm4&scouted_team=6390&form_id=qa-match-form&assignment_id=qa-assignment');const note=`Offline evidence ${Date.now()}`;
   await page.getByLabel('Autonomous pieces',{exact:true}).fill('0');await page.getByLabel('Scout notes',{exact:true}).fill(note);await page.getByText('Draft saved as you go',{exact:true}).waitFor();await context.setOffline(true);await page.reload({waitUntil:'domcontentloaded'});await page.getByLabel('Scout notes',{exact:true}).waitFor();assert.equal(await page.getByLabel('Scout notes',{exact:true}).inputValue(),note);
-  await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('heading',{name:'Report saved.',exact:true}).waitFor();await context.setOffline(false);await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(async note=>{const r=await(await fetch('/api/submissions')).json();return r.filter(x=>x.answers?.notes===note).length===1;},note);
+  await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('heading',{name:'Report saved.',exact:true}).waitFor();await page.goto(baseURL,{waitUntil:'domcontentloaded'});await page.locator('.argus-app').waitFor();assert.equal(await page.locator('.argus-public').count(),0,'Prepared scouts bypass the public welcome page on an offline root reload');await context.setOffline(false);await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(async note=>{const r=await(await fetch('/api/submissions')).json();return r.filter(x=>x.answers?.notes===note).length===1;},note);
  });
  await check('ownership preview, selected scouts, generated duties and locked manual changes persist',async()=>{
   await route('/assignments');await page.getByRole('button',{name:'Manage ownership',exact:true}).click();await page.getByText('Choose scouts and forms',{exact:true}).click();await page.getByRole('checkbox',{name:'qa_idle',exact:true}).uncheck();

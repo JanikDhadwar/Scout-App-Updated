@@ -9,6 +9,7 @@ import { useReportDraft } from './use-report-draft.js';
 import { ReportDrawing, ReportPhoto } from './report-media.jsx';
 import { Icon } from './ui-primitives.jsx';
 import ArgusWorkspace from './argus/workspace.jsx';
+import WelcomeScreen from './argus/welcome.jsx';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
@@ -91,6 +92,12 @@ export default function App() {
   const [user,setUser]=useState(null),[team,setTeam]=useState(null),[mem,setMem]=useState(null),[booting,setBooting]=useState(true);
   const [syncState,setSyncState]=useState(offline.getState());
   const [shellReady,setShellReady]=useState(!!navigator.serviceWorker?.controller);
+  const [publicRoute,setPublicRoute]=useState(window.location.hash);
+  useEffect(()=>{
+    const changed=()=>setPublicRoute(window.location.hash);
+    window.addEventListener('hashchange',changed);
+    return()=>window.removeEventListener('hashchange',changed);
+  },[]);
   useEffect(()=>{
     let registration,timer,stopped=false;
     const check=async()=>{if(navigator.onLine&&document.visibilityState==='visible'){try{registration=registration||await navigator.serviceWorker?.getRegistration();if(!stopped)await registration?.update();}catch{ /* Recheck after reconnecting. */ }}};
@@ -98,6 +105,9 @@ export default function App() {
     window.addEventListener('online',check);document.addEventListener('visibilitychange',check);
     return()=>{stopped=true;clearInterval(timer);window.removeEventListener('online',check);document.removeEventListener('visibilitychange',check);};
   },[]);
+  useEffect(()=>{
+    if(user&&team&&['#/login','#/signup','#/welcome'].includes(publicRoute))window.location.replace('#/dashboard');
+  },[user,team,publicRoute]);
   async function saveSession(u,t,m){if(u)localStorage.setItem(SESSION_KEY,JSON.stringify({user:{id:u.id,username:u.username},team:t||null,mem:m||null}));else localStorage.removeItem(SESSION_KEY);}
   useEffect(()=>{
     const listener=event=>setSyncState(event.detail),ready=()=>setShellReady(!!navigator.serviceWorker?.controller);
@@ -160,15 +170,18 @@ export default function App() {
   async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this team?':'Archive this team? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
   async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active teams you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
   if(booting)return <div className="argus-boot" role="status">Opening ARGUS…</div>;
-  if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main className="workspace-main">{!user?<AuthScreen onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
+  if(!user&&!['#/login','#/signup'].includes(publicRoute))return <WelcomeScreen/>;
+  if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main id="account-main" tabIndex={-1} className="workspace-main">{!user?<AuthScreen key={publicRoute} initialMode={publicRoute==='#/signup'?'signup':'login'} onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
   const renderLegacy=(view,context={})=>view==='match'||view==='pit'?<FormsTab key={`${view}:${context.match_key||''}:${context.scouted_team||''}`} team={team} user={user} role={role} syncState={syncState} reportKind={view} context={context} onPending={()=>{offline.refresh();window.dispatchEvent(new Event('scout-report-saved'));}}/>:view==='news'?<AnnouncementsTab team={team} user={user} role={role}/>:view==='myteam'?<MyTeamTab key={context.event_key} team={team} eventKey={context.event_key}/>:view==='manage'?<ManageTab team={team} user={user} onTeamUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} onRoleChange={refreshMem}/>:view==='sync'?<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>{window.location.hash='/settings';}}/>:null;
   return <ArgusWorkspace workspace={team} user={user} role={role} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={()=>updateServiceWorker(true)}/>;
 }
 
 // ─── Auth Screen ──────────────────────────────────────────────────────────────
-function AuthScreen({ onLogin }) {
-  const [mode,setMode]=useState("login");
+function AuthScreen({ onLogin, initialMode='login' }) {
+  const [mode,setMode]=useState(initialMode);
+  const heading=useRef(null);
+  useEffect(()=>{heading.current?.focus();},[]);
   const [username,setUsername]=useState("");
   const [password,setPassword]=useState("");
   const [err,setErr]=useState("");
@@ -186,8 +199,9 @@ function AuthScreen({ onLogin }) {
   return (
     <div className="auth-layout">
       <section className="auth-form-area" aria-label="Account access"><form className="auth-form-card" onSubmit={e=>{e.preventDefault();submit();}}>
+        <a href="#/welcome">About Argus</a>
         <div className="auth-wordmark">Argus</div>
-        <h1>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your team scouting app.':'You can join your team after signing up.'}</p>
+        <h1 tabIndex={-1} ref={heading}>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your team scouting app.':'You can join your team after signing up.'}</p>
         <div className="auth-tabs" aria-label="Account options">
           {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}

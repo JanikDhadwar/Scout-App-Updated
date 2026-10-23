@@ -6,6 +6,6 @@ The form controls, autosave and offline queue are the same mechanisms used for r
 
 Submit one pit and one match practice report to record basic progress. This is not a certification of observation accuracy. Admins can see which types have been submitted.
 
-Practice never affects real reports, duty completion, team statistics, AI evidence or alliance lists. Returning to real assignments preserves unfinished practice and real drafts.
+Practice never affects real reports, duty completion, team statistics, analyst evidence or alliance lists. Returning to real assignments preserves unfinished practice and real drafts.
 
 [Back to contents](contents.md)

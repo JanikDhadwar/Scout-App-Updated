@@ -1,0 +1,82 @@
+{
+  "temporaryDatabase": true,
+  "externalRatings": "Synthetic provider responses for demonstration; not live competition values.",
+  "formats": {
+    "website": {
+      "size": {
+        "width": 1280,
+        "height": 800
+      },
+      "markers": [
+        {
+          "name": "handoff",
+          "start": 3.199,
+          "end": 13.196,
+          "status": "captured"
+        },
+        {
+          "name": "forms",
+          "start": 14.34,
+          "end": 18.498,
+          "status": "captured"
+        },
+        {
+          "name": "offline",
+          "start": 19.517,
+          "end": 24.997,
+          "status": "captured"
+        },
+        {
+          "name": "members",
+          "start": 26.025,
+          "end": 28.33,
+          "status": "captured"
+        },
+        {
+          "name": "display-full",
+          "start": 29.345,
+          "end": 33.099,
+          "status": "captured"
+        }
+      ]
+    },
+    "instagram": {
+      "size": {
+        "width": 540,
+        "height": 960
+      },
+      "markers": [
+        {
+          "name": "handoff",
+          "start": 3.046,
+          "end": 12.845,
+          "status": "captured"
+        },
+        {
+          "name": "forms",
+          "start": 13.985,
+          "end": 18.126,
+          "status": "captured"
+        },
+        {
+          "name": "offline",
+          "start": 19.142,
+          "end": 24.679,
+          "status": "captured"
+        },
+        {
+          "name": "members",
+          "start": 25.698,
+          "end": 28.007,
+          "status": "captured"
+        },
+        {
+          "name": "display-full",
+          "start": 29.02,
+          "end": 32.747,
+          "status": "captured"
+        }
+      ]
+    }
+  }
+}

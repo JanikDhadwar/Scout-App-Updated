@@ -10,6 +10,6 @@ Audit entries are stored with mutations and contain operational metadata, not pa
 
 IndexedDB scout-device-v1 retains cache/queue/drafts/meta/receipts. Practice queue entries use the practice endpoint; existing real report payloads and draft keys remain compatible.
 
-All profile/comparison/AI/export calculations use analytics.js. Blue Alliance and optional Groq keys are private server settings. Run npm test and npm run build in Clasue-scout-app. Browser tests run only against temporary local fixtures.
+All profile/comparison/analyst/export calculations use analytics.js. Blue Alliance and Match13 keys are private server settings. Run npm test and npm run build in Clasue-scout-app. Browser tests run only against temporary local fixtures.
 
 [Back to contents](contents.md)

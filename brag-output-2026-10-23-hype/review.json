@@ -1,0 +1,618 @@
+{
+  "ok": true,
+  "outputDir": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024",
+  "frames": [
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-01-at-0.3s.png",
+      "time": 0.3,
+      "role": "beat",
+      "label": "home"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-02-at-1.915s.png",
+      "time": 1.915,
+      "role": "beat",
+      "label": "home mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-03-at-4.13s.png",
+      "time": 4.13,
+      "role": "beat",
+      "label": "play"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-04-at-5.83s.png",
+      "time": 5.83,
+      "role": "beat",
+      "label": "play mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-05-at-8.13s.png",
+      "time": 8.13,
+      "role": "beat",
+      "label": "entry"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-06-at-10.702s.png",
+      "time": 10.702,
+      "role": "beat",
+      "label": "entry mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-07-at-13.874s.png",
+      "time": 13.874,
+      "role": "beat",
+      "label": "crew"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-08-at-16.447s.png",
+      "time": 16.447,
+      "role": "beat",
+      "label": "crew mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-09-at-19.619s.png",
+      "time": 19.619,
+      "role": "beat",
+      "label": "pits"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-10-at-22.191s.png",
+      "time": 22.191,
+      "role": "beat",
+      "label": "pits mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-11-at-25.364s.png",
+      "time": 25.364,
+      "role": "beat",
+      "label": "evidence"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-12-at-27.937s.png",
+      "time": 27.937,
+      "role": "beat",
+      "label": "evidence mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-13-at-31.109s.png",
+      "time": 31.109,
+      "role": "beat",
+      "label": "picks"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-14-at-33.681s.png",
+      "time": 33.681,
+      "role": "beat",
+      "label": "picks mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-15-at-36.853s.png",
+      "time": 36.853,
+      "role": "beat",
+      "label": "finish"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-16-at-39.426s.png",
+      "time": 39.426,
+      "role": "beat",
+      "label": "finish mid"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-1-at-3.63s.png",
+      "time": 3.63,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-2-at-3.73s.png",
+      "time": 3.73,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-3-at-3.83s.png",
+      "time": 3.83,
+      "role": "seam",
+      "label": "cut home -> play"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-4-at-3.93s.png",
+      "time": 3.93,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-5-at-4.03s.png",
+      "time": 4.03,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-1-at-7.63s.png",
+      "time": 7.63,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-2-at-7.73s.png",
+      "time": 7.73,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-3-at-7.83s.png",
+      "time": 7.83,
+      "role": "seam",
+      "label": "cut play -> entry"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-4-at-7.93s.png",
+      "time": 7.93,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-5-at-8.03s.png",
+      "time": 8.03,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-1-at-13.374s.png",
+      "time": 13.374,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-2-at-13.474s.png",
+      "time": 13.474,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-3-at-13.574s.png",
+      "time": 13.574,
+      "role": "seam",
+      "label": "cut entry -> crew"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-4-at-13.674s.png",
+      "time": 13.674,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-5-at-13.774s.png",
+      "time": 13.774,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-1-at-19.119s.png",
+      "time": 19.119,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-2-at-19.219s.png",
+      "time": 19.219,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-3-at-19.319s.png",
+      "time": 19.319,
+      "role": "seam",
+      "label": "cut crew -> pits"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-4-at-19.419s.png",
+      "time": 19.419,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-5-at-19.519s.png",
+      "time": 19.519,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-1-at-24.864s.png",
+      "time": 24.864,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-2-at-24.964s.png",
+      "time": 24.964,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-3-at-25.064s.png",
+      "time": 25.064,
+      "role": "seam",
+      "label": "cut pits -> evidence"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-4-at-25.164s.png",
+      "time": 25.164,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-5-at-25.264s.png",
+      "time": 25.264,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-1-at-30.609s.png",
+      "time": 30.609,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-2-at-30.709s.png",
+      "time": 30.709,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-3-at-30.809s.png",
+      "time": 30.809,
+      "role": "seam",
+      "label": "cut evidence -> picks"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-4-at-30.909s.png",
+      "time": 30.909,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-5-at-31.009s.png",
+      "time": 31.009,
+      "role": "seam",
+      "label": "+0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-1-at-36.353s.png",
+      "time": 36.353,
+      "role": "seam",
+      "label": "cut -0.2"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-2-at-36.453s.png",
+      "time": 36.453,
+      "role": "seam",
+      "label": "-0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-3-at-36.553s.png",
+      "time": 36.553,
+      "role": "seam",
+      "label": "cut picks -> finish"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-4-at-36.653s.png",
+      "time": 36.653,
+      "role": "seam",
+      "label": "+0.1"
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-5-at-36.753s.png",
+      "time": 36.753,
+      "role": "seam",
+      "label": "+0.2"
+    }
+  ],
+  "contactSheets": [
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-beats.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-01.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-02.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-03.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-04.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-05.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-06.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-07.jpg",
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-phone.jpg"
+  ],
+  "review": {
+    "window": [
+      0,
+      42.3
+    ],
+    "scenes": [
+      {
+        "id": "home",
+        "start": 0,
+        "end": 3.83
+      },
+      {
+        "id": "play",
+        "start": 3.83,
+        "end": 7.83
+      },
+      {
+        "id": "entry",
+        "start": 7.83,
+        "end": 13.574
+      },
+      {
+        "id": "crew",
+        "start": 13.574,
+        "end": 19.319
+      },
+      {
+        "id": "pits",
+        "start": 19.319,
+        "end": 25.064
+      },
+      {
+        "id": "evidence",
+        "start": 25.064,
+        "end": 30.809
+      },
+      {
+        "id": "picks",
+        "start": 30.809,
+        "end": 36.553
+      },
+      {
+        "id": "finish",
+        "start": 36.553,
+        "end": 42.298
+      }
+    ],
+    "beats": [
+      {
+        "time": 0.3,
+        "label": "home",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-01-at-0.3s.png"
+      },
+      {
+        "time": 1.915,
+        "label": "home mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-02-at-1.915s.png"
+      },
+      {
+        "time": 4.13,
+        "label": "play",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-03-at-4.13s.png"
+      },
+      {
+        "time": 5.83,
+        "label": "play mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-04-at-5.83s.png"
+      },
+      {
+        "time": 8.13,
+        "label": "entry",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-05-at-8.13s.png"
+      },
+      {
+        "time": 10.702,
+        "label": "entry mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-06-at-10.702s.png"
+      },
+      {
+        "time": 13.874,
+        "label": "crew",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-07-at-13.874s.png"
+      },
+      {
+        "time": 16.447,
+        "label": "crew mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-08-at-16.447s.png"
+      },
+      {
+        "time": 19.619,
+        "label": "pits",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-09-at-19.619s.png"
+      },
+      {
+        "time": 22.191,
+        "label": "pits mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-10-at-22.191s.png"
+      },
+      {
+        "time": 25.364,
+        "label": "evidence",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-11-at-25.364s.png"
+      },
+      {
+        "time": 27.937,
+        "label": "evidence mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-12-at-27.937s.png"
+      },
+      {
+        "time": 31.109,
+        "label": "picks",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-13-at-31.109s.png"
+      },
+      {
+        "time": 33.681,
+        "label": "picks mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-14-at-33.681s.png"
+      },
+      {
+        "time": 36.853,
+        "label": "finish",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-15-at-36.853s.png"
+      },
+      {
+        "time": 39.426,
+        "label": "finish mid",
+        "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\beat-16-at-39.426s.png"
+      }
+    ],
+    "seams": [
+      {
+        "time": 3.83,
+        "from": "home",
+        "to": "play",
+        "times": [
+          3.63,
+          3.73,
+          3.83,
+          3.93,
+          4.03
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-1-at-3.63s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-2-at-3.73s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-3-at-3.83s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-4-at-3.93s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-01-5-at-4.03s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-01.jpg"
+      },
+      {
+        "time": 7.83,
+        "from": "play",
+        "to": "entry",
+        "times": [
+          7.63,
+          7.73,
+          7.83,
+          7.93,
+          8.03
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-1-at-7.63s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-2-at-7.73s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-3-at-7.83s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-4-at-7.93s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-02-5-at-8.03s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-02.jpg"
+      },
+      {
+        "time": 13.574,
+        "from": "entry",
+        "to": "crew",
+        "times": [
+          13.374,
+          13.474,
+          13.574,
+          13.674,
+          13.774
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-1-at-13.374s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-2-at-13.474s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-3-at-13.574s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-4-at-13.674s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-03-5-at-13.774s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-03.jpg"
+      },
+      {
+        "time": 19.319,
+        "from": "crew",
+        "to": "pits",
+        "times": [
+          19.119,
+          19.219,
+          19.319,
+          19.419,
+          19.519
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-1-at-19.119s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-2-at-19.219s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-3-at-19.319s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-4-at-19.419s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-04-5-at-19.519s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-04.jpg"
+      },
+      {
+        "time": 25.064,
+        "from": "pits",
+        "to": "evidence",
+        "times": [
+          24.864,
+          24.964,
+          25.064,
+          25.164,
+          25.264
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-1-at-24.864s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-2-at-24.964s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-3-at-25.064s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-4-at-25.164s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-05-5-at-25.264s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-05.jpg"
+      },
+      {
+        "time": 30.809,
+        "from": "evidence",
+        "to": "picks",
+        "times": [
+          30.609,
+          30.709,
+          30.809,
+          30.909,
+          31.009
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-1-at-30.609s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-2-at-30.709s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-3-at-30.809s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-4-at-30.909s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-06-5-at-31.009s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-06.jpg"
+      },
+      {
+        "time": 36.553,
+        "from": "picks",
+        "to": "finish",
+        "times": [
+          36.353,
+          36.453,
+          36.553,
+          36.653,
+          36.753
+        ],
+        "paths": [
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-1-at-36.353s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-2-at-36.453s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-3-at-36.553s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-4-at-36.653s.png",
+          "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\seam-07-5-at-36.753s.png"
+        ],
+        "sheet": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-07.jpg"
+      }
+    ],
+    "sheets": {
+      "beats": [
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-beats.jpg"
+      ],
+      "seams": [
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-01.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-02.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-03.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-04.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-05.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-06.jpg",
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-seam-07.jpg"
+      ],
+      "phone": [
+        "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-hype\\composition\\.hyperframes\\artifacts\\snapshots\\7c2e41be-6b66-43b5-ad6f-81441c122024\\review-phone.jpg"
+      ]
+    },
+    "notes": []
+  },
+  "_meta": {
+    "version": "0.8.186",
+    "latestVersion": "0.8.186",
+    "updateAvailable": false
+  }
+}

@@ -1,0 +1,1570 @@
+{
+  "version": 1,
+  "historyId": "1839d788-709c-4c36-b7d0-4ebc7c25a98f",
+  "currentRevision": "886df907-d491-44b2-8c6f-565515a95e46",
+  "pendingChanges": false,
+  "files": {
+    "assets/click.ogg": {
+      "hash": "2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\2f\\2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292"
+    },
+    "assets/gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\c1\\c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "assets/play-still.jpg": {
+      "hash": "9adbe6f72782e4a66ed0a738d9d4b85643885cfc2bf6491f472759f765719675",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\9a\\9adbe6f72782e4a66ed0a738d9d4b85643885cfc2bf6491f472759f765719675"
+    },
+    "assets/robot-photo.jpg": {
+      "hash": "96ffe5fa36b03aa4064e948bfa31d1b660e73bfda3fbfe8dc1e33261d2a447e5",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\96\\96ffe5fa36b03aa4064e948bfa31d1b660e73bfda3fbfe8dc1e33261d2a447e5"
+    },
+    "assets/screens/admin.png": {
+      "hash": "b1f7870e40ca6771ba8b38efa32e07aad3e4c9e6b178503d1ef234e4834de143",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\b1\\b1f7870e40ca6771ba8b38efa32e07aad3e4c9e6b178503d1ef234e4834de143"
+    },
+    "assets/screens/analytics.png": {
+      "hash": "5a8368b30ffff425cabf4714ca088d4f67e1ff3ac534adf96ace10a123b19593",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\5a\\5a8368b30ffff425cabf4714ca088d4f67e1ff3ac534adf96ace10a123b19593"
+    },
+    "assets/screens/assignments.png": {
+      "hash": "392fa2240d65b303a2f2493d324cb7f5a133843084321e4639ba9dac5d44b74b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\39\\392fa2240d65b303a2f2493d324cb7f5a133843084321e4639ba9dac5d44b74b"
+    },
+    "assets/screens/comparison.png": {
+      "hash": "ed57d6f93b3353d087384933f4d077eb5e29c0c8bb71071528d2789302d93016",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\ed\\ed57d6f93b3353d087384933f4d077eb5e29c0c8bb71071528d2789302d93016"
+    },
+    "assets/screens/help.png": {
+      "hash": "af2a7f9a140cafa44e6b85f7c17143277b6f05d960dd0c0a0490ede918ef0348",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\af\\af2a7f9a140cafa44e6b85f7c17143277b6f05d960dd0c0a0490ede918ef0348"
+    },
+    "assets/screens/home-laptop.png": {
+      "hash": "40334b28de207cc0b4839048841a8965fae1473c9981cc17e24b58859dcf5677",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\40\\40334b28de207cc0b4839048841a8965fae1473c9981cc17e24b58859dcf5677"
+    },
+    "assets/screens/home-phone.png": {
+      "hash": "813ceb66239f0186ac667c1d857c65e59d26a03af3e6e89a10a3636883f7a6ed",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\81\\813ceb66239f0186ac667c1d857c65e59d26a03af3e6e89a10a3636883f7a6ed"
+    },
+    "assets/screens/home-tablet.png": {
+      "hash": "96ef49fd40a3354a7cdaf81c1283dfe44fae0591bed89266bacc6022b210c0a6",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\96\\96ef49fd40a3354a7cdaf81c1283dfe44fae0591bed89266bacc6022b210c0a6"
+    },
+    "assets/screens/matches.png": {
+      "hash": "2b053e6da9987eb67390461f60acebd2aa9b2d1509256df9df356ab733551414",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\2b\\2b053e6da9987eb67390461f60acebd2aa9b2d1509256df9df356ab733551414"
+    },
+    "assets/screens/picklist.png": {
+      "hash": "b502a219ee0d03c23fae41fc016ae4737f709bae9c96103a6f723e67e387becc",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\b5\\b502a219ee0d03c23fae41fc016ae4737f709bae9c96103a6f723e67e387becc"
+    },
+    "assets/screens/pit.png": {
+      "hash": "a663f1fb60a21e91751b32fa0dedd2398908b06861803b642f6e687a07c24203",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\a6\\a663f1fb60a21e91751b32fa0dedd2398908b06861803b642f6e687a07c24203"
+    },
+    "assets/screens/practice.png": {
+      "hash": "092ba0e7a44a1bf3f06f31991fb30faef1b37be43a0904ad77274ec791330b5b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\09\\092ba0e7a44a1bf3f06f31991fb30faef1b37be43a0904ad77274ec791330b5b"
+    },
+    "assets/screens/reminders.png": {
+      "hash": "b357ef95eabcdaa5f8e51651ee126d91957d777449ee8363ca64388a38dd84b7",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\b3\\b357ef95eabcdaa5f8e51651ee126d91957d777449ee8363ca64388a38dd84b7"
+    },
+    "assets/screens/scout-filled.png": {
+      "hash": "399372cf0a27df3dbfa7a1340ef66287f8bf3f7ec36117568520791b94745fa8",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\39\\399372cf0a27df3dbfa7a1340ef66287f8bf3f7ec36117568520791b94745fa8"
+    },
+    "assets/screens/scout.png": {
+      "hash": "a5d461d4a857b1b29b13d2b1c81c535dd1378b208c8852aea031cbcf26966edd",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\a5\\a5d461d4a857b1b29b13d2b1c81c535dd1378b208c8852aea031cbcf26966edd"
+    },
+    "assets/screens/strategy.png": {
+      "hash": "5ca38e176ae84495468f39d92e78450d17e585936ce2bc8a4a2830d76a3a76ca",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\5c\\5ca38e176ae84495468f39d92e78450d17e585936ce2bc8a4a2830d76a3a76ca"
+    },
+    "assets/soft.ogg": {
+      "hash": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\76\\7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf"
+    },
+    "assets/style.css": {
+      "hash": "1329d032e08b2c25535eeb31dd5dc77214075a793603e4217e3f579f6b23b13f",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\13\\1329d032e08b2c25535eeb31dd5dc77214075a793603e4217e3f579f6b23b13f"
+    },
+    "compositions/crew.html": {
+      "hash": "c1721014504d7156885dadff95d5a1722c2331d46a06a274af8488631452d583",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\c1\\c1721014504d7156885dadff95d5a1722c2331d46a06a274af8488631452d583"
+    },
+    "compositions/entry.html": {
+      "hash": "0713bba750b101a1a234b31a265ea94f3d3bd3504f6d41e830f9a2753a570124",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\07\\0713bba750b101a1a234b31a265ea94f3d3bd3504f6d41e830f9a2753a570124"
+    },
+    "compositions/evidence.html": {
+      "hash": "28980b92d118572431518926afe9a9507b2c83140b3ff137fcc1a816a26d1607",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\28\\28980b92d118572431518926afe9a9507b2c83140b3ff137fcc1a816a26d1607"
+    },
+    "compositions/finish.html": {
+      "hash": "688f236c43cc80b9b04947859e67df4b48f9de9420b9ea52e7147aaf40a9acfb",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\68\\688f236c43cc80b9b04947859e67df4b48f9de9420b9ea52e7147aaf40a9acfb"
+    },
+    "compositions/home.html": {
+      "hash": "2d3319f737b8e59d02ca0dcdf68c78387a6c96691a31d424ef1c6feda9d8449d",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\2d\\2d3319f737b8e59d02ca0dcdf68c78387a6c96691a31d424ef1c6feda9d8449d"
+    },
+    "compositions/picks.html": {
+      "hash": "44b84bfc90159e1c85f8346a9fc948c1e8a7ce90834421574825a1f33d765711",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\44\\44b84bfc90159e1c85f8346a9fc948c1e8a7ce90834421574825a1f33d765711"
+    },
+    "compositions/pits.html": {
+      "hash": "de50d11f6cc6df7655f005b1ee598850ac7e5c289adc47df72f05415af706696",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\de\\de50d11f6cc6df7655f005b1ee598850ac7e5c289adc47df72f05415af706696"
+    },
+    "compositions/play.html": {
+      "hash": "666e1e06d2230ec36ef7c50bdbd08c3bd56c0cc91bb488c2d6547dff757009d7",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\66\\666e1e06d2230ec36ef7c50bdbd08c3bd56c0cc91bb488c2d6547dff757009d7"
+    },
+    "hyperframes.json": {
+      "hash": "53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\53\\53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50"
+    },
+    "index.html": {
+      "hash": "ce507bb3b19502437d381376ed3d55ebcfd7ec5e4ed8e2bdcbd74b9d366fa57a",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\ce\\ce507bb3b19502437d381376ed3d55ebcfd7ec5e4ed8e2bdcbd74b9d366fa57a"
+    },
+    "package.json": {
+      "hash": "93e0a0f0aa43e181a4d5f81405d1aeeae0d69edf28b45e50a299b26b2fc6fd1b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\93\\93e0a0f0aa43e181a4d5f81405d1aeeae0d69edf28b45e50a299b26b2fc6fd1b"
+    },
+    "assets/6390-rebuilt.mp4": {
+      "hash": "0407d3109ba0794b32594bc7129e6ae10a38adbbd87b585cb92a955d7f25f82f",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\04\\0407d3109ba0794b32594bc7129e6ae10a38adbbd87b585cb92a955d7f25f82f"
+    },
+    "assets/music.mp3": {
+      "hash": "aa56ab1cdcbef6b05566c6a7c114323078580ccf6a740a9e6c6b6c4b40b4389f",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\aa\\aa56ab1cdcbef6b05566c6a7c114323078580ccf6a740a9e6c6b6c4b40b4389f"
+    },
+    "SPEC.md": {
+      "hash": "351a5da708bcb21b5fae2971378ac07adff8db7116fa7bdc7df1e2a0341dba2e",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\35\\351a5da708bcb21b5fae2971378ac07adff8db7116fa7bdc7df1e2a0341dba2e"
+    },
+    "REVIEW.md": {
+      "hash": "760dcdb9170fdd80e5c7bf1398bf703351874ac09bd1b98bed4b8c3d80944850",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\76\\760dcdb9170fdd80e5c7bf1398bf703351874ac09bd1b98bed4b8c3d80944850"
+    }
+  },
+  "revisions": {
+    "5b2cf334-f2c1-4e94-9f0f-32234f46b020": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792730966383,
+      "endedAt": 1792730966769,
+      "files": {
+        "assets/style.css": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\e4\\e4d7692fe0ca99fbbf9868c6ddbff0c1ea626c812fe2abd1910413c0ac20b9df",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\13\\1329d032e08b2c25535eeb31dd5dc77214075a793603e4217e3f579f6b23b13f"
+        },
+        "compositions/entry.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\39\\392c6b64ec6fcd991e15754004b0d76f37cd4487d4a1a85cda9c808f65fe9d6c",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\a0\\a0487f30babdae8a6fa5aa40f95b1e37a2b33bf7dccd3608e0d3100cf30e1c14"
+        }
+      }
+    },
+    "88ca58b3-9ba5-435f-b03e-7cc226adf8b7": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792731012232,
+      "endedAt": 1792731012280,
+      "files": {
+        "compositions/crew.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\f3\\f3de440db698d2fcc352a3349c72ca32fa519b484466be94b45b9163f44a06b6",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\c1\\c1721014504d7156885dadff95d5a1722c2331d46a06a274af8488631452d583"
+        },
+        "compositions/entry.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\a0\\a0487f30babdae8a6fa5aa40f95b1e37a2b33bf7dccd3608e0d3100cf30e1c14",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\07\\0713bba750b101a1a234b31a265ea94f3d3bd3504f6d41e830f9a2753a570124"
+        },
+        "compositions/evidence.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\d5\\d5b5a7c67c41c5bc3d68e662038bc2f88af0ade8858f801b546ddfe79b46c059",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\28\\28980b92d118572431518926afe9a9507b2c83140b3ff137fcc1a816a26d1607"
+        },
+        "compositions/finish.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\8e\\8e7dddbab8ba175f2765b0f51c9214b89dc652685f98b4de36d2cb3154d8e787",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\68\\688f236c43cc80b9b04947859e67df4b48f9de9420b9ea52e7147aaf40a9acfb"
+        },
+        "compositions/home.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\ed\\ed8f058de6ff5902666275c08ae5a5c6c54c780db586ab3bb902b8958ddabbf8",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\2d\\2d3319f737b8e59d02ca0dcdf68c78387a6c96691a31d424ef1c6feda9d8449d"
+        },
+        "compositions/picks.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\1a\\1a2ed7a1e996acac6a2f019a45b2aac038439051d1d9ceb30e72cf73ad66c3fa",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\44\\44b84bfc90159e1c85f8346a9fc948c1e8a7ce90834421574825a1f33d765711"
+        },
+        "compositions/pits.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\d4\\d4dbe803bd0495c6bf192521844501f597bbbc104d3851db9e50c7402a80f9f7",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\de\\de50d11f6cc6df7655f005b1ee598850ac7e5c289adc47df72f05415af706696"
+        },
+        "compositions/play.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\61\\6106faf7f527e512325f697ea018394c7c406379072a761556e986a0b5d80c28",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\66\\666e1e06d2230ec36ef7c50bdbd08c3bd56c0cc91bb488c2d6547dff757009d7"
+        },
+        "index.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\be\\be572edc17b4773a4c8e08cd54fea2279b1f255daf00c00aecc79874d2c579f9",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\ce\\ce507bb3b19502437d381376ed3d55ebcfd7ec5e4ed8e2bdcbd74b9d366fa57a"
+        }
+      }
+    },
+    "73ec6948-2aaa-4709-911a-de4a30eebf78": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792731088311,
+      "endedAt": 1792731090332,
+      "files": {
+        "REVIEW.md": {
+          "before": null,
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\d0\\d0668cb045b1eb0ecb7104ff4be365b17ed956a9c1eda4d2b7762be66f240d44"
+        },
+        "SPEC.md": {
+          "before": null,
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\35\\351a5da708bcb21b5fae2971378ac07adff8db7116fa7bdc7df1e2a0341dba2e"
+        }
+      }
+    },
+    "886df907-d491-44b2-8c6f-565515a95e46": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792731193855,
+      "endedAt": 1792731195855,
+      "files": {
+        "REVIEW.md": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\d0\\d0668cb045b1eb0ecb7104ff4be365b17ed956a9c1eda4d2b7762be66f240d44",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\1839d788-709c-4c36-b7d0-4ebc7c25a98f\\blobs\\76\\760dcdb9170fdd80e5c7bf1398bf703351874ac09bd1b98bed4b8c3d80944850"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+      "id": "571db3fb-1427-43c6-bca3-a269bb9dfd4c"
+    },
+    "revisions": {
+      "5b2cf334-f2c1-4e94-9f0f-32234f46b020": [
+        {
+          "id": "571db3fb-1427-43c6-bca3-a269bb9dfd4c",
+          "scope": "project",
+          "report": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\checks\\571db3fb-1427-43c6-bca3-a269bb9dfd4c.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792730975503,
+          "contentHash": "2a59a27979c4f6321d7ed86e2d4bf5646a5b7fce698fe1617464257f74705045",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "id": "fcd7433c-95a2-4f0a-917b-dbe87322283d",
+        "scope": "project",
+        "report": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\checks\\fcd7433c-95a2-4f0a-917b-dbe87322283d.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1792730934731,
+        "contentHash": "ea0a1d09331a0dc2f41cd3c501db4dae113e217aaa1e548f13f1431b244e40a9",
+        "revision": null,
+        "inputFingerprint": "cff5e6d9efaf9560d32fd797d06f7713aba61306e4f7cecef99b9e032e524f6e",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+      "id": "0805772e-c155-4528-acfb-cbbf8deec28b-50"
+    },
+    "revisions": {
+      "5b2cf334-f2c1-4e94-9f0f-32234f46b020": [
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-0",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-01-at-0.3s.png",
+          "time": 0.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "home"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990028,
+          "contentHash": "b980213d8e5ecc72fbefb83b9aaebc93c637b601bb3c637c8c17a3c02abc14fa",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-1",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-02-at-2.5s.png",
+          "time": 2.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "home mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990028,
+          "contentHash": "7b69fb9a56c986df9986ae1f9ffa642d0169605db39fa3e8b9289ec705ab2f7a",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-2",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-03-at-5.3s.png",
+          "time": 5.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "play"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "afe992c2abe2fac7f46e2b5497537a7151c1c8b2f88923d3b7fdcdb837f748dd",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-3",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-04-at-7s.png",
+          "time": 7,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "play mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "cf7352c5f62c267504c2603bf0df5c56d9ae0de20f20473a98f715017a60fdb0",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-4",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-05-at-9.3s.png",
+          "time": 9.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "entry"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "f46b6393e739a4987c173ac19030e60f49ca056483b884e9a54f1d3e15649ac8",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-5",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-06-at-12s.png",
+          "time": 12,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "entry mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "5694faa64992bbe41b1a1927e8da09e8d4399517b98c186db44ff09f33a43125",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-6",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-07-at-15.3s.png",
+          "time": 15.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "crew"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "9eac17ee3acceb5ef376a5c9fc5b988f101858ef0c3dbffbec306d5968b3eefc",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-7",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-08-at-18s.png",
+          "time": 18,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "crew mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990029,
+          "contentHash": "312498bc913d2c62f061f0505956423de21ea155d74cd0c71e10ea7286a20a9b",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-8",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-09-at-21.3s.png",
+          "time": 21.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "pits"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990030,
+          "contentHash": "9166f7c6e21c06ce62b9f9e0669993b73a8ce43aaba5d13cb4abaec81ea8a9dd",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-9",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-10-at-24s.png",
+          "time": 24,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "pits mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990030,
+          "contentHash": "10f8954ddf008c461af0bfe70a0f3ab37eaa09aebfda2127af11fd5a5c44621e",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-10",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-11-at-27.3s.png",
+          "time": 27.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "evidence"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990030,
+          "contentHash": "5b888f097b6e274040fb10f6618e2bc9b6a32b5102dd7d9ca7133c54f258bcee",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-11",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-12-at-30s.png",
+          "time": 30,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "evidence mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990031,
+          "contentHash": "009b8131b68d0dc61748c59a6132c751d1116e5b103e5838619f5b50ab9a3bb8",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-12",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-13-at-33.3s.png",
+          "time": 33.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "picks"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990031,
+          "contentHash": "c9403271f0f4c3c171f8ec3abefbbe1e2d9e86b970c7cb7fb8bce4663e7253b9",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-13",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-14-at-36s.png",
+          "time": 36,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "picks mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990031,
+          "contentHash": "221ece4a39c7223a5e7bdd940ed33403ccbfa824fa30c2bbf506787749802e6a",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-14",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-15-at-39.3s.png",
+          "time": 39.3,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "finish"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990032,
+          "contentHash": "725d7a9635d288c8d99bbc495cc6eada5f5248bc2d6772ceed52aade6380ca0e",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-15",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\beat-16-at-42s.png",
+          "time": 42,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "finish mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990032,
+          "contentHash": "33b4c9a3491e7a9c43ad61c4cf1f7878432fcf95278e797657445e63e7f6e0e3",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-16",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-01-1-at-4.8s.png",
+          "time": 4.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990032,
+          "contentHash": "c19ccdf189545e3033a89beee8cf9f0c6511a91528a7d246486ce2acddc08a0d",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-17",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-01-2-at-4.9s.png",
+          "time": 4.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990033,
+          "contentHash": "5fe4c5ad1e9a65aabbb948ef4a5016f2640f5a3b420bea13f119b6291ea30a7b",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-18",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-01-3-at-5s.png",
+          "time": 5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut home -> play"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990033,
+          "contentHash": "9d3aeae36eb77908616231da16f016cfc8af79d7b030500a1876756f84ecc5ec",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-19",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-01-4-at-5.1s.png",
+          "time": 5.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990034,
+          "contentHash": "d8a709fdda5d4e605e26cdccf6e5939b695578cde2e19e9e7b3fbf1f8cf4af3e",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-20",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-01-5-at-5.2s.png",
+          "time": 5.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990035,
+          "contentHash": "27c31465d703cd461c5e85b1cab64235d5cf38c10a43448ae2d9ab02abe03e8c",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-21",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-02-1-at-8.8s.png",
+          "time": 8.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990035,
+          "contentHash": "ae1e65fa2c493b267d1f09bab5cb455f2abb6b27b3ddb6d5fbed32ce61d8c204",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-22",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-02-2-at-8.9s.png",
+          "time": 8.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990036,
+          "contentHash": "d4da0fe214b92ea093b4eb509c696107c86e05d4c1bbc5e6a244023968dadf1d",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-23",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-02-3-at-9s.png",
+          "time": 9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut play -> entry"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990036,
+          "contentHash": "e8b01a65f92b4f1241d63287194692aad1c916b762c1113dd560b196f4b85f72",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-24",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-02-4-at-9.1s.png",
+          "time": 9.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990037,
+          "contentHash": "4d92938e3e0ffdac359920d2b57297811af97ea1b24342e61d58ae6866b349a7",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-25",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-02-5-at-9.2s.png",
+          "time": 9.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990038,
+          "contentHash": "21009b73a94f8ac49f2e35f81d237671cadd125ef21639cf6853d267903fd490",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-26",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-03-1-at-14.8s.png",
+          "time": 14.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990039,
+          "contentHash": "4c98b51bc20816ada9df3c305bed85b95d1806d0a68f0b33270dd3e0b018a6fa",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-27",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-03-2-at-14.9s.png",
+          "time": 14.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990039,
+          "contentHash": "4c98b51bc20816ada9df3c305bed85b95d1806d0a68f0b33270dd3e0b018a6fa",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-28",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-03-3-at-15s.png",
+          "time": 15,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut entry -> crew"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990040,
+          "contentHash": "999bf82487e90afc1716a370c64c10f0c2dd591c809b441fd703f833cf80dbb9",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-29",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-03-4-at-15.1s.png",
+          "time": 15.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990041,
+          "contentHash": "13705c78ae65559162212e2a34be7a4b9f1c2fc2bc01930dbb30845f738deb2c",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-30",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-03-5-at-15.2s.png",
+          "time": 15.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990042,
+          "contentHash": "a58279ac145b08a2479a96d763cd1e145409b4e01066e99dc5f7d59d9eee3f9e",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-31",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-04-1-at-20.8s.png",
+          "time": 20.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990043,
+          "contentHash": "00c24afa500ade1f9dbeab835dadd1eb39295605820a448215fd751eca85bab7",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-32",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-04-2-at-20.9s.png",
+          "time": 20.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990044,
+          "contentHash": "00c24afa500ade1f9dbeab835dadd1eb39295605820a448215fd751eca85bab7",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-33",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-04-3-at-21s.png",
+          "time": 21,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut crew -> pits"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990045,
+          "contentHash": "803028b9ab222add1fe985f921439133091b41508eb34b35a07f59c61b61d379",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-34",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-04-4-at-21.1s.png",
+          "time": 21.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990045,
+          "contentHash": "475a901a4807f859a41d405818a4e07b71e73cc33673b241e07f40de672f1587",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-35",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-04-5-at-21.2s.png",
+          "time": 21.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990047,
+          "contentHash": "333d25c82255f079cc0b08d288b9b030b72d0b4bda05edacd181ef83f5f98dfa",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-36",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-05-1-at-26.8s.png",
+          "time": 26.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990048,
+          "contentHash": "17a78671054e056a0259579313b9690d9788ad36ff9658566c1a8a0fa94c9549",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-37",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-05-2-at-26.9s.png",
+          "time": 26.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990049,
+          "contentHash": "17a78671054e056a0259579313b9690d9788ad36ff9658566c1a8a0fa94c9549",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-38",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-05-3-at-27s.png",
+          "time": 27,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut pits -> evidence"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990050,
+          "contentHash": "2411290e58849975763abf21d1671798328a9b08e788643bf647b914023462e2",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-39",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-05-4-at-27.1s.png",
+          "time": 27.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990051,
+          "contentHash": "ff27839f273bb051627007067b6681ea36ec0271d958c0cbcda4e016ec656250",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-40",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-05-5-at-27.2s.png",
+          "time": 27.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990052,
+          "contentHash": "37bffbcc2e8656cf59e820ac5a748addbe972b314f70f8db9b81cd3dab331cd1",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-41",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-06-1-at-32.8s.png",
+          "time": 32.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990053,
+          "contentHash": "41de8442eb5ed3b8e7aac1534cc972376a97995cb75492600c180f216729d764",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-42",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-06-2-at-32.9s.png",
+          "time": 32.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990054,
+          "contentHash": "41de8442eb5ed3b8e7aac1534cc972376a97995cb75492600c180f216729d764",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-43",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-06-3-at-33s.png",
+          "time": 33,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut evidence -> picks"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990056,
+          "contentHash": "799a28a0b35059c9a05dea26137923036bac971b81a40c921b7d7ac700cf1c1b",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-44",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-06-4-at-33.1s.png",
+          "time": 33.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990057,
+          "contentHash": "64e42e76f1f89c7730fe88ddfe2be7dcacafa5c65a253767ff38aa513dc0801c",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-45",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-06-5-at-33.2s.png",
+          "time": 33.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990058,
+          "contentHash": "c45b1eb0cca964e57060dac47340fb1d1d0cd6e7f0412e3095e117278dca8e7d",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-46",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-07-1-at-38.8s.png",
+          "time": 38.8,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990061,
+          "contentHash": "9dddfbd2519fad2492db901d90483d20866d2a0984f19552976c125098e7406a",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-47",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-07-2-at-38.9s.png",
+          "time": 38.9,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990063,
+          "contentHash": "9dddfbd2519fad2492db901d90483d20866d2a0984f19552976c125098e7406a",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-48",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-07-3-at-39s.png",
+          "time": 39,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut picks -> finish"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990064,
+          "contentHash": "b6f9910bb75d0c99a8979c927c0100e9342427db0179ab295174e26305d178d0",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-49",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-07-4-at-39.1s.png",
+          "time": 39.1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990065,
+          "contentHash": "aa3fdfe3da573a5120f8e11286e7333e88773950928ec23505a9b5fd7a9a3628",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "0805772e-c155-4528-acfb-cbbf8deec28b-50",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\composition\\.hyperframes\\artifacts\\snapshots\\f0178284-d220-4b3d-8fbc-d08b8b441224\\seam-07-5-at-39.2s.png",
+          "time": 39.2,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792730990067,
+          "contentHash": "9f49b290472b4b768e4cb6bd6fa594114f343500222b8c961273eb0ee7b0435e",
+          "revision": "5b2cf334-f2c1-4e94-9f0f-32234f46b020",
+          "inputFingerprint": "dea41ed813a8104b75e7980da003ba2909691a01967d2d7c5dab32b7f9f47272",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "0f8a3439-0ed5-4faf-a9bd-3644fe518591",
+      "completedAt": 1792731121605,
+      "output": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-044114\\brag.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

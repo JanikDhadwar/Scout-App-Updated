@@ -11,7 +11,7 @@ Choose a topic:
 - [Handoffs and breaks](handoffs-and-breaks.md)
 - [Admin controls](admin-controls.md)
 - [Practice and training](practice-and-training.md)
-- [AI analysis](ai-analysis.md)
+- [Scouting calculations](ai-analysis.md)
 - [Alliance strategy](alliance-strategy.md)
 - [Notes and photos](notes-and-photos.md)
 - [Reminders](reminders.md)

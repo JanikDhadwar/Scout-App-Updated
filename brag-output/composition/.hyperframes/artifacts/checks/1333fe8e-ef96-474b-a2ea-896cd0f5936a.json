@@ -1,0 +1,966 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 5
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 6,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-0\" is 0.01s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.01s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-1\" is 0.01s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.01s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-2\" is 0.01s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.01s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-3\" is 0.18s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.18s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-4\" is 0.01s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.01s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"fx-5\" is 0.18s but its slot (data-duration) is 0.25s — the slot is shortened to the media length when rendered. Set data-duration to ~0.18s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "22",
+          "data-width": "1920",
+          "data-height": "1080"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      }
+    ]
+  },
+  "layout": {
+    "ok": false,
+    "errorCount": 3,
+    "warningCount": 0,
+    "infoCount": 8,
+    "findings": [
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 3.667,
+        "selector": "div.alliance.red-alliance",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 847,
+          "top": 476,
+          "right": 1058.58,
+          "bottom": 509,
+          "width": 211.58,
+          "height": 33
+        },
+        "containerSelector": "p.muted",
+        "text": "Red alliance 101 102 103",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 476,
+          "width": 211.58,
+          "height": 33
+        },
+        "firstSeen": 2.25,
+        "lastSeen": 4.875,
+        "occurrences": 23,
+        "heldMs": 2625,
+        "times": [
+          2.25,
+          2.375,
+          2.5,
+          2.625,
+          2.75,
+          2.875,
+          3,
+          3.125,
+          3.25,
+          3.375,
+          3.5,
+          3.625,
+          3.667,
+          3.75,
+          3.875,
+          4,
+          4.125,
+          4.25,
+          4.375,
+          4.5,
+          4.625,
+          4.75,
+          4.875
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 3.667,
+        "selector": "div.alliance.red-alliance > b:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 847,
+          "top": 436,
+          "right": 995,
+          "bottom": 466,
+          "width": 148,
+          "height": 30
+        },
+        "containerSelector": "#handoff-dialog > h3:nth-of-type(1)",
+        "text": "Red alliance",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 436,
+          "width": 148,
+          "height": 30
+        },
+        "firstSeen": 2.25,
+        "lastSeen": 4.875,
+        "occurrences": 23,
+        "heldMs": 2625,
+        "times": [
+          2.25,
+          2.375,
+          2.5,
+          2.625,
+          2.75,
+          2.875,
+          3,
+          3.125,
+          3.25,
+          3.375,
+          3.5,
+          3.625,
+          3.667,
+          3.75,
+          3.875,
+          4,
+          4.125,
+          4.25,
+          4.375,
+          4.5,
+          4.625,
+          4.75,
+          4.875
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 6.111,
+        "selector": "#scout > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(2)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1598.16,
+          "top": 992,
+          "right": 1808,
+          "bottom": 1025,
+          "width": 209.84,
+          "height": 33
+        },
+        "containerSelector": "div.s2-panel > div:nth-of-type(1)",
+        "text": "Illustrative demo",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 0.63,
+        "dataAttributes": {},
+        "sourceFile": "compositions/scout.html",
+        "bbox": {
+          "x": 1598.16,
+          "y": 992,
+          "width": 209.84,
+          "height": 33
+        },
+        "firstSeen": 6.111,
+        "lastSeen": 8.556,
+        "occurrences": 2,
+        "heldMs": 0,
+        "times": [
+          6.111,
+          8.556
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.alliance.red-alliance",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 847,
+          "top": 476,
+          "right": 1058.58,
+          "bottom": 509,
+          "width": 211.58,
+          "height": 33
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "101 102 103",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 476,
+          "width": 211.58,
+          "height": 33
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.alliance.red-alliance > b:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 847,
+          "top": 436,
+          "right": 995,
+          "bottom": 466,
+          "width": 148,
+          "height": 30
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "Red alliance",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 436,
+          "width": 148,
+          "height": 30
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.alliance.blue-alliance",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1330,
+          "top": 476,
+          "right": 1541.58,
+          "bottom": 509,
+          "width": 211.58,
+          "height": 33
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "104 105 106",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 1330,
+          "y": 476,
+          "width": 211.58,
+          "height": 33
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.alliance.blue-alliance > b:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1330,
+          "top": 436,
+          "right": 1485.02,
+          "bottom": 466,
+          "width": 155.02,
+          "height": 30
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "Blue alliance",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 1330,
+          "y": 436,
+          "width": 155.02,
+          "height": 30
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.team-assignment > strong:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 826,
+          "top": 601.19,
+          "right": 1087.28,
+          "bottom": 643.19,
+          "width": 261.28,
+          "height": 42
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "Your team: 101",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 0.89,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 826,
+          "y": 601.19,
+          "width": 261.28,
+          "height": 42
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 3.667,
+        "selector": "div.team-assignment > span:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1641.36,
+          "top": 605.19,
+          "right": 1748,
+          "bottom": 639.19,
+          "width": 106.64,
+          "height": 34
+        },
+        "containerSelector": "#handoff-dialog",
+        "text": "Handoff",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 1641.36,
+          "y": 605.19,
+          "width": 106.64,
+          "height": 34
+        },
+        "firstSeen": 3.667,
+        "lastSeen": 3.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          3.667
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 6.625,
+        "selector": "#count4",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1629.19,
+          "top": 466,
+          "right": 1666.8,
+          "bottom": 536,
+          "width": 37.61,
+          "height": 70
+        },
+        "containerSelector": "#count5",
+        "text": "4",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/scout.html",
+        "bbox": {
+          "x": 1629.19,
+          "y": 466,
+          "width": 37.61,
+          "height": 70
+        },
+        "firstSeen": 6.625,
+        "lastSeen": 6.625,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          6.625
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 15.375,
+        "selector": "#create-pick",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1333.02,
+          "top": 906,
+          "right": 1658.98,
+          "bottom": 942,
+          "width": 325.96,
+          "height": 36
+        },
+        "containerSelector": "#pick-draft",
+        "text": "Create scoring picklist",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/selection.html",
+        "bbox": {
+          "x": 1333.02,
+          "y": 906,
+          "width": 325.96,
+          "height": 36
+        },
+        "firstSeen": 15.375,
+        "lastSeen": 15.375,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          15.375
+        ]
+      }
+    ],
+    "duration": 22,
+    "samples": [
+      1.222,
+      3.667,
+      6.111,
+      8.556,
+      11,
+      13.444,
+      15.889,
+      18.333,
+      20.778
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 11,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      1.222,
+      6.111,
+      11,
+      15.889,
+      20.778
+    ],
+    "checked": 88,
+    "passed": 88
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 4,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 6 text elements stay under it for 0.5 s or more, the smallest \"Red alliance\" at 25 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Red alliance",
+        "selector": "div.alliance.red-alliance > b:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 861.77,
+          "y": 436,
+          "width": 148,
+          "height": 30
+        },
+        "time": 0.375,
+        "times": [
+          0,
+          0,
+          0.375,
+          0.375,
+          0.375,
+          0.375
+        ],
+        "fontPx": 25,
+        "floorPx": 28,
+        "seconds": 4.5,
+        "elements": [
+          {
+            "selector": "div.alliance.red-alliance > b:nth-of-type(1)",
+            "text": "Red alliance",
+            "fontPx": 25,
+            "time": 0.375,
+            "seconds": 4.5
+          },
+          {
+            "selector": "div.alliance.blue-alliance > b:nth-of-type(1)",
+            "text": "Blue alliance",
+            "fontPx": 25,
+            "time": 0.375,
+            "seconds": 4.5
+          },
+          {
+            "selector": "#match > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FRC scouting, from the stands to selection.",
+            "fontPx": 27,
+            "time": 0,
+            "seconds": 5
+          },
+          {
+            "selector": "#match > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Illustrative demo",
+            "fontPx": 27,
+            "time": 0,
+            "seconds": 5
+          },
+          {
+            "selector": "div.alliance.red-alliance",
+            "text": "101 102 103",
+            "fontPx": 27,
+            "time": 0.375,
+            "seconds": 4.5
+          },
+          {
+            "selector": "div.alliance.blue-alliance",
+            "text": "104 105 106",
+            "fontPx": 27,
+            "time": 0.375,
+            "seconds": 4.5
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"7 / 10\" at 26 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "7 / 10",
+        "selector": "div.s2-panel > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/scout.html",
+        "bbox": {
+          "x": 1691.3,
+          "y": 614,
+          "width": 73.92,
+          "height": 31
+        },
+        "time": 5.25,
+        "times": [
+          5,
+          5,
+          5.25,
+          5.25,
+          5.25,
+          5.25,
+          5.25,
+          8.875,
+          8.875
+        ],
+        "fontPx": 26,
+        "floorPx": 28,
+        "seconds": 5.625,
+        "elements": [
+          {
+            "selector": "div.s2-panel > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "7 / 10",
+            "fontPx": 26,
+            "time": 5.25,
+            "seconds": 5.625
+          },
+          {
+            "selector": "span.chip.success",
+            "text": "Yes",
+            "fontPx": 26,
+            "time": 5.25,
+            "seconds": 5.625
+          },
+          {
+            "selector": "#scout > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FRC scouting, from the stands to selection.",
+            "fontPx": 27,
+            "time": 5,
+            "seconds": 6
+          },
+          {
+            "selector": "#scout > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Illustrative demo",
+            "fontPx": 27,
+            "time": 5,
+            "seconds": 6
+          },
+          {
+            "selector": "div.tabs > span:nth-of-type(1)",
+            "text": "Autonomous",
+            "fontPx": 27,
+            "time": 5.25,
+            "seconds": 5.625
+          },
+          {
+            "selector": "span.chosen",
+            "text": "Teleoperated",
+            "fontPx": 27,
+            "time": 5.25,
+            "seconds": 5.625
+          },
+          {
+            "selector": "div.tabs > span:nth-of-type(3)",
+            "text": "Endgame",
+            "fontPx": 27,
+            "time": 5.25,
+            "seconds": 5.625
+          },
+          {
+            "selector": "#device-state",
+            "text": "✓ Saved on device",
+            "fontPx": 27,
+            "time": 8.875,
+            "seconds": 2
+          },
+          {
+            "selector": "#device-state > span:nth-of-type(1)",
+            "text": "· Queued for sync",
+            "fontPx": 27,
+            "time": 8.875,
+            "seconds": 2
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 10 text elements stay under it for 0.5 s or more, the smallest \"6 source reports\" at 26 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "6 source reports",
+        "selector": "#rank-one > td:nth-of-type(4)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/selection.html",
+        "bbox": {
+          "x": 1366.14,
+          "y": 599,
+          "width": 203.08,
+          "height": 31
+        },
+        "time": 11.625,
+        "times": [
+          11,
+          11,
+          11.25,
+          11.25,
+          11.25,
+          11.25,
+          11.25,
+          11.625,
+          12.75,
+          13.75
+        ],
+        "fontPx": 26,
+        "floorPx": 28,
+        "seconds": 5.75,
+        "elements": [
+          {
+            "selector": "#rank-one > td:nth-of-type(4)",
+            "text": "6 source reports",
+            "fontPx": 26,
+            "time": 11.625,
+            "seconds": 5.75
+          },
+          {
+            "selector": "#rank-two > td:nth-of-type(4)",
+            "text": "5 source reports",
+            "fontPx": 26,
+            "time": 12.75,
+            "seconds": 4.625
+          },
+          {
+            "selector": "#rank-three > td:nth-of-type(4)",
+            "text": "4 source reports",
+            "fontPx": 26,
+            "time": 13.75,
+            "seconds": 3.625
+          },
+          {
+            "selector": "#selection > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FRC scouting, from the stands to selection.",
+            "fontPx": 27,
+            "time": 11,
+            "seconds": 6.5
+          },
+          {
+            "selector": "#selection > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Illustrative demo",
+            "fontPx": 27,
+            "time": 11,
+            "seconds": 6.5
+          },
+          {
+            "selector": "table.selection-table > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(1)",
+            "text": "Team",
+            "fontPx": 27,
+            "time": 11.25,
+            "seconds": 6.125
+          },
+          {
+            "selector": "table.selection-table > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(2)",
+            "text": "Relative score / 100",
+            "fontPx": 27,
+            "time": 11.25,
+            "seconds": 6.125
+          },
+          {
+            "selector": "table.selection-table > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(3)",
+            "text": "Linked matches",
+            "fontPx": 27,
+            "time": 11.25,
+            "seconds": 6.125
+          },
+          {
+            "selector": "table.selection-table > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(4)",
+            "text": "Evidence",
+            "fontPx": 27,
+            "time": 11.25,
+            "seconds": 6.125
+          },
+          {
+            "selector": "div.sheet-bottom > p:nth-of-type(1)",
+            "text": "Configured fields. Visible sources.Missing evidence stays unranked.",
+            "fontPx": 27,
+            "time": 11.25,
+            "seconds": 6.125
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 5 text elements stay under it for 0.5 s or more, the smallest \"FRC scouting, from the stands to sele...\" at 27 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "FRC scouting, from the stands to selection.",
+        "selector": "#outro > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/outro.html",
+        "bbox": {
+          "x": 112,
+          "y": 992,
+          "width": 545.94,
+          "height": 33
+        },
+        "time": 17.5,
+        "times": [
+          17.5,
+          17.5,
+          18.125,
+          18.125,
+          18.125
+        ],
+        "fontPx": 27,
+        "floorPx": 28,
+        "seconds": 4.5,
+        "elements": [
+          {
+            "selector": "#outro > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FRC scouting, from the stands to selection.",
+            "fontPx": 27,
+            "time": 17.5,
+            "seconds": 4.5
+          },
+          {
+            "selector": "#outro > div:nth-of-type(1) > div:nth-of-type(1) > footer:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Illustrative demo",
+            "fontPx": 27,
+            "time": 17.5,
+            "seconds": 4.5
+          },
+          {
+            "selector": "div.s4-proof > div:nth-of-type(1) > small:nth-of-type(1)",
+            "text": "Match 43 · Team 101",
+            "fontPx": 27,
+            "time": 18.125,
+            "seconds": 3.875
+          },
+          {
+            "selector": "div.s4-proof > div:nth-of-type(2) > small:nth-of-type(1)",
+            "text": "Match report",
+            "fontPx": 27,
+            "time": 18.125,
+            "seconds": 3.875
+          },
+          {
+            "selector": "div.s4-proof > div:nth-of-type(3) > small:nth-of-type(1)",
+            "text": "Alliance selection",
+            "fontPx": 27,
+            "time": 18.125,
+            "seconds": 3.875
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 176
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

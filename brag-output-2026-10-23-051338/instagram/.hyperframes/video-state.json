@@ -1,0 +1,3100 @@
+{
+  "version": 1,
+  "historyId": "54ad55f9-4051-4977-9f05-7b82c9067313",
+  "currentRevision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+  "pendingChanges": false,
+  "files": {
+    "assets/click.ogg": {
+      "hash": "2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\2f\\2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292"
+    },
+    "assets/edits/admin.mp4": {
+      "hash": "cfa22db9505c3eb5c0ba80194e4f0a3c4bd65e827ae83420275dc8350eb45372",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\cf\\cfa22db9505c3eb5c0ba80194e4f0a3c4bd65e827ae83420275dc8350eb45372"
+    },
+    "assets/edits/analyst.mp4": {
+      "hash": "90deebaed54a9a3cf0dcaab33fee4214c99ec5393f849adc89b7330510b3ae19",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\90\\90deebaed54a9a3cf0dcaab33fee4214c99ec5393f849adc89b7330510b3ae19"
+    },
+    "assets/edits/analytics.mp4": {
+      "hash": "3558d37c68b4e5309585b93d5f04ff5b3095e9232113e2ef0be6b6e1797be6c9",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\35\\3558d37c68b4e5309585b93d5f04ff5b3095e9232113e2ef0be6b6e1797be6c9"
+    },
+    "assets/edits/compare.mp4": {
+      "hash": "6b442711c9fc9db89a781f54882e4e456fa064ea6634703fb9f353a1c3534f28",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\6b\\6b442711c9fc9db89a781f54882e4e456fa064ea6634703fb9f353a1c3534f28"
+    },
+    "assets/edits/display-full.mp4": {
+      "hash": "f91949d54e667fd997ef43abd09d725dba0c60daac6de40e2a8360196b3b45ff",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\f9\\f91949d54e667fd997ef43abd09d725dba0c60daac6de40e2a8360196b3b45ff"
+    },
+    "assets/edits/display.mp4": {
+      "hash": "5300c4332303198d252b39d7ab70e7fee203e16437c50ce79d63ac153a782d7e",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\53\\5300c4332303198d252b39d7ab70e7fee203e16437c50ce79d63ac153a782d7e"
+    },
+    "assets/edits/forms.mp4": {
+      "hash": "f9d899bba4d2349edafa2110e273f9559847e2764a315039b023c8c3f500ffcf",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\f9\\f9d899bba4d2349edafa2110e273f9559847e2764a315039b023c8c3f500ffcf"
+    },
+    "assets/edits/handoff.mp4": {
+      "hash": "f213a18357a5f886417ac47f373264fe5fdd2cc7656180f64e9e66d029a42653",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\f2\\f213a18357a5f886417ac47f373264fe5fdd2cc7656180f64e9e66d029a42653"
+    },
+    "assets/edits/match.mp4": {
+      "hash": "24bbb2f2e385c01d78f7825792be85974b935d21cda202ddd66525c2552f9e72",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\24\\24bbb2f2e385c01d78f7825792be85974b935d21cda202ddd66525c2552f9e72"
+    },
+    "assets/edits/members.mp4": {
+      "hash": "b2fd51b44c8b0936efa187eff9d867ab9342193405c629f74286a1caa84cc6ff",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\b2\\b2fd51b44c8b0936efa187eff9d867ab9342193405c629f74286a1caa84cc6ff"
+    },
+    "assets/edits/offline.mp4": {
+      "hash": "2700a870b870d35a40e0bf114adb6229b8ab34693ec8a991940fdcae672a9da0",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\27\\2700a870b870d35a40e0bf114adb6229b8ab34693ec8a991940fdcae672a9da0"
+    },
+    "assets/edits/picklist.mp4": {
+      "hash": "19a47d83d515b1a53ef1a97b5cf9eadf256d2f0ed6713a9af095b9b41b747ee2",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\19\\19a47d83d515b1a53ef1a97b5cf9eadf256d2f0ed6713a9af095b9b41b747ee2"
+    },
+    "assets/edits/pit.mp4": {
+      "hash": "c41899b0613852db64f60a5e0290ed3fd95625a22efe598d6c4b22bcb2d111a1",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\c4\\c41899b0613852db64f60a5e0290ed3fd95625a22efe598d6c4b22bcb2d111a1"
+    },
+    "assets/edits/present.mp4": {
+      "hash": "e62a5dda86b9b5a732d827115f9c4b58f3186345f720395255162631e276677f",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\e6\\e62a5dda86b9b5a732d827115f9c4b58f3186345f720395255162631e276677f"
+    },
+    "assets/edits/search.mp4": {
+      "hash": "44427e58dd8ef0b50b38e7aeb42c90a649409bd34caa3056c6815193ae2f59d6",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\44\\44427e58dd8ef0b50b38e7aeb42c90a649409bd34caa3056c6815193ae2f59d6"
+    },
+    "assets/gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\c1\\c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "assets/screens/home-laptop.png": {
+      "hash": "40334b28de207cc0b4839048841a8965fae1473c9981cc17e24b58859dcf5677",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\40\\40334b28de207cc0b4839048841a8965fae1473c9981cc17e24b58859dcf5677"
+    },
+    "assets/screens/home-phone.png": {
+      "hash": "813ceb66239f0186ac667c1d857c65e59d26a03af3e6e89a10a3636883f7a6ed",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\81\\813ceb66239f0186ac667c1d857c65e59d26a03af3e6e89a10a3636883f7a6ed"
+    },
+    "assets/screens/home-tablet.png": {
+      "hash": "96ef49fd40a3354a7cdaf81c1283dfe44fae0591bed89266bacc6022b210c0a6",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\96\\96ef49fd40a3354a7cdaf81c1283dfe44fae0591bed89266bacc6022b210c0a6"
+    },
+    "assets/soft.ogg": {
+      "hash": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\76\\7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf"
+    },
+    "assets/style.css": {
+      "hash": "698d6c9c32d4e67d44692514ff5609773f74c668df6006c88a5124c8325d2b4c",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\69\\698d6c9c32d4e67d44692514ff5609773f74c668df6006c88a5124c8325d2b4c"
+    },
+    "compositions/admin.html": {
+      "hash": "e000930d157348dac8e496daa8ebe9ec7e36364d2aaed38f329656349bf43984",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\e0\\e000930d157348dac8e496daa8ebe9ec7e36364d2aaed38f329656349bf43984"
+    },
+    "compositions/analyst.html": {
+      "hash": "361226c0803ebb8d2b31034c269ef90a0ae71190054fcb43cb3bfcfcd3d8a75c",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\36\\361226c0803ebb8d2b31034c269ef90a0ae71190054fcb43cb3bfcfcd3d8a75c"
+    },
+    "compositions/analytics.html": {
+      "hash": "1b6d27a88ea33c0c4c5206a631659404655e1d4e3ced62ace576e4dc81c79d52",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\1b\\1b6d27a88ea33c0c4c5206a631659404655e1d4e3ced62ace576e4dc81c79d52"
+    },
+    "compositions/compare.html": {
+      "hash": "79c95c812b5ee518ba66015ee15a0502fbee9c8c0eb3867d9edf74dfb9df2fe8",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\79\\79c95c812b5ee518ba66015ee15a0502fbee9c8c0eb3867d9edf74dfb9df2fe8"
+    },
+    "compositions/display-full.html": {
+      "hash": "fd2540d5fd90bbd73d5b50b77176b758c9e024600beb93b48fffdfa12b70e275",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\fd\\fd2540d5fd90bbd73d5b50b77176b758c9e024600beb93b48fffdfa12b70e275"
+    },
+    "compositions/display.html": {
+      "hash": "55ccddb477df7ef314368e0df0a77c9fedf940e5a4c1ac4e2c86d85b9613fab2",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\55\\55ccddb477df7ef314368e0df0a77c9fedf940e5a4c1ac4e2c86d85b9613fab2"
+    },
+    "compositions/finish.html": {
+      "hash": "e8003c0ab87ff2a9525372da5fb98f311684e5a1a102cf428ec07b673f4244d2",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\e8\\e8003c0ab87ff2a9525372da5fb98f311684e5a1a102cf428ec07b673f4244d2"
+    },
+    "compositions/forms.html": {
+      "hash": "62804a1202a2f7022eb9807b8ab13faa4cbf2045035bc0bdb3b2587fe3855f28",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\62\\62804a1202a2f7022eb9807b8ab13faa4cbf2045035bc0bdb3b2587fe3855f28"
+    },
+    "compositions/handoff.html": {
+      "hash": "299b8b0738cfcb0ec65a1759c09ec08605ea1f5cca0dbcc2544383bf24193258",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\29\\299b8b0738cfcb0ec65a1759c09ec08605ea1f5cca0dbcc2544383bf24193258"
+    },
+    "compositions/intro.html": {
+      "hash": "69b5b97b58f4bdc0ebe2d15e676558c4a4f18993ff78e78c130ce311d63b9b8b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\69\\69b5b97b58f4bdc0ebe2d15e676558c4a4f18993ff78e78c130ce311d63b9b8b"
+    },
+    "compositions/match.html": {
+      "hash": "72cb7e6324eb5fb4ff4266a56b123d8cf3dc1016a459632d6ab16c75b56100ea",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\72\\72cb7e6324eb5fb4ff4266a56b123d8cf3dc1016a459632d6ab16c75b56100ea"
+    },
+    "compositions/members.html": {
+      "hash": "927a8b6c2afed7ed26f5be4d406bbe7664fa87e67abbc2de4a865b6a71a4a5bc",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\92\\927a8b6c2afed7ed26f5be4d406bbe7664fa87e67abbc2de4a865b6a71a4a5bc"
+    },
+    "compositions/offline.html": {
+      "hash": "6fbdefd1c5bef64be47da28a918fa74acbd7252efd6468209a470b92086e9692",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\6f\\6fbdefd1c5bef64be47da28a918fa74acbd7252efd6468209a470b92086e9692"
+    },
+    "compositions/picklist.html": {
+      "hash": "cb9f57a136a0e24e2f186618616f386236a6e9121be1c6284114f4f6a5532263",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\cb\\cb9f57a136a0e24e2f186618616f386236a6e9121be1c6284114f4f6a5532263"
+    },
+    "compositions/pit.html": {
+      "hash": "979a40d7b242a256238ce300ee72fa909e6b154446f9cba540aa9fc25db6cd81",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\97\\979a40d7b242a256238ce300ee72fa909e6b154446f9cba540aa9fc25db6cd81"
+    },
+    "compositions/present.html": {
+      "hash": "84d6d62c0f834e5ea61e747a2256bf138fc33c9d834e2c4b1ac7478eea02f300",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\84\\84d6d62c0f834e5ea61e747a2256bf138fc33c9d834e2c4b1ac7478eea02f300"
+    },
+    "compositions/robot.html": {
+      "hash": "b1db5d0297bc05ce2f179a70e3e7292784d63219db76940210ff3225088812ba",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\b1\\b1db5d0297bc05ce2f179a70e3e7292784d63219db76940210ff3225088812ba"
+    },
+    "compositions/search.html": {
+      "hash": "7219229eb6c4aafcc73d891dabdc80680ed6f3b67fabcc5c173408f86bcfcce2",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\72\\7219229eb6c4aafcc73d891dabdc80680ed6f3b67fabcc5c173408f86bcfcce2"
+    },
+    "hyperframes.json": {
+      "hash": "53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\53\\53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50"
+    },
+    "index.html": {
+      "hash": "ca174ca19d4751380a416cfc181ec27c54077dcf9710b82c36ddfbc83e73df39",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\ca\\ca174ca19d4751380a416cfc181ec27c54077dcf9710b82c36ddfbc83e73df39"
+    },
+    "package.json": {
+      "hash": "93e0a0f0aa43e181a4d5f81405d1aeeae0d69edf28b45e50a299b26b2fc6fd1b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\93\\93e0a0f0aa43e181a4d5f81405d1aeeae0d69edf28b45e50a299b26b2fc6fd1b"
+    },
+    "assets/6390-rebuilt.mp4": {
+      "hash": "0407d3109ba0794b32594bc7129e6ae10a38adbbd87b585cb92a955d7f25f82f",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\04\\0407d3109ba0794b32594bc7129e6ae10a38adbbd87b585cb92a955d7f25f82f"
+    },
+    "assets/original-score.wav": {
+      "hash": "d2a66969764eb225081a00fd6b87aa0ab81c915114ee05030f4951fe93391c3b",
+      "content": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\d2\\d2a66969764eb225081a00fd6b87aa0ab81c915114ee05030f4951fe93391c3b"
+    }
+  },
+  "revisions": {
+    "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792733523349,
+      "endedAt": 1792733523449,
+      "files": {
+        "assets/style.css": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\9e\\9e62b6f1959efc9a105722c8a39c8632cc5790129adc38d0ab2122e5fca0b11f",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\69\\698d6c9c32d4e67d44692514ff5609773f74c668df6006c88a5124c8325d2b4c"
+        },
+        "compositions/forms.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\46\\46ff9cda77326494827571eeef0894379b54377f946d57693c9f167e49a6ca62",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\62\\62804a1202a2f7022eb9807b8ab13faa4cbf2045035bc0bdb3b2587fe3855f28"
+        },
+        "compositions/handoff.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\e4\\e4bb2276b05a26b5d2964e1ce53b6b5089e705d399ca5e3013484f8a1354d0f0",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\29\\299b8b0738cfcb0ec65a1759c09ec08605ea1f5cca0dbcc2544383bf24193258"
+        },
+        "compositions/intro.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\e5\\e5307ff47c816e473529e8fd7396e4677f37a5ba7ff167700e4fe4c63bebb6df",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\69\\69b5b97b58f4bdc0ebe2d15e676558c4a4f18993ff78e78c130ce311d63b9b8b"
+        },
+        "compositions/pit.html": {
+          "before": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\98\\988c26853326c6284e5f1d32c686016b093def36c046f88bec017b7b1adb97bd",
+          "after": "C:\\Users\\Janik\\.cache\\hyperframes\\history\\54ad55f9-4051-4977-9f05-7b82c9067313\\blobs\\97\\979a40d7b242a256238ce300ee72fa909e6b154446f9cba540aa9fc25db6cd81"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "25816fbe-23de-4446-ba55-7d1a646021ac"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "25816fbe-23de-4446-ba55-7d1a646021ac",
+        "scope": "project",
+        "report": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\checks\\25816fbe-23de-4446-ba55-7d1a646021ac.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1792733455113,
+        "contentHash": "3bf2ddedb80cf62baff293d5f3873fce765f13acaee677189a936cfb650a47c9",
+        "revision": null,
+        "inputFingerprint": "c7c84fc12d78daea5e5b5aba151cc146d9f2a7a3ba6f675f1b49a5d7e95d91b7",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+      "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-117"
+    },
+    "revisions": {
+      "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa": [
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-0",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-01-at-0.3s.png",
+          "time": 0.3,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "intro"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570375,
+          "contentHash": "e1800af7a9065665dcf8caa7ad084ecd320279ad62082e7cc6e00fbeae1afe47",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-1",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-02-at-2.188s.png",
+          "time": 2.188,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "intro mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570375,
+          "contentHash": "3c8e271efa81c396c7144716cfcfb2407615d8e83f0eaa0982ab06ab8c9a7136",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-2",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-03-at-4.675s.png",
+          "time": 4.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "robot"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570375,
+          "contentHash": "f6121aa45f4e8b8cfda7d1d275f2d4ef4f1ca4df1dc520c5cca079550dac8e86",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-3",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-04-at-6.375s.png",
+          "time": 6.375,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "robot mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570375,
+          "contentHash": "18af135f0c87976e67417a7caf8acb1fa3ac70dcad49ed8e570385dc806a1b41",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-4",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-05-at-8.675s.png",
+          "time": 8.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "match"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570376,
+          "contentHash": "513e2b0ceb76d34f956d2f99b21e7f147de48597f33a21172166fc39f6865aa8",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-5",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-06-at-12.125s.png",
+          "time": 12.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "match mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570376,
+          "contentHash": "9f25bffe42f5db191126b99c9432eca28af7628800be363f1896b7d4c10e63c5",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-6",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-07-at-16.175s.png",
+          "time": 16.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "offline"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570376,
+          "contentHash": "d8a6666128da29626d86924d0ec5c688c392495f5e287c155142d0a76aeb85a1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-7",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-08-at-17s.png",
+          "time": 17,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "offline mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570377,
+          "contentHash": "6d2943903a0ac0dac903f8d6eccdfb65220440f0521e4811b5967cdfa2b6791a",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-8",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-09-at-18.425s.png",
+          "time": 18.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "admin"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570377,
+          "contentHash": "900b2cc5fc7de8a6a2fbacbe4258ccab95b9054017b22f54210214f3a91d6890",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-9",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-10-at-21.875s.png",
+          "time": 21.875,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "admin mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570378,
+          "contentHash": "a769d9116059666a83cef6045f576f25af7a8ffeb899ed2f674225d635dc6fae",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-10",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-11-at-25.925s.png",
+          "time": 25.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "members"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570378,
+          "contentHash": "89529b32e5e2a7118ffc2808127d70de514d88cda86229bb92c571d3e61ca240",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-11",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-12-at-27.175s.png",
+          "time": 27.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "display"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570379,
+          "contentHash": "1a6beebf4fb6ccb5f5762b6b5856e2d6f63441cc6634a814733347c61e697836",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-12",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-13-at-30s.png",
+          "time": 30,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "display mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570379,
+          "contentHash": "60b6c41ae6b641c639775922dcbf6d8b661ee65871daab52d1daa4b4c4c97eb7",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-13",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-14-at-33.425s.png",
+          "time": 33.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "display-full"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570380,
+          "contentHash": "21020e4d44c49c1b7003a9b638e0a60ed45a7956e8ddc3b4ac1f901f9222069e",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-14",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-15-at-34.063s.png",
+          "time": 34.063,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "display-full mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570380,
+          "contentHash": "81c0659db9ecf6d959eaf817942de11c0e3424daca3fe4f1809e7014c9e89e72",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-15",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-16-at-35.3s.png",
+          "time": 35.3,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "analytics"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570381,
+          "contentHash": "d5d385a1b6e047e411e5b12039b4ca3bf37f63d34fa1d17fc9177d1f6c0bbdde",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-16",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-17-at-36.563s.png",
+          "time": 36.563,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "analytics mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570382,
+          "contentHash": "a7b45ccd1ccb0fcf8ca978e906f11b9a8e5e7ba27e10501580c94a05127df1ff",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-17",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-18-at-38.425s.png",
+          "time": 38.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "compare"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570383,
+          "contentHash": "5d6f56bb98c2c57cafd32610e92eac5058ab08bee13a818041619007a4f65d6c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-18",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-19-at-39.375s.png",
+          "time": 39.375,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "compare mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570383,
+          "contentHash": "e42336fe4823ada11277013a7f8fdf3b7ed1c3edf4227ba7a2357b1e0fe7ff89",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-19",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-20-at-40.925s.png",
+          "time": 40.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "analyst"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570384,
+          "contentHash": "94752859352eed5c0228dc6c5bc4eeab0c9848392e31953ed646b7f894427fd0",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-20",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-21-at-41.875s.png",
+          "time": 41.875,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "analyst mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570385,
+          "contentHash": "7dbf7d3a49487d73849ed93d2d289b93547c46da2ff0e44ada2015bde3957d61",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-21",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-22-at-43.425s.png",
+          "time": 43.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "search"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570386,
+          "contentHash": "09ae435b744eed0aeb28606eed67d72597eb943b09e1d823c494040d6fd78050",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-22",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-23-at-44.063s.png",
+          "time": 44.063,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "search mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570387,
+          "contentHash": "0fb893acb639adb40f8bdd6273f521f7dad09b971e4ae447b27f1fc072f19949",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-23",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-24-at-45.3s.png",
+          "time": 45.3,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "handoff"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570388,
+          "contentHash": "7d79f985ff6a43c291c3195e7d247b914517213e3b7c12f53171cb379b5c730b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-24",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-25-at-45.938s.png",
+          "time": 45.938,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "handoff mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570389,
+          "contentHash": "049b722d5b6156a14c16efa5698fb247d963c0bdb8330213ee8e32aeec1de89e",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-25",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-26-at-47.175s.png",
+          "time": 47.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "pit"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570391,
+          "contentHash": "0aacaa2fb56748509d82571617dc661f85c0756460e684299a74fd234d67edfa",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-26",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-27-at-48.425s.png",
+          "time": 48.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "forms"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570392,
+          "contentHash": "f7e8ba5bcec15c9a9c535d40cb49d3411695498c2eed37920a3540d1d7cab443",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-27",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-28-at-49.675s.png",
+          "time": 49.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "picklist"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570393,
+          "contentHash": "9dbed19a2a4c76eb9a3b8ef4ae628b24a1544976acf586d046668a4883bcb93b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-28",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-29-at-50.313s.png",
+          "time": 50.313,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "picklist mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570395,
+          "contentHash": "e231488572ee703e356a2411de88418e8eaae1fc05081e80dd38627dda88f4ac",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-29",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-30-at-51.55s.png",
+          "time": 51.55,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "present"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570396,
+          "contentHash": "9c653d24b60136ee51743c10bf144193683350f597a5116316515864ca1ede28",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-30",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-31-at-52.188s.png",
+          "time": 52.188,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "present mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570398,
+          "contentHash": "056f95c115b08613e773b445572752d52754cb10b6e648bc7cc435a16ee8a693",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-31",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-32-at-53.425s.png",
+          "time": 53.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "finish"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570399,
+          "contentHash": "3bf3bb0ea0f08de499f7aa77b5be0d1e30f5cea13e022482ef396a7421a6a15a",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-32",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\beat-33-at-55.063s.png",
+          "time": 55.063,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "beat",
+              "label": "finish mid"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570401,
+          "contentHash": "624b8a8c36704493409bd4844b828f6f31e3609e36ee5d1e03d717aea193922d",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-33",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-01-1-at-4.175s.png",
+          "time": 4.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570403,
+          "contentHash": "12d94737fa088d71d76ad3db64dba27e392afd329e9d48b824102283eca605ac",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-34",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-01-2-at-4.275s.png",
+          "time": 4.275,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570404,
+          "contentHash": "12d94737fa088d71d76ad3db64dba27e392afd329e9d48b824102283eca605ac",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-35",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-01-3-at-4.375s.png",
+          "time": 4.375,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut intro -> robot"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570406,
+          "contentHash": "07f84e5201ed71a007557cddcb1387090818af84a708270a891a15da39b7c206",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-36",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-01-4-at-4.475s.png",
+          "time": 4.475,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570408,
+          "contentHash": "0a7376ea10a6a181ae9c05aa5d9a98d8ca41b67b3f68279f0b9aa6806a54d245",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-37",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-01-5-at-4.575s.png",
+          "time": 4.575,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570409,
+          "contentHash": "e78ba97a5eafcc58bbbc7339cc8c6515cd319e971d4a8f520b00ae6288d423b3",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-38",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-02-1-at-8.175s.png",
+          "time": 8.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570412,
+          "contentHash": "a719413ae7079a38dca730c6fd4886feae43bb76e748ade6be9eea9015e6cb6b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-39",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-02-2-at-8.275s.png",
+          "time": 8.275,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570414,
+          "contentHash": "21c08782fb5b39c97cf35fdefb1bcb2cde53a197826bc75826bdcbe76d5d1f52",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-40",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-02-3-at-8.375s.png",
+          "time": 8.375,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut robot -> match"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570416,
+          "contentHash": "777c5e6f042cbd6d0d30e626984db06eddcedb3703009240c1ca40dd75830a58",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-41",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-02-4-at-8.475s.png",
+          "time": 8.475,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570418,
+          "contentHash": "98b87f9291b506a3ce0c414e13c76172e397a10d006eb7edaa3ef8b5e2bd4ab6",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-42",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-02-5-at-8.575s.png",
+          "time": 8.575,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570420,
+          "contentHash": "1bf3863b098ff6ded5d2b327725252794499bc5aeb573becbca913c74b2500e2",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-43",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-03-1-at-15.675s.png",
+          "time": 15.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570421,
+          "contentHash": "2032e3496ac676c9109f22cd4b4b7edb17078423433f93491d588650d36c6154",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-44",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-03-2-at-15.775s.png",
+          "time": 15.775,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570423,
+          "contentHash": "86f39f9456b5a9a1bc50e1bde39e6b04318b0484b7336a84f16a62e5c96bed3c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-45",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-03-3-at-15.875s.png",
+          "time": 15.875,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut match -> offline"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570426,
+          "contentHash": "18e47d032d9a163910e5dc3ddb544b6a80bf8240860734a00ce858bc17c1594c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-46",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-03-4-at-15.975s.png",
+          "time": 15.975,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570428,
+          "contentHash": "91d53ae4bf0b0063e86003e2f2e835754d43b374fff603dc68f7a109d74b753c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-47",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-03-5-at-16.075s.png",
+          "time": 16.075,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570429,
+          "contentHash": "d18a7deb456bd193802d84cdc4e74fb2782957c9afecd8ec0f07b4ed7dd476fc",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-48",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-04-1-at-17.925s.png",
+          "time": 17.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570432,
+          "contentHash": "7f9ae0a8c03252d088e7d95c65c4984e07f511a42ea90d0af3f70c2c5b7d96ed",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-49",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-04-2-at-18.025s.png",
+          "time": 18.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570434,
+          "contentHash": "060a661a57121d62d4ae435e8590888837579a257cf1239c8d57a4c48667e67c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-50",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-04-3-at-18.125s.png",
+          "time": 18.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut offline -> admin"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570437,
+          "contentHash": "2f70f743946c4bf5337ab49ed3be2493d934eb33fdfb1aaa8277f12925461e07",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-51",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-04-4-at-18.225s.png",
+          "time": 18.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570440,
+          "contentHash": "5cc9700c52b787b91053198c62a9637f088798daa925fc54991f1b71e547b8b4",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-52",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-04-5-at-18.325s.png",
+          "time": 18.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570442,
+          "contentHash": "9e271cf50ae2efbd04f1df3a044f067c11a19b3c18cbc1e976bab93fc4f190ba",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-53",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-05-1-at-25.425s.png",
+          "time": 25.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570444,
+          "contentHash": "6584f5bdfc67b57974540be1c10180707581f49a08c04513e754dfebe49ac8b1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-54",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-05-2-at-25.525s.png",
+          "time": 25.525,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570447,
+          "contentHash": "b5d91886a92249248758b86401ed28609c382329f2f8ca7351c077bf23cac662",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-55",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-05-3-at-25.625s.png",
+          "time": 25.625,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut admin -> members"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570450,
+          "contentHash": "fdf18a535fc5a9f5c0e72cc1aa0f693e9a849f173c40ee5cf78477754c914a67",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-56",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-05-4-at-25.725s.png",
+          "time": 25.725,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570452,
+          "contentHash": "5731337916b510d8255d5bd5c3d8cc23ea838149eb81a041e4d11b2a71cad681",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-57",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-05-5-at-25.825s.png",
+          "time": 25.825,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570455,
+          "contentHash": "39ca6760a8ee7d761d930af2124c46927d6af0be55f326f484991fcc5c0dccd5",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-58",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-06-1-at-26.675s.png",
+          "time": 26.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570458,
+          "contentHash": "4c2b927d885ccbc36a5eac18365579261cf34abfa584b1c4cad3146dc081985c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-59",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-06-2-at-26.775s.png",
+          "time": 26.775,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570460,
+          "contentHash": "77fe88e4c52830c39883303ca5c9a83641ea98d95ec9d4bd8d9cec60a88ae769",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-60",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-06-3-at-26.875s.png",
+          "time": 26.875,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut members -> display"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570463,
+          "contentHash": "d2b25e197dab4c7a7553b4e3d524327d16764241062ae08cef56f25b294e29b7",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-61",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-06-4-at-26.975s.png",
+          "time": 26.975,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570465,
+          "contentHash": "9bef0d4aa50c0e96dc0207a46770074d377abb8369ae8981bf1d55ad1942acc8",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-62",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-06-5-at-27.075s.png",
+          "time": 27.075,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570468,
+          "contentHash": "82575abec7fcb9ceda3239cd3d1c573f76d3aac1b7f343ea78ddbbd9b169085d",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-63",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-07-1-at-32.925s.png",
+          "time": 32.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570472,
+          "contentHash": "726bd4cd1bb9153535ed9e0d8c6ae8ccf79d08453fb8fd5e6f58611aae7a3c0b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-64",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-07-2-at-33.025s.png",
+          "time": 33.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570478,
+          "contentHash": "726bd4cd1bb9153535ed9e0d8c6ae8ccf79d08453fb8fd5e6f58611aae7a3c0b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-65",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-07-3-at-33.125s.png",
+          "time": 33.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut display -> display-full"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570483,
+          "contentHash": "2ad0bc8ec3cbf7411c56026f1a06b6aa072bb9652925c9dd5b66cf3da01750c1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-66",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-07-4-at-33.225s.png",
+          "time": 33.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570489,
+          "contentHash": "aae7c5cc562ec41858d1cf37e0e55adc7ba2a99e64f16cc4e1319a315be28ebd",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-67",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-07-5-at-33.325s.png",
+          "time": 33.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570493,
+          "contentHash": "23287c0d7a3598129162f44c47f0b4e12cbc1010ac907b47299d0edfd48c9e59",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-68",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-08-1-at-34.8s.png",
+          "time": 34.8,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570501,
+          "contentHash": "1bdaddd5544d1804b015e56a4c719f1ccc511879014f859831a1ed55711dac84",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-69",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-08-2-at-34.9s.png",
+          "time": 34.9,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570505,
+          "contentHash": "de52c45eafab754c37842c3f058c4b920a0feb1d7d61234501504b89c2ad4340",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-70",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-08-3-at-35s.png",
+          "time": 35,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut display-full -> analytics"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570508,
+          "contentHash": "8ef00bb6cfac9d49a802d1eb056c895bef8f1273ed65e6091b3ec3df29af6832",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-71",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-08-4-at-35.1s.png",
+          "time": 35.1,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570513,
+          "contentHash": "d596da3c40863e85766bacc1506fd71fb81972f19aa53d3cda3d12d093d3a41b",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-72",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-08-5-at-35.2s.png",
+          "time": 35.2,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570517,
+          "contentHash": "b1d760bc41e57c222f039a8281c67c50c8b94d0778772e35ee5389904deef836",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-73",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-09-1-at-37.925s.png",
+          "time": 37.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570521,
+          "contentHash": "c758ad8a06609a0105bb111ea2ace77386073f3265acb78a1bbeaf053650adbb",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-74",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-09-2-at-38.025s.png",
+          "time": 38.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570525,
+          "contentHash": "2aed223479f1629b0db633268755cade1587ce7825e8ace1c65e271bf45abdf7",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-75",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-09-3-at-38.125s.png",
+          "time": 38.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut analytics -> compare"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570532,
+          "contentHash": "6e711779d638f5e3e5e3c74797d09917689551a497cfe7f85af9b7f379088300",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-76",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-09-4-at-38.225s.png",
+          "time": 38.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570538,
+          "contentHash": "1cc9dfbf0e9882cb001463ac7301fcdbc5f3605c0da45e006c5b94f08ec6e5b3",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-77",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-09-5-at-38.325s.png",
+          "time": 38.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570544,
+          "contentHash": "83f4db182ff1528c6a1476f498b32792a0e693d1df24e322e2abe1604cdec45a",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-78",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-10-1-at-40.425s.png",
+          "time": 40.425,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570548,
+          "contentHash": "d8ccb97ce2f1204f8f3b010bfb5b67a601dc1ec2298314e457de6c7c9ada5ff4",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-79",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-10-2-at-40.525s.png",
+          "time": 40.525,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570551,
+          "contentHash": "a8305f8402158c22ae390fb99a712378079a564fb8469ffbbff6617f8f1c2d2c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-80",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-10-3-at-40.625s.png",
+          "time": 40.625,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut compare -> analyst"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570556,
+          "contentHash": "d58515f0e302fd685d030fb161cc6957ed5fd15ae41ddb341bebec7e6ed0ada4",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-81",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-10-4-at-40.725s.png",
+          "time": 40.725,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570561,
+          "contentHash": "3d81af1cd4d30a7fe3a33c956fa2049f742b0a02b71b1010ac0c50bff1ba1e03",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-82",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-10-5-at-40.825s.png",
+          "time": 40.825,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570564,
+          "contentHash": "9e7ef0a9208a0d3f9334f623028508b437f8a0764a73de72d66b60aeafb5107c",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-83",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-11-1-at-42.925s.png",
+          "time": 42.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570569,
+          "contentHash": "f995316a0f668a1d2f2c9807bddacbf9075f9a469975e18088422ebdd30fe0bf",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-84",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-11-2-at-43.025s.png",
+          "time": 43.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570573,
+          "contentHash": "f995316a0f668a1d2f2c9807bddacbf9075f9a469975e18088422ebdd30fe0bf",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-85",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-11-3-at-43.125s.png",
+          "time": 43.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut analyst -> search"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570576,
+          "contentHash": "434b9e863eb9dd5075e66164bede1465d94057d2475d8358407f9fc91d8635c1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-86",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-11-4-at-43.225s.png",
+          "time": 43.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570580,
+          "contentHash": "9321ebd4a896ca92e08cd8369ac18a37522eaec196ae9a44a3982620ce5b34c3",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-87",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-11-5-at-43.325s.png",
+          "time": 43.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570584,
+          "contentHash": "60db7a4c4c5fd2914f36c513aa41c1932d0e789525489d59bf2bfc444fad95a1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-88",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-12-1-at-44.8s.png",
+          "time": 44.8,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570590,
+          "contentHash": "1f02d829ed230520f3082ead2e34dcd6b81db72ae79d2b40de2e74727a92edb3",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-89",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-12-2-at-44.9s.png",
+          "time": 44.9,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570593,
+          "contentHash": "5486d0186bcd36b6da8f740d53cf0182d44f7be96fe0d5d7617432fb07eb786d",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-90",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-12-3-at-45s.png",
+          "time": 45,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut search -> handoff"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570597,
+          "contentHash": "d3b1e9ebea96b9265561fd6f5fbddefd7619e82350a9298ad8151cff1a4ac496",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-91",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-12-4-at-45.1s.png",
+          "time": 45.1,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570602,
+          "contentHash": "506c194d6d80e97f186c0e50d4a86d9433af667290c29179350c3125d0be392f",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-92",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-12-5-at-45.2s.png",
+          "time": 45.2,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570605,
+          "contentHash": "01fe7455e2ba8109d1f1a7a885b5e2aa5ac67fec63020695a94da3f7e4c7a368",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-93",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-13-1-at-46.675s.png",
+          "time": 46.675,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570610,
+          "contentHash": "c5ce229623e94013605cefab83f64a774fab5aa020eeabe0f8d1162c2100169e",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-94",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-13-2-at-46.775s.png",
+          "time": 46.775,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570613,
+          "contentHash": "575dd5ee0756b17888dd4c6a4ed533a0a43e78cdd387a6300bcccc1c89d45da9",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-95",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-13-3-at-46.875s.png",
+          "time": 46.875,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut handoff -> pit"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570618,
+          "contentHash": "7b372469888d152fdf7c72f4330ce603f4179a50cb50db5111d86d0e5b5f6003",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-96",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-13-4-at-46.975s.png",
+          "time": 46.975,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570623,
+          "contentHash": "142de2b3957499d70335205acd40da7edb3042a5cef43e0dd95e70d04871d288",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-97",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-13-5-at-47.075s.png",
+          "time": 47.075,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570627,
+          "contentHash": "f000cc52adae756b31db0c2a0a7f38900a25e1a4897b2dae02664dc53641ec24",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-98",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-14-1-at-47.925s.png",
+          "time": 47.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570632,
+          "contentHash": "0effe2d4238a1ccb2dc24032980bf86b7a6d35539844c02339f4d4f490da4251",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-99",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-14-2-at-48.025s.png",
+          "time": 48.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570637,
+          "contentHash": "80fa0ca3eecd18ad84f7cf18638deb47c3d41eb8316877f0d9b0cd39babb3342",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-100",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-14-3-at-48.125s.png",
+          "time": 48.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut pit -> forms"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570642,
+          "contentHash": "63c22545510e50b06b5aa6d93ba631808f0336e65751c770a736e613752ef3ec",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-101",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-14-4-at-48.225s.png",
+          "time": 48.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570646,
+          "contentHash": "f478f7de54c6e2d86b22caa4349d1d110e3c098105b22e2b9752dcdca665ccb5",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-102",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-14-5-at-48.325s.png",
+          "time": 48.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570652,
+          "contentHash": "17ecfd84e6144eb713ee96e64660636995112f8eb8f1f70803ae18ba899a1051",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-103",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-15-1-at-49.175s.png",
+          "time": 49.175,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570657,
+          "contentHash": "e8d7504b7ee3e25b2d279ee8a90e9386b800a9c21312656c0cf6be051325dd86",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-104",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-15-2-at-49.275s.png",
+          "time": 49.275,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570665,
+          "contentHash": "2ed03628264fecad8bc351baaac486ba66caf0c6e2e6a2b4758830ba01b26d2e",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-105",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-15-3-at-49.375s.png",
+          "time": 49.375,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut forms -> picklist"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570669,
+          "contentHash": "6d9c241afcadc81b834eda2055fa1cbd0e6e1d0ccf808ee1484dd1f9e55d8760",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-106",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-15-4-at-49.475s.png",
+          "time": 49.475,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570673,
+          "contentHash": "12043e8d3ad0a4c5b524f1d861bd6af604b8e947c047b3335780fd1015a4d339",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-107",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-15-5-at-49.575s.png",
+          "time": 49.575,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570678,
+          "contentHash": "c7b5c59471e03976949be656ca67d0d99a1679facfca03a118f16e97d71dac1d",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-108",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-16-1-at-51.05s.png",
+          "time": 51.05,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570681,
+          "contentHash": "8f381c2cc2b04f6b159946819d73fcb530c4f5c489aff9f13294cf15af6f010d",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-109",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-16-2-at-51.15s.png",
+          "time": 51.15,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570686,
+          "contentHash": "3069194b0fa13bd7ad9422ea35f9d889c7059edc4c64fdb0f10e8de00e0835cf",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-110",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-16-3-at-51.25s.png",
+          "time": 51.25,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut picklist -> present"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570691,
+          "contentHash": "b1679197ff48fbc7987a35f5ef6fb5f3e31c5ac9ef879e6f3f6d9b003031b7c9",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-111",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-16-4-at-51.35s.png",
+          "time": 51.35,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570697,
+          "contentHash": "4d7e1d8a20f53cee7b856162c85d364de4b7bc1c497e7904f9773f2f95c15c74",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-112",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-16-5-at-51.45s.png",
+          "time": 51.45,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570703,
+          "contentHash": "fddb32888dd35d6d75b47b827c6bfa4047971f80a913d670550a7a9bc181d38f",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-113",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-17-1-at-52.925s.png",
+          "time": 52.925,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut -0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570709,
+          "contentHash": "a38a8034ab67841033b0305e20f96de6de7efaf4795b4eee4c8dc9ff3989cc14",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-114",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-17-2-at-53.025s.png",
+          "time": 53.025,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "-0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570715,
+          "contentHash": "64d026dc0b368a60eff9d100e5ffe7850af066e80458758f9026b9266a75f801",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-115",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-17-3-at-53.125s.png",
+          "time": 53.125,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "cut present -> finish"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570721,
+          "contentHash": "012aa3977f4d11018640a3103977036099cce2a47b544bea693c78c7875d80d1",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-116",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-17-4-at-53.225s.png",
+          "time": 53.225,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.1"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570727,
+          "contentHash": "97b2c232e0de42b35e0ca8ea257f04b16e112f0feb001c1f6e5028037cd43fb3",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "83c05635-a26c-4dd2-85e2-634b32a4c3a4-117",
+          "image": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-051338\\instagram\\.hyperframes\\artifacts\\snapshots\\2d999a04-d62e-4cae-be39-565b8e48bbfa\\seam-17-5-at-53.325s.png",
+          "time": 53.325,
+          "metadata": {
+            "width": 1080,
+            "height": 1920,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "review": {
+              "role": "seam",
+              "label": "+0.2"
+            },
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792733570734,
+          "contentHash": "ce5a49f8b9b2ac033cb9d8de4a94f398a72f30239fc0761b0f04573633adc63a",
+          "revision": "c0e55af0-d4d7-40c8-b259-a1a288dbe5aa",
+          "inputFingerprint": "024602988c7b3c322a1a010a59478e3c57998e63c2a317c55b2b8aed9cc5e8dc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": []
+  }
+}

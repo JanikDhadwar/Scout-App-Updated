@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "outputDir": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55",
+  "frames": [
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-00-at-7.3s.png",
+      "time": 7.3
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-01-at-8.8s.png",
+      "time": 8.8
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-02-at-12.7s.png",
+      "time": 12.7
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-03-at-16.7s.png",
+      "time": 16.7
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-04-at-20.8s.png",
+      "time": 20.8
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-05-at-24.8s.png",
+      "time": 24.8
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-06-at-27.1s.png",
+      "time": 27.1
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-07-at-33.8s.png",
+      "time": 33.8
+    },
+    {
+      "path": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\frame-08-at-33.271s.png",
+      "time": 33.271
+    }
+  ],
+  "contactSheets": [
+    "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output-2026-10-23-cake\\composition\\.hyperframes\\artifacts\\snapshots\\b69b478d-5abf-46a6-9e09-9f2f1f920a55\\contact-sheet.jpg"
+  ],
+  "_meta": {
+    "version": "0.8.186",
+    "latestVersion": "0.8.186",
+    "updateAvailable": false
+  }
+}

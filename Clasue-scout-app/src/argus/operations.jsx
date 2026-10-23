@@ -766,6 +766,7 @@ function MetricEditor({ analytics, event, role, api, onRefresh }) {
                   <th>Phase</th>
                   <th>Unit</th>
                   <th>Preferred direction</th>
+                  <th>Alliance role</th>
                 </tr>
               </thead>
               <tbody>
@@ -821,6 +822,7 @@ function MetricEditor({ analytics, event, role, api, onRefresh }) {
                         <option value="lower">Lower</option>
                       </select>
                     </td>
+                    <td><select className="a-input" aria-label={`Alliance role for ${metric.label}`} value={config[metric.id]?.category || ''} disabled={saving || !canEdit} onChange={e=>update(metric.id,'category',e.target.value)}><option value="">Unassigned</option><option value="scoring">Scoring</option><option value="defense">Defense</option><option value="support">Support</option><option value="reliability">Reliability</option></select></td>
                   </tr>
                 ))}
               </tbody>

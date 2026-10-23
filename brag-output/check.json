@@ -1,0 +1,234 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 5
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 4,
+    "findings": [
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 2.25,
+        "selector": "div.alliance.red-alliance",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 847,
+          "top": 480.8,
+          "right": 1066.41,
+          "bottom": 514.8,
+          "width": 219.41,
+          "height": 34
+        },
+        "containerSelector": "p.muted",
+        "text": "Red alliance 101 102 103",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 480.8,
+          "width": 219.41,
+          "height": 34
+        },
+        "firstSeen": 2.25,
+        "lastSeen": 2.25,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          2.25
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 2.25,
+        "selector": "div.alliance.red-alliance > b:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 847,
+          "top": 436,
+          "right": 1012.77,
+          "bottom": 470,
+          "width": 165.77,
+          "height": 34
+        },
+        "containerSelector": "#handoff-dialog > h3:nth-of-type(1)",
+        "text": "Red alliance",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/match.html",
+        "bbox": {
+          "x": 847,
+          "y": 436,
+          "width": 165.77,
+          "height": 34
+        },
+        "firstSeen": 2.25,
+        "lastSeen": 2.25,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          2.25
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 6.625,
+        "selector": "#count4",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1629.19,
+          "top": 441,
+          "right": 1666.8,
+          "bottom": 511,
+          "width": 37.61,
+          "height": 70
+        },
+        "containerSelector": "#count5",
+        "text": "4",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/scout.html",
+        "bbox": {
+          "x": 1629.19,
+          "y": 441,
+          "width": 37.61,
+          "height": 70
+        },
+        "firstSeen": 6.625,
+        "lastSeen": 6.625,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          6.625
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 15.375,
+        "selector": "#create-pick",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1333.02,
+          "top": 907,
+          "right": 1658.98,
+          "bottom": 943,
+          "width": 325.96,
+          "height": 36
+        },
+        "containerSelector": "#pick-draft",
+        "text": "Create scoring picklist",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/selection.html",
+        "bbox": {
+          "x": 1333.02,
+          "y": 907,
+          "width": 325.96,
+          "height": 36
+        },
+        "firstSeen": 15.375,
+        "lastSeen": 15.375,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          15.375
+        ]
+      }
+    ],
+    "duration": 22,
+    "samples": [
+      1.222,
+      3.667,
+      6.111,
+      8.556,
+      11,
+      13.444,
+      15.889,
+      18.333,
+      20.778
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 4,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      1.222,
+      6.111,
+      11,
+      15.889,
+      20.778
+    ],
+    "checked": 88,
+    "passed": 88
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 176
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  },
+  "saved": {
+    "id": "a14c3297-4db1-4460-b881-6415daba75ad",
+    "revision": "8ff15856-aef4-4ee7-ba5f-1f47593c7645",
+    "report": "C:\\Users\\Janik\\Documents\\GitHub\\Scout-App-Updated\\brag-output\\composition\\.hyperframes\\artifacts\\checks\\a14c3297-4db1-4460-b881-6415daba75ad.json",
+    "attribution": "recorded-revision"
+  },
+  "_meta": {
+    "version": "0.8.186",
+    "latestVersion": "0.8.186",
+    "updateAvailable": false
+  }
+}

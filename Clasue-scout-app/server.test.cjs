@@ -98,15 +98,15 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
     assert.equal((await owner('/api/assignments')).data.filter(row=>row.event_key===impossible.event_key).length,0,'Failed match generation must not commit pit assignments');
     assert.equal((await outsider('/api/integrations/check','POST',{workspaceId:team.id})).status,403);
     const checked=await member('/api/integrations/check','POST',{workspaceId:team.id});
-    assert.equal(checked.status,200);assert.equal(checked.data.tba.state,'missing');assert.equal(checked.data.groq.state,'missing');
+    assert.equal(checked.status,200);assert.equal(checked.data.tba.state,'missing');assert.equal(checked.data.groq.state,'disabled');
     assert.equal((await member('/api/integrations/check','POST',{workspaceId:team.id})).status,429);
     const event={id:'metric-event',team_id:team.id,event_key:'2026test',event_name:'Metric event',custom_field:{preserve:true}};
     assert.equal((await owner('/api/scout_events','POST',event)).status,200);
     assert.equal((await owner('/api/scout_events/metric-event','DELETE')).status,409);
     assert.equal((await owner('/api/forms/form-1','DELETE')).status,409);
-    const groqStatus=await owner('/api/analyst/status');assert.equal(groqStatus.data.configured,false);assert.equal(groqStatus.data.provider,'groq');assert.equal(groqStatus.data.key,undefined);
+    const groqStatus=await owner('/api/analyst/status');assert.equal(groqStatus.data.configured,false);assert.equal(groqStatus.data.provider,'local');assert.equal(groqStatus.data.key,undefined);
     const query={workspaceId:team.id,eventKey:'2026test',question:'Summarize team 254'};
-    assert.equal((await owner('/api/analyst/ask','POST',query)).status,503);
+    assert.equal((await owner('/api/analyst/ask','POST',query)).status,200);
     assert.equal((await outsider('/api/analyst/ask','POST',query)).status,403);
     assert.equal((await owner('/api/analyst/ask','POST',{...query,eventKey:'unknown'})).status,404);
     assert.equal((await owner('/api/analyst/ask','POST',{...query,question:{unsafe:true}})).status,400);
@@ -139,7 +139,7 @@ assert.equal((await member('/api/session')).status,403);assert.equal((await owne
     assert.equal((await member('/api/integrations/configure','POST',settings)).status,403);
     assert.equal((await outsider('/api/integrations/configure','POST',settings)).status,403);
     assert.equal((await owner('/api/integrations/configure','POST',settings)).status,200);
-    const connectionStatus=(await member(`/api/integrations/status?workspaceId=${team.id}`)).data;assert.equal(connectionStatus.groqConfigured,true);assert.ok(!JSON.stringify(connectionStatus).includes('synthetic-private'));
+    const connectionStatus=(await member(`/api/integrations/status?workspaceId=${team.id}`)).data;assert.equal(connectionStatus.groqConfigured,false);assert.ok(!JSON.stringify(connectionStatus).includes('synthetic-private'));
     assert.equal((await outsider(`/api/integrations/status?workspaceId=${team.id}`)).status,403);
     assert.equal((await outsider(`/api/integrations/status?workspaceId=${otherTeam.id}`)).data.groqConfigured,false);
     assert.ok(fs.existsSync(path.join(dir,'argus-integrations.private.json')));

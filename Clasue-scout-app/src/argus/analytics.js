@@ -66,7 +66,7 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
  const descriptors=new Map();
  const addQuestions=(formId,questions,title)=>questions.forEach(question=>{
    const id=`${formId}:${question.id}`, config=event?.analytics_config?.[id] || {};
-   if(!descriptors.has(id))descriptors.set(id,{id,formId,questionId:question.id,label:config.label || question.text,type:question.type,formTitle:title || '',phase:['auto','teleop','endgame'].includes(config.phase)?config.phase:null,unit:config.unit || null,direction:['higher','lower'].includes(config.direction)?config.direction:null});
+   if(!descriptors.has(id))descriptors.set(id,{id,formId,questionId:question.id,label:config.label || question.text,type:question.type,formTitle:title || '',category:['scoring','defense','support','reliability'].includes(config.category)?config.category:null,phase:['auto','teleop','endgame'].includes(config.phase)?config.phase:null,unit:config.unit || null,direction:['higher','lower'].includes(config.direction)?config.direction:null});
  });
  scopedForms.forEach(form=>addQuestions(form.id,form.questions || [],form.title));
  current.forEach(report=>addQuestions(report.form_id,questionsFor(report,scopedForms),report.form_title));
@@ -208,4 +208,33 @@ export function answerQuestion(question,analytics){
   return result(`${metric.label} (${key==='stddev'?'population standard deviation':'average'}; ${metric.unit || 'question units'}):\n${ranked.map(team=>`Team ${team.teamNumber}: ${formatValue(team.metrics[metric.id][key])}, n=${team.metrics[metric.id].n}`).join('\n') || 'No observations.'}`,ranked);
  }
  return result('Insufficient information for that question. Try “Summarize team 254”, “Compare team 254 and 1678”, “Which teams need more scouting data?”, or ask for the highest average of an existing numeric question. Season scoring and predictions require a verified scoring model.',[],'insufficient');
+}
+
+/** Relative event percentiles, never season points. Only linked match evidence ranks teams. */
+export function allianceSelectionSheet(analytics,exclude=[]) {
+ const categories=[['scoring','Scoring'],['defense','Defense'],['support','Support'],['reliability','Reliability']];
+ return categories.map(([key,label])=>{
+  const metrics=(analytics?.metrics||[]).filter(m=>m.category===key&&['number','scale'].includes(m.type)&&['higher','lower'].includes(m.direction));
+  const candidates=(analytics?.teams||[]).filter(t=>!exclude.map(String).includes(String(t.teamNumber)));
+  const rows=candidates.map(team=>{
+   const measurements=metrics.map(metric=>{
+    const values=(team.metrics?.[metric.id]?.values||[]).filter(v=>v.matchKey&&typeof v.value==='number'&&Number.isFinite(v.value));
+    return {...metric,mean:values.length?values.reduce((sum,v)=>sum+v.value,0)/values.length:null,n:values.length,sourceIds:[...new Set(values.flatMap(v=>v.sourceIds||[]))]};
+   });
+   return {teamNumber:team.teamNumber,measurements,sourceIds:[...new Set(measurements.flatMap(m=>m.sourceIds))],coverage:team.confidence?.coveragePercent??null,disagreements:team.confidence?.disagreements?.length||0};
+  });
+  for(const row of rows){
+   const scores=row.measurements.filter(m=>m.mean!=null).map(m=>{
+    const peers=rows.map(r=>r.measurements.find(x=>x.id===m.id)?.mean).filter(v=>v!=null);
+    const worse=peers.filter(v=>m.direction==='lower'?v>m.mean:v<m.mean).length;
+    const tied=peers.filter(v=>v===m.mean).length;
+    return peers.length<=1?50:100*(worse+(tied-1)/2)/(peers.length-1);
+   });
+   // Partial categories remain unranked, rather than rewarding missing weak fields.
+   row.complete=metrics.length>0&&scores.length===metrics.length;
+   row.score=row.complete?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+  }
+  rows.sort((a,b)=>(a.score==null?1:0)-(b.score==null?1:0)||(b.score??0)-(a.score??0)||Number(a.teamNumber)-Number(b.teamNumber));
+  return {key,label,metrics,teams:rows};
+ });
 }

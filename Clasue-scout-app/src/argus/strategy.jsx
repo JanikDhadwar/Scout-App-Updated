@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { moveEntry, teamDirectory } from "./strategy-model.js";
-import { formatValue } from './analytics.js';
+import { allianceSelectionSheet, formatValue } from './analytics.js';
 import "./strategy.css";
 
 export function Strategy({
@@ -72,6 +72,13 @@ export function Strategy({
     return a.team_number-b.team_number;
   });
   const canEdit = ["owner", "admin"].includes(role);
+  const sheet=allianceSelectionSheet(analytics,[workspace.frc_team_number||workspace.number]);
+  function generateList(section){
+    if(dirty&&!window.confirm('Discard unsaved picklist changes?'))return;
+    setSelected('');setChosen([]);setError('');setDirty(true);
+    setDraft({id:crypto.randomUUID(),team_id:workspace.id,event_key:eventKey,name:`${section.label} selection`,revision:0,created_by:user.id,entries:section.teams.filter(t=>t.score!=null).map(t=>({team_number:Number(t.teamNumber),note:`${section.label}: relative score ${formatValue(t.score)}/100. Review the selection sheet for evidence.`,review:t.measurements.some(m=>m.n<3)||t.disagreements>0}))});
+    setMessage('Generated a new picklist draft. Review and save it to share. Existing lists are preserved.');
+  }
   const update = (patch) => {
     setDraft((current) => ({ ...current, ...patch }));
     setDirty(true);
@@ -171,6 +178,17 @@ export function Strategy({
         </section>
       ) : (
         <>
+          <section className="a-panel a-stack" aria-labelledby="alliance-sheet-title">
+            <h2 id="alliance-sheet-title">Automatic alliance selection sheet</h2>
+            <p className="a-muted">Uses this event’s linked match reports. Assign numeric fields an alliance role and preferred direction in <a href="#/analytics">Analytics → Metric definitions</a>. The same algorithm works with each season’s forms.</p>
+            <details><summary>How rankings work</summary><p>For each configured field, compare each team’s average of match medians with other teams using that field. Higher or lower values are preferred as configured. The category score averages those relative percentiles with equal weight. Ties share a percentile; a single team gets 50. Scores are relative to this event, not points or win probabilities. A team needs every configured field in a category to rank. Pit and unlinked reports are excluded. Your own team is excluded. Fewer than three matches or conflicting reports need review.</p></details>
+            {sheet.map(section=><details key={section.key} open><summary>{section.label} · {section.teams.filter(t=>t.score!=null).length} ranked teams</summary><div className="a-stack">
+              {!section.metrics.length?<p className="a-muted">No numeric fields mapped to {section.label.toLowerCase()} with a preferred direction. Configure the fields you collect; question names are never guessed.</p>:<>
+                {canEdit&&<button type="button" className="a-button" disabled={saving||!section.teams.some(t=>t.score!=null)} onClick={()=>generateList(section)}>Create {section.label.toLowerCase()} picklist</button>}
+                <div className="a-table-wrap a-alliance-sheet" role="region" aria-label={`${section.label} selection sheet`} tabIndex={0}><table><thead><tr><th>Team</th><th>Relative score / 100</th>{section.metrics.map(m=><th key={m.id}>{m.label}{m.unit?` (${m.unit})`:''}<small> · {m.direction} preferred</small></th>)}<th>Evidence</th></tr></thead><tbody>{section.teams.map(t=><tr key={t.teamNumber}><th><button type="button" className="a-team-number" onClick={()=>onOpenTeam?.(Number(t.teamNumber))}>{t.teamNumber}</button></th><td>{t.score==null?'Unranked':formatValue(t.score)}</td>{t.measurements.map(m=><td key={m.id}>{formatValue(m.mean)} · n={m.n}{m.n>0&&m.n<3?' · Small sample':''}</td>)}<td>{t.coverage==null?'Coverage unknown':`${formatValue(t.coverage)}% coverage`} · {t.disagreements} disagreements<details><summary>{t.sourceIds.length} source reports</summary><ul>{t.sourceIds.map(id=><li key={id}>{id}</li>)}</ul><p>Open the team to inspect reports.</p></details></td></tr>)}</tbody></table></div>
+              </>}
+            </div></details>)}
+          </section>
           <section className="a-panel a-row">
             <label>
               Saved picklist

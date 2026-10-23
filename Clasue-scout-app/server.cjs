@@ -7,7 +7,6 @@ const privateEnv = process.env.ARGUS_ENV_FILE || (process.env.DB_FILE ? path.joi
 for (const file of [privateEnv,path.join(__dirname,'.env')].filter(Boolean)) if(fs.existsSync(file))process.loadEnvFile(file);
 const crypto = require('node:crypto');
 const { isDeepStrictEqual } = require('node:util');
-const { askGroq, DEFAULT_MODEL } = require('./analyst-service.cjs');
 const { createIntegrationStore } = require('./integration-store.cjs');
 const { checkConnections } = require('./connection-check.cjs');
 const { submissionError } = require('./scouting-rules.cjs');
@@ -134,7 +133,7 @@ app.post('/api/auth/deactivate-account',(req,res)=>{
   res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});
 });
 registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, dbFile:DB_FILE });
-app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:!!integrationKey(req,'GROQ_API_KEY',workspaceId),match13Configured:!!integrationKey(req,'MATCH13_API_KEY',workspaceId)});});
+app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:false,match13Configured:!!integrationKey(req,'MATCH13_API_KEY',workspaceId)});});
 app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{res.json(integrations.save(workspaceId,values));}catch{fail(res,400,'Could not save private settings. Check the key format and server storage permissions.');}});
 const connectionChecks=new Map();
 app.post('/api/integrations/check',async(req,res)=>{
@@ -144,28 +143,18 @@ app.post('/api/integrations/check',async(req,res)=>{
   if(connectionChecks.get(bucket)>now-30000)return fail(res,429,'Wait 30 seconds before checking again.');
   if(connectionChecks.size>1000)for(const [key,time]of connectionChecks)if(time<now-30000)connectionChecks.delete(key);
   connectionChecks.set(bucket,now);
-  res.json(await checkConnections({tbaKey:integrationKey(req,'TBA_API_KEY',workspaceId),groqKey:integrationKey(req,'GROQ_API_KEY',workspaceId),model:integrationKey(req,'GROQ_MODEL',workspaceId)||DEFAULT_MODEL}));
+  res.json(await checkConnections({tbaKey:integrationKey(req,'TBA_API_KEY',workspaceId)}));
 });
-const analystRequests=new Map();
-app.get('/api/analyst/status',(_req,res)=>res.json({provider:'groq',configured:!!integrationKey(_req,'GROQ_API_KEY'),model:integrationKey(_req,'GROQ_MODEL')||DEFAULT_MODEL}));
+app.get('/api/analyst/status',(_req,res)=>res.json({provider:'local',configured:false}));
 app.post('/api/analyst/ask',async(req,res)=>{
-  const {workspaceId,eventKey,question}=req.body||{};
-  if(typeof workspaceId!=='string'||typeof eventKey!=='string'||typeof question!=='string'||!question.trim()||question.length>1000)return fail(res,400,'Choose a workspace and event, and enter a question under 1,000 characters.');
-  const db=readDB();
-  if(!membership(db,req.user.id,workspaceId))return fail(res,403,'Workspace permission required');
-  const event=rows(db,'scout_events').find(row=>row.team_id===workspaceId&&row.event_key===eventKey);
-  if(!event)return fail(res,404,'Select an event in this workspace.');
-  if(!integrationKey(req,'GROQ_API_KEY',workspaceId))return fail(res,503,'The workspace owner can connect Groq in Settings. Import the private connection file or enter an API key.');
-  const now=Date.now(),previous=analystRequests.get(req.user.id),count=previous?.until>now?previous.count:0;
-  if(count>=10)return fail(res,429,'Wait a minute before asking Groq again. The local analyst is still available.');
-  if(analystRequests.size>1000)for(const [id,bucket]of analystRequests)if(bucket.until<now)analystRequests.delete(id);
-  analystRequests.set(req.user.id,{count:count+1,until:previous?.until>now?previous.until:now+60000});
-  try{
-    const { analyticsForUser } = require('./shared-analytics.cjs');
-    const analytics=await analyticsForUser(db,event,req.user.id);
-    const answer=await askGroq({analytics,question:question.trim(),key:integrationKey(req,'GROQ_API_KEY',workspaceId),model:integrationKey(req,'GROQ_MODEL',workspaceId)||DEFAULT_MODEL});
-    res.json(answer);
-  }catch(error){return fail(res,502,error.name==='TimeoutError'?'Groq took too long. Try the local analyst.':error.message?.startsWith('Groq')?error.message:'The AI service could not answer. Try the local analyst.');}
+ const {workspaceId,eventKey,question}=req.body||{};
+ if(typeof workspaceId!=='string'||typeof eventKey!=='string'||typeof question!=='string'||!question.trim()||question.length>1000)return fail(res,400,'Choose an event and enter a question under 1,000 characters.');
+ const db=readDB();if(!membership(db,req.user.id,workspaceId))return fail(res,403,'Workspace permission required');
+ const event=rows(db,'scout_events').find(row=>row.team_id===workspaceId&&row.event_key===eventKey);
+ if(!event)return fail(res,404,'Select an event in this workspace.');
+ const {analyticsForUser}=require('./shared-analytics.cjs');
+ const {answerQuestion}=await import('./src/argus/analytics.js');
+ res.json(answerQuestion(question,await analyticsForUser(db,event,req.user.id)));
 });
 app.get('/api/tba/*path',async(req,res)=>{
   const route=req.params.path.join('/');
