@@ -1,86 +1,69 @@
 export const destinations = [
-  ["dashboard", "Dashboard"],
-  ["match", "Match scouting"],
-  ["assignments", "Assignments"],
+  ["dashboard", "Home"],
+  ["assignments", "Scout"],
   ["pit", "Pit scouting"],
   ["teams", "Teams"],
   ["matches", "Matches"],
-  ["analytics", "Analytics"],
-  ["analyst", "Scouting analyst"],
+  ["analytics", "Event statistics"],
   ["practice", "Practice"],
   ["help", "Help"],
   ["history", "Event history"],
   ["reminders", "Reminders"],
   ["admin", "Admin control centre"],
-  ["strategy", "Strategy"],
+  ["strategy", "Alliance selection"],
+  ["present", "Present"],
   ["display", "Pit display"],
   ["events", "Event data"],
   ["settings", "Settings"],
 ];
 export const mainDestinations = [
   ["dashboard", "Home"],
-  ["match", "Scouting"],
-  ["assignments", "Assignments"],
+  ["assignments", "Scout"],
   ["teams", "Teams"],
-  ["settings", "Settings"],
+  ["present", "Present"],
+  ["more", "More"],
 ];
 export const sidebarDestinations = [
   ['dashboard', 'Home'],
-  ['match', 'Scouting'],
+  ['assignments', 'Scout'],
+  ['matches', 'Matches'],
   ['teams', 'Teams'],
-  ['events', 'Event'],
+  ['strategy', 'Alliance selection'],
+  ['present', 'Present'],
+  ['admin', 'Admin'],
   ['settings', 'Settings'],
+  ['help', 'Help'],
 ];
 export function navigationGroup(section) {
-  if (["match", "pit", "assignments"].includes(section)) return "match";
+  if (["match", "pit", "assignments"].includes(section)) return "assignments";
+  if (section === 'matches') return 'matches';
+  if (['present', 'display'].includes(section)) return 'present';
+  if (['strategy', 'admin', 'help'].includes(section)) return section;
   if (
     [
       "teams",
       "analytics",
       "reports",
       "compare",
-      "present",
-      "strategy",
-      "analyst",
     ].includes(section)
   )
     return "teams";
-  if (["events", "matches", "display"].includes(section)) return "events";
+  if (section === 'analyst') return 'teams';
+  if (section === 'events') return 'settings';
   if (["settings", "news", "myteam", "manage", "sync", "admin", "help", "practice", "history", "reminders"].includes(section))
     return "settings";
   return "dashboard";
 }
-export const sectionLinks = {
-  match: [
-    ["match", "Match forms"],
-    ["pit", "Pit forms"],
-    ["assignments", "Assignments"],
-  ],
-  teams: [
-    ["teams", "Team profiles"],
-    ["analytics", "Analytics"],
-    ["strategy", "Strategy"],
-    ["reports", "Reports"],
-    ["analyst", "Scouting analyst"],
-  ],
-  events: [
-    ["events", "Event setup"],
-    ["matches", "Match schedule"],
-    ["display", "Pit display"],
-  ],
-  settings: [
-    ["settings", "Settings"],
-    ["events", "Events"],
-    ["help", "Help"],
-    ["myteam", "My team"],
-    ["news", "Team news"],
-    ["sync", "Device and sync"],
-    ["practice", "Practice"],
-    ["reminders", "Reminders"],
-    ["history", "Event history"],
-    ["admin", "Admin control centre"],
-  ],
-};
+// Secondary tools have one visible list, rather than a second navigation tier.
+export const utilityDestinations = [
+  ['matches', 'Match schedule'], ['strategy', 'Alliance selection'],
+  ['display', 'Pit display'], ['reports', 'Reports and export'],
+  ['events', 'Event setup'], ['sync', 'Device and sync'],
+  ['reminders', 'Reminders'], ['news', 'Team news'],
+  ['history', 'Event history'], ['practice', 'Practice scouting'],
+  ['admin', 'Admin'], ['settings', 'Settings'], ['help', 'Help'],
+];
+export const canSeeDestination = (key, role) => key !== 'admin' || ['owner', 'admin'].includes(role);
 export const matchLabel = (match) =>
   match?.comp_level === "qm"
     ? `Qual ${match.match_number}`
@@ -114,7 +97,7 @@ export function buildSearchIndex({
   userId,
   role,
 } = {}) {
-  const items = destinations.map(([route, label]) => ({
+  const items = destinations.filter(([key]) => canSeeDestination(key, role)).map(([route, label]) => ({
     group: "Pages",
     label,
     route: `/${route}`,

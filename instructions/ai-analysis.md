@@ -1,10 +1,10 @@
-# Scouting calculations
+# Team statistics and presentations
 
-Open Scouting analyst directly, or use the analyst within Analytics. Choose a suggested question, name a team, or use a configured numeric metric. Answers use deterministic calculations on your device. No generative AI, account, API key, or external request is needed.
+Open Teams, then choose a robot to review statistics, source reports, sample sizes and missing observations. Select two to four teams in the directory to compare them. Event statistics and report exports are linked at the top of Teams.
 
-The calculation engine uses form and question IDs rather than season rules or guessed question names. New seasons need their own forms and metric mappings, not a software update. Unsupported questions return insufficient information.
+The AI and scouting analyst screens have been removed. Statistics and alliance rankings use deterministic calculations from authorized scouting records.
 
-Check source reports, sample sizes, coverage, disagreements and missing counts. Pit evidence stays separate from match performance. Name teams and metrics in each question; questions do not assume conversation memory.
+Open Present in the main menu, find a team and choose Present. Use arrow keys to move between slides. Export PDF and Export PowerPoint are at the top. Pit display is a separate shared-screen view, available from Present or More.
 
 For automatic scoring, defense, support and reliability lists, open [Alliance strategy](alliance-strategy.md).
 

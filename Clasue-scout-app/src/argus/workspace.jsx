@@ -16,7 +16,8 @@ import {
   mainDestinations,
   sidebarDestinations,
   navigationGroup,
-  sectionLinks,
+  utilityDestinations,
+  canSeeDestination,
   searchIndex,
 } from "./workspace-model.js";
 import {
@@ -29,7 +30,8 @@ import {
 import { EventData, MetricConfiguration } from "./operations.jsx";
 import { ReportLibrary } from "./report-library.jsx";
 import { SetupGuidance } from "./setup-guidance.jsx";
-import { MobileMore, SectionTools } from './workspace-navigation.jsx';
+import { MobileMore } from './workspace-navigation.jsx';
+import { PresentationPicker } from './presentations.jsx';
 import { PitDisplay, PitDisplaySettings } from "./restored-features.jsx";
 import { offline } from "../offline.js";
 import "./workspace.css";
@@ -44,7 +46,6 @@ import { Walkthrough } from './walkthrough.jsx';
 import ReminderSettings, { ReminderInbox } from './reminders.jsx';
 import { OwnershipInbox } from './ownership-inbox.jsx';
 const Strategy = lazy(() => import("./strategy.jsx"));
-const Analyst = lazy(() => import("./analyst.jsx"));
 const AssignmentHub = lazy(() => import('./assignment-hub.jsx'));
 const AdminCentre = lazy(() => import('./admin-centre.jsx'));
 const Practice = lazy(() => import('./practice.jsx'));
@@ -90,6 +91,7 @@ export function RouteIcon({ name }) {
       "M16 21v-3a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v3M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 1a4 4 0 0 1 0 7m1 4a4 4 0 0 1 3 4v2",
     matches: "M5 5h14v16H5zM8 3v4m8-4v4M5 10h14M9 14h2m2 3h2",
     analytics: "M4 3v18h17M8 17v-5m5 5V7m5 10V4",
+    present: "M3 4h18v12H3zM12 16v5m-4 0 4-3 4 3",
     strategy: "M4 4h6v6H4zM14 14h6v6h-6zM7 10v7h7m0-10h6m-3-3 3 3-3 3",
     events: "M4 6h16v14H4zM8 3v6m8-6v6M4 11h16",
     settings: "M4 7h16M4 17h16M8 4v6m8 4v6",
@@ -534,6 +536,7 @@ export default function ArgusWorkspace({
         analytics={analytics}
         onOpenTeam={openTeam}
         onCompare={compare}
+        onPresent={present}
       />
     );
   else if (section === "matches")
@@ -576,18 +579,13 @@ export default function ArgusWorkspace({
   else if (section === "present")
     body = (
       <>
-        <TeamDirectory
-          api={api} workspaceId={workspace.id} season={event?.event_key?.slice(0,4)}
-          analytics={analytics}
-          onOpenTeam={openTeam}
-          onCompare={compare}
-        />
-        <TeamPresentation
+        <PresentationPicker analytics={analytics} onPresent={present}/>
+        {id && <TeamPresentation
           analytics={analytics}
           teamNumber={id}
           onClose={() => openTeam(id)}
           onExport={exportTeam}
-        />
+        />}
       </>
     );
   else if (section === "strategy")
@@ -611,7 +609,7 @@ export default function ArgusWorkspace({
   else if (section === 'evidence') body = <Evidence key={`${event?.id}:${id}`} {...common} reportId={decodeURIComponent(id||'')} />;
   else if (section === 'reminders') body = <ReminderSettings {...common} />;
   else if (section === 'history') body = <EventHistory {...common} />;
-  else if (section === 'analyst') body = <div className="a-stack"><header><h1>Scouting analyst</h1><p className="a-muted">{analytics.evidenceScope||'Your authorized event evidence'}</p></header><Analyst api={api} workspaceId={workspace.id} eventKey={event?.event_key} analytics={analytics} onOpenTeam={openTeam} onCompare={compare} onOpenReport={openReport}/></div>;
+  else if (section === 'analyst') body = <section className="a-panel a-stack"><h1>Team statistics</h1><p>The analyst has been removed. Open a team to review its statistics, source reports and comparisons.</p><a className="a-button a-primary" href="#/teams">Open teams</a></section>;
   else if (section === "events")
     body = (
       <EventData {...common} />
@@ -620,7 +618,7 @@ export default function ArgusWorkspace({
     body = (
       <div className="a-stack">
         <header className="a-page-heading">
-          <h1>Analytics</h1>
+          <h1>Event statistics</h1>
           <p className="a-muted">
             Scouting evidence for {event?.event_name || "the selected event"}.
             Every calculation links back to reports.
@@ -689,15 +687,6 @@ export default function ArgusWorkspace({
           onRefresh={refresh}
           role={role}
         />
-        <Analyst
-          api={api}
-          workspaceId={workspace.id}
-          eventKey={event?.event_key}
-          analytics={analytics}
-          onOpenTeam={openTeam}
-          onCompare={compare}
-          onOpenReport={openReport}
-        />
       </div>
     );
   else if (section === "reports" && !id)
@@ -725,6 +714,7 @@ export default function ArgusWorkspace({
           <p className="a-muted">Your team, account and this device.</p>
           <a className="a-button" href="#/welcome">About Argus</a>
         </header>
+        <nav className="a-tool-list" aria-label="Settings tools">{utilityDestinations.filter(([key])=>key!=='settings'&&canSeeDestination(key,role)).map(([key,label])=><a key={key} className="a-button" href={`#/${key}`}>{label}</a>)}</nav>
         <IntegrationSettings api={api} workspaceId={workspace.id} role={role} />
         <Match13Settings api={api} workspaceId={workspace.id} role={role}/>
         <section className="a-panel a-stack">
@@ -883,6 +873,7 @@ export default function ArgusWorkspace({
         </div>
         <nav aria-label="Main navigation">
           {sidebarDestinations
+            .filter(([key])=>canSeeDestination(key,role))
             .map(([key, label]) => (
               <a
                 key={key}
@@ -989,7 +980,6 @@ export default function ArgusWorkspace({
           )}
           {!loading && (
             <>
-              <SectionTools section={section} links={(sectionLinks[activeGroup] || []).filter(([key])=>key!=='admin'||['owner','admin'].includes(role))}/>
                 {['dashboard','events','settings'].includes(section)&&<SetupGuidance
                 key={`${user.id}:${workspace.id}`}
                 userId={user.id}
@@ -1030,11 +1020,11 @@ export default function ArgusWorkspace({
         </main>
       </div>
       <nav className="a-mobile-nav" aria-label="Mobile navigation">
-        {["dashboard", "assignments", "match", "teams"].map((key) => (
+        {["dashboard", "assignments", "teams", "present"].map((key) => (
           <a
             href={`#/${key}`}
             key={key}
-            aria-current={(key==='assignments'?section==='assignments':key==='match'?['match','pit'].includes(section):activeGroup===key)?'page':undefined}
+            aria-current={activeGroup===key?'page':undefined}
           >
             <RouteIcon name={key} />
             <span>{mainDestinations.find((row) => row[0] === key)[1]}</span>

@@ -1,25 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, sidebarDestinations, navigationGroup, sectionLinks } from './workspace-model.js';
+import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, sidebarDestinations, navigationGroup, utilityDestinations, canSeeDestination } from './workspace-model.js';
 
-test('five main destinations retain routes for related tools',()=>{
- assert.equal(mainDestinations.length,5);
- for(const section of ['match','pit','assignments'])assert.equal(navigationGroup(section),'match');
- for(const section of ['events','display','matches'])assert.equal(navigationGroup(section),'events');
- for(const section of ['teams','analytics','strategy','reports'])assert.equal(navigationGroup(section),'teams');
- assert.ok(sectionLinks.events.some(([key])=>key==='display'));
- assert.ok(sectionLinks.match.some(([key])=>key==='assignments'));
+test('one scouting destination and a visible presentation destination keep task context',()=>{
+ assert.deepEqual(mainDestinations.map(([key])=>key),['dashboard','assignments','teams','present','more']);
+ for(const section of ['match','pit','assignments'])assert.equal(navigationGroup(section),'assignments');
+ for(const section of ['present','display'])assert.equal(navigationGroup(section),'present');
+ for(const section of ['teams','analytics','compare','reports'])assert.equal(navigationGroup(section),'teams');
+ assert.equal(navigationGroup('matches'),'matches');
+ assert.equal(navigationGroup('strategy'),'strategy');
 });
 
 test('pit assignments and unavailable schedule rows have no completed match',()=>{assert.equal(isCompleted(undefined),false);assert.equal(isCompleted(null),false);assert.equal(isCompleted({}),false);});
 
-test('sidebar contains only main areas while every secondary page remains in its section',()=>{
- assert.deepEqual(sidebarDestinations.map(([key])=>key),['dashboard','match','teams','events','settings']);
- for(const section of ['assignments','pit','matches','analytics','strategy','analyst','practice','help','history','reminders','admin','display']){
-  const parent=navigationGroup(section);
-  assert.ok(sectionLinks[parent]?.some(([key])=>key===section),`${section} stays accessible under ${parent}`);
-  assert.ok(!sidebarDestinations.some(([key])=>key===section));
- }
+test('visible task links are unique, secondary tools remain accessible and Admin is role scoped',()=>{
+ assert.ok(sidebarDestinations.some(([key])=>key==='present'));
+ assert.equal(new Set(sidebarDestinations.map(([key])=>key)).size,sidebarDestinations.length);
+ for(const key of ['events','sync','history','practice','display','reports'])assert.ok(utilityDestinations.some(([route])=>route===key));
+ assert.equal(canSeeDestination('admin','member'),false);
+ assert.equal(canSeeDestination('admin','admin'),true);
+ assert.equal(buildSearchIndex({role:'member'}).some(row=>['/admin','/analyst'].includes(row.route)),false);
+ assert.ok(![...sidebarDestinations,...utilityDestinations].some(([key])=>key==='analyst'));
 });
 
 test('assignments complete only from matching submitted records, not unrelated or opened forms',()=>{

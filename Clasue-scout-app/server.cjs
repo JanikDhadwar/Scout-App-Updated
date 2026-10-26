@@ -145,17 +145,7 @@ app.post('/api/integrations/check',async(req,res)=>{
   connectionChecks.set(bucket,now);
   res.json(await checkConnections({tbaKey:integrationKey(req,'TBA_API_KEY',workspaceId)}));
 });
-app.get('/api/analyst/status',(_req,res)=>res.json({provider:'local',configured:false}));
-app.post('/api/analyst/ask',async(req,res)=>{
- const {workspaceId,eventKey,question}=req.body||{};
- if(typeof workspaceId!=='string'||typeof eventKey!=='string'||typeof question!=='string'||!question.trim()||question.length>1000)return fail(res,400,'Choose an event and enter a question under 1,000 characters.');
- const db=readDB();if(!membership(db,req.user.id,workspaceId))return fail(res,403,'Workspace permission required');
- const event=rows(db,'scout_events').find(row=>row.team_id===workspaceId&&row.event_key===eventKey);
- if(!event)return fail(res,404,'Select an event in this workspace.');
- const {analyticsForUser}=require('./shared-analytics.cjs');
- const {answerQuestion}=await import('./src/argus/analytics.js');
- res.json(answerQuestion(question,await analyticsForUser(db,event,req.user.id)));
-});
+app.all(['/api/analyst/status','/api/analyst/ask'],(_req,res)=>fail(res,410,'The scouting analyst has been removed. Use team statistics and comparisons.'));
 app.get('/api/tba/*path',async(req,res)=>{
   const route=req.params.path.join('/');
   if(!/^(event\/\w+(?:\/(?:teams\/simple|matches(?:\/simple)?|rankings))?|events\/\d{4}\/simple|team\/frc\d+(?:\/simple|\/events\/\d{4}\/simple|\/event\/\w+\/status)?)$/.test(route))return fail(res,400,'Unsupported official data request');

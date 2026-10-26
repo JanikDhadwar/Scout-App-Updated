@@ -85,16 +85,15 @@ try {
  });
  await check('compact phone navigation retains tools, disclosures and modal keyboard access',async()=>{
   await page.setViewportSize({width:390,height:844});await route('/dashboard');
-  assert.equal(await page.locator('.a-sidebar nav a').count(),5);
-  for(const route of ['assignments','analyst','practice','help','history','reminders','admin'])assert.equal(await page.locator(`.a-sidebar nav a[href="#/${route}"]`).count(),0);
+  assert.equal(await page.locator('.a-mobile-nav a').count(),4);assert.ok(await page.locator('.a-mobile-nav a[href="#/present"]').isVisible());assert.equal(await page.locator('.a-page-tools').count(),0);
+  for(const route of ['match','analyst','practice','history','reminders'])assert.equal(await page.locator(`.a-sidebar nav a[href="#/${route}"]`).count(),0);
   const summary=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Event summary'})});
   assert.equal(await summary.getAttribute('open'),null);await summary.locator(':scope > summary').click();assert.ok(await summary.locator('.a-scoreboard').isVisible());await summary.locator(':scope > summary').click();
   const observations=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Scouting observations'})});assert.equal(await observations.getAttribute('open'),null);
   await page.screenshot({path:path.join(artifacts,'compact-home-390.png'),fullPage:true});
   await page.getByRole('button',{name:'More',exact:true}).click();const more=page.getByRole('dialog',{name:'More',exact:true});await more.waitFor();
   await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('#mobile-more')));
-  await more.getByText('Analysis tools',{exact:true}).click();await more.getByRole('link',{name:'Scouting analyst',exact:true}).click();await more.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Scouting analyst',exact:true}).waitFor();
-  const tools=page.locator('.a-page-tools');assert.equal(await tools.getAttribute('open'),null);await tools.locator(':scope > summary').click();await page.getByRole('navigation',{name:'Section tools'}).getByRole('link',{name:'Analytics',exact:true}).click();
+  await more.getByRole('link',{name:'Alliance selection',exact:true}).click();await more.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Alliance strategy',exact:true}).waitFor();
   await page.getByRole('button',{name:'More',exact:true}).click();await page.keyboard.press('Escape');await more.waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('.a-mobile-nav button[aria-controls="mobile-more"]').getAttribute('aria-expanded')==='false');
   await page.getByRole('button',{name:'More',exact:true}).click();await page.setViewportSize({width:1280,height:1000});await more.waitFor({state:'hidden'});
   await route('/dashboard');assert.ok(await page.locator('.a-scoreboard').isVisible());
@@ -103,10 +102,11 @@ try {
   await page.setViewportSize({width:1280,height:700});await page.getByRole('button',{name:'Hide menu',exact:true}).click();await page.reload({waitUntil:'networkidle'});assert.ok(await page.locator('.a-sidebar').isHidden());await page.getByRole('button',{name:'Show menu',exact:true}).click();
   await page.keyboard.press('Control+k');const dialog=page.getByRole('dialog');await dialog.getByRole('combobox').fill('254');await dialog.getByRole('option').first().waitFor();await page.keyboard.press('Enter');await dialog.waitFor({state:'hidden'});
  });
- await check('team profiles, comparisons and local analyst fallback',async()=>{
+ await check('team profiles, comparisons and removed analyst',async()=>{
   await route('/teams/254');for(const tab of await page.getByRole('tab').all()){await tab.click();assert.equal(await tab.getAttribute('aria-selected'),'true');}
   for(const value of ['254,1678','254,1678,2056,6390']){await route(`/compare?teams=${value}`);await page.getByRole('region',{name:'Team comparison statistics'}).waitFor();}
-  await route('/analyst');await page.getByRole('button',{name:'Summarize team 254',exact:true}).click();await page.getByText('Verified local calculation',{exact:true}).waitFor();await page.getByLabel('Ask a follow-up question',{exact:true}).fill('Predict the champion');await page.getByRole('button',{name:'Ask locally',exact:true}).click();await page.getByText('Insufficient information',{exact:true}).waitFor();
+  await route('/analyst');await page.getByRole('heading',{name:'Team statistics',exact:true}).waitFor();assert.equal(await page.getByRole('button',{name:'Ask locally',exact:true}).count(),0);await page.getByRole('link',{name:'Open teams',exact:true}).click();await page.getByRole('heading',{name:'Teams',exact:true}).waitFor();
+  await page.locator('.a-sidebar nav a[href="#/present"]').click();await page.getByRole('heading',{name:'Present',exact:true}).waitFor();await page.getByLabel('Find a team to present',{exact:true}).fill('254');await page.getByRole('button',{name:'Present team 254',exact:true}).click();await page.getByRole('button',{name:'Next',exact:true}).waitFor();await page.keyboard.press('ArrowRight');await page.getByRole('status').filter({hasText:'Section 2 of 7'}).waitFor();await page.keyboard.press('Escape');
  });
  await check('picklist reorder, persistent unsaved edits, saved revisions and real exports',async()=>{
   await route('/strategy');await page.getByLabel('Saved picklist').selectOption('qa-picklist');await page.getByRole('button',{name:'Move team 1678 up',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();
@@ -127,7 +127,7 @@ try {
    await page.setViewportSize({width:1440,height:1000});await page.getByRole('button',{name:'Create scoring picklist',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();
    const lists=(await api(page,'/picklists')).data;const generated=lists.find(l=>l.name==='Scoring selection');assert.ok(generated);assert.equal(generated.entries[0].team_number,1678);assert.ok(lists.some(l=>l.id==='qa-picklist'));
    await route('/dashboard');await route('/strategy');await page.getByLabel('Saved picklist').selectOption(generated.id);assert.equal(await page.getByLabel('Picklist name',{exact:true}).inputValue(),'Scoring selection');
-   await route('/analyst');await page.getByRole('button',{name:'Summarize team 254',exact:true}).click();await page.getByText('Verified local calculation',{exact:true}).waitFor();assert.deepEqual(requests,[]);
+   await route('/teams');assert.deepEqual(requests,[]);
   }finally{page.off('request',capture);}
  });
  await check('one-match handoff acceptance preserves permanent owners and other matches',async()=>{
@@ -149,12 +149,12 @@ try {
   await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('heading',{name:'Report saved.',exact:true}).waitFor();await page.goto(baseURL,{waitUntil:'domcontentloaded'});await page.locator('.argus-app').waitFor();assert.equal(await page.locator('.argus-public').count(),0,'Prepared scouts bypass the public welcome page on an offline root reload');await context.setOffline(false);await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(async note=>{const r=await(await fetch('/api/submissions')).json();return r.filter(x=>x.answers?.notes===note).length===1;},note);
  });
  await check('ownership preview, selected scouts, generated duties and locked manual changes persist',async()=>{
-  await route('/assignments');await page.getByRole('button',{name:'Manage ownership',exact:true}).click();await page.getByText('Choose scouts and forms',{exact:true}).click();await page.getByRole('checkbox',{name:'qa_idle',exact:true}).uncheck();
+  await route('/assignments');assert.equal(await page.getByRole('button',{name:'Manage ownership',exact:true}).count(),0);await page.getByRole('link',{name:'Manage assignments in Admin',exact:true}).click();await page.getByText('Choose scouts and forms',{exact:true}).click();await page.getByRole('checkbox',{name:'qa_idle',exact:true}).uncheck();
   await page.getByRole('button',{name:'Randomize teams',exact:true}).click();await page.getByRole('region',{name:'Ownership preview'}).waitFor();await page.getByRole('button',{name:'Apply assignments',exact:true}).click();await page.getByText(/Ownership saved\./).waitFor();
   const owners=(await api(page,'/team_allocations')).data;assert.equal(owners.length,4);assert.ok(!owners.some(a=>a.owner_user_id==='qa-idle'));
   const duties=(await api(page,'/assignments')).data;for(const a of owners)assert.ok(duties.some(d=>d.report_kind==='pit'&&d.team_number===a.team_number&&d.scout_user_id===a.owner_user_id));assert.ok(duties.some(d=>d.handoff_id&&d.scout_user_id==='qa-idle'));
   await page.getByText(/Move or lock individual teams/).click();await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).check();await page.getByRole('button',{name:'Save team 254',exact:true}).click();await page.waitForFunction(async()=>{const a=await(await fetch('/api/team_allocations')).json();return a.find(x=>x.team_number===254).locked;});
-  await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'Manage ownership',exact:true}).click();await page.getByText(/Move or lock individual teams/).click();assert.ok(await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).isChecked());
+  await page.reload({waitUntil:'networkidle'});await page.getByRole('heading',{name:'Team assignments',exact:true}).waitFor();await page.getByText(/Move or lock individual teams/).click();assert.ok(await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).isChecked());
  });
  await check('simple Admin randomizer and searchable scout/team roster keep preview reversible',async()=>{
   await route('/admin?tab=assignments');await page.getByRole('heading',{name:'Team assignments',exact:true}).waitFor();
@@ -192,7 +192,7 @@ try {
  await check('Scouter API/route protection and approved evidence exclude private raw reports',async()=>{
   const ctx=await browser.newContext({viewport:{width:390,height:1000}}),scout=await ctx.newPage();
   try{await login(scout,'qa_member');assert.equal((await api(scout,'/admin/overview?event_id=qa-event')).status,403);assert.equal((await api(scout,'/submissions/qa-zero')).status,404);await route('/admin',scout);await scout.getByRole('heading',{name:'Administrator access required'}).waitFor();
-   const shared=await api(scout,'/events/qa-event/analytics');assert.equal(shared.status,200);assert.ok(!JSON.stringify(shared.data).includes('Scout notes'));assert.ok(!JSON.stringify(shared.data).includes('qa_owner'));await route('/analytics',scout);await scout.getByRole('heading',{name:'Analytics',exact:true}).waitFor();
+   const shared=await api(scout,'/events/qa-event/analytics');assert.equal(shared.status,200);assert.ok(!JSON.stringify(shared.data).includes('Scout notes'));assert.ok(!JSON.stringify(shared.data).includes('qa_owner'));await route('/analytics',scout);await scout.getByRole('heading',{name:'Event statistics',exact:true}).waitFor();
    await scout.screenshot({path:path.join(artifacts,'scouter-approved-390.png'),fullPage:true});
   }finally{await ctx.close();}
  });
@@ -206,7 +206,7 @@ try {
   await context.setOffline(true);await route('/help?topic=offline-and-sync');await page.getByRole('article',{name:'Offline and synchronization'}).waitFor();await context.setOffline(false);
  });
  await check('responsive task/Admin/help screens, five mobile destinations and dialog focus',async()=>{
-  for(const width of widths){await page.setViewportSize({width,height:1000});for(const section of ['dashboard','assignments','admin','practice','help','analyst','strategy','events','settings']){await route(`/${section}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();if(section==='admin')await page.locator('.a-coverage-tile').first().waitFor();await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(artifacts,`${section}-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${section} overflow at ${width}`);}}
+  for(const width of widths){await page.setViewportSize({width,height:1000});for(const section of ['dashboard','assignments','teams','present','admin','practice','help','strategy','events','settings']){await route(`/${section}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();if(section==='admin')await page.locator('.a-coverage-tile').first().waitFor();await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(artifacts,`${section}-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${section} overflow at ${width}`);}}
   assert.equal(await page.locator('.a-mobile-nav a,.a-mobile-nav button').count(),5);assert.ok(await page.locator('.a-mobile-nav a[href="#/assignments"]').isVisible());
  });
  await check('large-event coverage is searchable, paginated and fits a phone without a long match list',async()=>{

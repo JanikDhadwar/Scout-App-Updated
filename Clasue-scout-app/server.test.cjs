@@ -104,12 +104,10 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
     assert.equal((await owner('/api/scout_events','POST',event)).status,200);
     assert.equal((await owner('/api/scout_events/metric-event','DELETE')).status,409);
     assert.equal((await owner('/api/forms/form-1','DELETE')).status,409);
-    const groqStatus=await owner('/api/analyst/status');assert.equal(groqStatus.data.configured,false);assert.equal(groqStatus.data.provider,'local');assert.equal(groqStatus.data.key,undefined);
+    assert.equal((await owner('/api/analyst/status')).status,410);
     const query={workspaceId:team.id,eventKey:'2026test',question:'Summarize team 254'};
-    assert.equal((await owner('/api/analyst/ask','POST',query)).status,200);
-    assert.equal((await outsider('/api/analyst/ask','POST',query)).status,403);
-    assert.equal((await owner('/api/analyst/ask','POST',{...query,eventKey:'unknown'})).status,404);
-    assert.equal((await owner('/api/analyst/ask','POST',{...query,question:{unsafe:true}})).status,400);
+    assert.equal((await owner('/api/analyst/ask','POST',query)).status,410);
+    assert.equal((await outsider('/api/analyst/ask','POST',query)).status,410);
     const definitions={'form-1:count':{phase:'auto',unit:'pieces',custom_definition:'keep'}};
     const configured=await owner('/api/scout_events/metric-event','PATCH',{analytics_config:definitions,analytics_revision:0});
     assert.equal(configured.status,200);assert.equal(configured.data.analytics_revision,1);assert.deepEqual(configured.data.custom_field,{preserve:true});

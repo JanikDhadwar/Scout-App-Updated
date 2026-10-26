@@ -55,8 +55,8 @@ export function OwnershipManager({ data, workspace, event, api, onRefresh, onSav
   </section>;
 }
 
-export default function AssignmentHub({ data, workspace, event, user, role, api, onRefresh, navigate }) {
-  const [view, setView] = useState(null), [tab, setTab] = useState('mine'), [error, setError] = useState('');
+export default function AssignmentHub({ data, workspace, event, user, role, api, navigate }) {
+  const [view, setView] = useState(null), [error, setError] = useState('');
   const canEdit = ['owner', 'admin'].includes(role);
   const refresh = useCallback(async () => {
     if (!event) return;
@@ -82,15 +82,15 @@ export default function AssignmentHub({ data, workspace, event, user, role, api,
   });
   const name = id => (data.memberships || []).find(m => m.user_id === id)?.username || 'Former member';
   const open = duty => navigate(`/${duty.report_kind === 'pit' ? 'pit' : 'match'}?${new URLSearchParams({ event_key: duty.event_key, match_key: duty.match_key || '', match_number: String(duty.match_number || ''), scouted_team: String(duty.team_number), alliance: duty.alliance || '', assignment_id: duty.id, form_id: duty.form_id || '' })}`);
-  if (!event) return <section className="a-panel"><h1>Assignments</h1><p>No active event. An Admin can activate one in Settings → Events.</p><a className="a-button" href="#/events">Event settings</a></section>;
-  return <div className="a-stack"><header><h1>Your scouting assignments</h1><p className="a-muted">{event.event_name || event.event_key} · Your teams stay yours across the event.</p></header>
-    <div className="a-row" aria-label="Assignment sections"><button className="a-button" aria-pressed={tab === 'mine'} onClick={() => setTab('mine')}>My work</button>{canEdit && <button className="a-button" aria-pressed={tab === 'manage'} onClick={() => setTab('manage')}>Manage ownership</button>}<button className="a-button" onClick={refresh}>Refresh responsibilities</button>{canEdit && <a className="a-button" href="#/admin">Admin control centre</a>}</div>
+  if (!event) return <section className="a-panel"><h1>Scout</h1><p>No active event. An Admin can activate one in Settings → Events.</p><a className="a-button" href="#/events">Event settings</a></section>;
+  return <div className="a-stack"><header><h1>Scout</h1><p className="a-muted">{event.event_name || event.event_key} · Your teams stay yours across the event.</p></header>
+    <nav className="a-row" aria-label="Scouting actions"><a className="a-button a-primary" href="#/matches">Match scouting</a><a className="a-button" href="#/pit">Pit scouting</a><button className="a-button" onClick={refresh}>Refresh assignments</button>{canEdit && <a className="a-button" href="#/admin?tab=assignments">Manage assignments in Admin</a>}</nav>
     {error && <p role="status" className="a-muted">{error}</p>}
-    {tab === 'manage' && canEdit ? <OwnershipManager key={event.id} data={data} workspace={workspace} event={event} api={api} onRefresh={onRefresh} onSaved={refresh} /> : <>
+    <>
       <section className="a-panel a-stack"><h2>My permanent teams</h2><div className="a-team-ownership">{allocations.filter(a => a.owner_user_id === user.id).map(a => { const pit = duties.find(d => d.team_number === a.team_number && d.report_kind === 'pit'); return <article key={a.id}><h3><a href={`#/teams/${a.team_number}`}>Team {a.team_number}</a>{a.locked && <small> · Locked</small>}</h3><p>{pit ? done(pit) ? 'Pit report submitted' : queued(pit) ? 'Pit report pending upload' : 'Pit report needed' : 'Pit duty not generated yet'}</p>{pit && pit.scout_user_id === user.id && !done(pit) && <button className="a-button" onClick={() => open(pit)}>Pit scout {a.team_number}</button>}</article>; })}</div>{!allocations.some(a => a.owner_user_id === user.id) && <p className="a-empty">No permanent teams assigned. Your existing match duties are shown below; ask an Admin to review ownership.</p>}</section>
       {!!conflicts.filter(c => c.user_id === user.id && !isCompleted(matches.find(m => m.key === c.match_key))).length && <section className="a-panel a-stack"><h2>Coverage conflicts</h2>{conflicts.filter(c => c.user_id === user.id && !isCompleted(matches.find(m => m.key === c.match_key))).map(c => <div key={`${c.match_key}:${c.kind}`}><p>{matchLabel(matches.find(m => m.key === c.match_key))}: teams {c.team_numbers.join(', ')} need you at the same time.</p><a className="a-button" href={`#/matches/${encodeURIComponent(c.match_key)}`}>Request one-match cover</a></div>)}</section>}
       <section className="a-panel a-stack"><h2>Next actions</h2>{tasks.length ? tasks.slice(0, 20).map(duty => { const match = matches.find(m => m.key === duty.match_key), handedOff = duty.scout_user_id !== user.id; return <article className="a-duty" key={duty.id}><div><strong>{duty.report_kind === 'pit' ? 'Pit scouting' : matchLabel(match)} · Team {duty.team_number}</strong><p className="a-muted">{handedOff ? `Covered by ${name(duty.scout_user_id)}` : duty.handoff_id ? `You are covering for ${name(duty.primary_scout_user_id)}` : 'Your responsibility'} · {queued(duty) ? 'Pending upload' : isCompleted(match) ? 'Missing report' : 'Awaiting report'}</p></div>{!handedOff && <button className="a-button a-primary" onClick={() => open(duty)}>Scout team {duty.team_number}</button>}{match && !handedOff && !isCompleted(match) && <details className="a-duty-cover"><summary>Request cover for this match</summary><MatchHandoffs api={api} event={event} match={match} user={user} /></details>}</article>; }) : <p className="a-empty">No outstanding duties in the downloaded data. A coordinator can review event coverage.</p>}{tasks.length > 20 && <a href="#/matches">Open full match schedule for more duties</a>}</section>
       <details className="a-panel a-disclosure"><summary>Completed duties ({mine.filter(done).length})</summary><ul>{mine.filter(done).map(d => <li key={d.id}>Team {d.team_number} · {d.report_kind === 'pit' ? 'Pit' : matchLabel(matches.find(m => m.key === d.match_key))} · Server confirmed</li>)}</ul></details>
-    </>}
+    </>
   </div>;
 }
