@@ -26,11 +26,11 @@ function shuffled(values, next) {
   for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(next() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
   return result;
 }
-function createScorer(allocations, matches) {
+function createScorer(allocations, matches, extraMembers = []) {
   // The schedule graph is fixed throughout a seeded start. Avoid reparsing robot
   // keys and creating maps for every candidate swap on the single server thread.
   const indexes = new Map(allocations.map((a,i)=>[Number(a.team_number),i]));
-  const members = new Map([...new Set(allocations.map(a=>a.owner_user_id))].map((id,i)=>[id,i]));
+  const members = new Map([...new Set([...allocations.map(a=>a.owner_user_id), ...extraMembers])].map((id,i)=>[id,i]));
   const slots = matches.map(match=>['red','blue'].flatMap(color=>match.alliances?.[color]?.team_keys||[]).map(key=>indexes.get(Number(key.replace(/^frc/,'')))).filter(i=>i!==undefined));
   const owners = new Int32Array(allocations.length), counts = new Int32Array(members.size), loads = new Int32Array(members.size);
   return () => {
@@ -47,15 +47,25 @@ function createScorer(allocations, matches) {
 const better = (a, b) => a[0] < b[0] || (a[0] === b[0] && (a[1] < b[1] || (a[1] === b[1] && a[2] < b[2])));
 function previewPlan(db, input, userId) {
   const event = eventFor(db, input.event_id, userId); editableEvent(db, event);
+  if(!Array.isArray(event.event_teams||[])||(event.event_teams||[]).length>128||!Array.isArray(event.matches||[])||(event.matches||[]).length>400||(event.matches||[]).some(match=>['red','blue'].some(color=>(match.alliances?.[color]?.team_keys?.length||0)>6)))reject('Automatic assignments support up to 128 teams and 400 matches per event.',400);
   const existing = allocationRows(db, event), prior = planFor(db, event);
-  const scoutIds = [...new Set(input.scout_ids || prior?.scout_ids || [])];
-  if (!scoutIds.length || scoutIds.some(id => !activeMember(db, id, event.team_id))) reject('Select at least one active workspace scout.', 400);
   const mode = input.mode || 'fill';
-  if (!['fill', 'rerandomize'].includes(mode)) reject('Choose Fill unowned teams or Rerandomize unlocked teams.', 400);
+  if (!['fill', 'rerandomize', 'add_scouts'].includes(mode)) reject('Choose an assignment action.', 400);
+  const incoming = mode === 'add_scouts' ? input.new_scout_ids : [];
+  if (mode === 'add_scouts') {
+    if (!existing.length) reject('Assign teams once before adding another scout.', 400);
+    if (!Array.isArray(incoming) || !incoming.length || incoming.length > 100 || incoming.some(id => typeof id !== 'string' || !activeMember(db, id, event.team_id))) reject('Choose an active team member as the new scout.', 400);
+    if (incoming.some(id => existing.some(row => row.owner_user_id === id))) reject('This scout already has teams. Use individual team changes instead.', 400);
+  }
+  const newIds = [...new Set(incoming)];
+  const scoutIds = [...new Set(mode === 'add_scouts'
+    ? [...(prior?.scout_ids || existing.map(row => row.owner_user_id)).filter(id => activeMember(db, id, event.team_id)), ...newIds]
+    : input.scout_ids || prior?.scout_ids || [])];
+  if (!scoutIds.length || scoutIds.length>100 || scoutIds.some(id => !activeMember(db, id, event.team_id))) reject('Select between 1 and 100 active workspace scouts.', 400);
   const seed = typeof input.seed === 'string' && input.seed.length <= 100 ? input.seed : randomUUID();
   const forms = {};
   for (const kind of ['pit', 'match']) {
-    const id = input[`${kind}_form_id`] || prior?.[`${kind}_form_id`];
+    const id = (mode === 'add_scouts' && prior?.[`${kind}_form_id`]) || input[`${kind}_form_id`] || prior?.[`${kind}_form_id`];
     forms[kind] = rows(db, 'forms').find(row => row.id === id && row.team_id === event.team_id && !row.archived && !row.archived_at && (row.kind || 'match') === kind);
     if (!forms[kind]) reject(`Choose an active ${kind} form.`, 400);
   }
@@ -67,7 +77,34 @@ function previewPlan(db, input, userId) {
   const movable = numbers.filter(number => !fixed.some(row => Number(row.team_number) === number));
   const future = (event.matches || []).filter(match => !isCompleted(match));
   let best, bestScore;
-  for (let start = 0; start < 32; start++) {
+  const warnings = [];
+  if (mode === 'add_scouts') {
+    best = existing.map(row => ({ ...row }));
+    const counts = new Map(scoutIds.map(id => [id, best.filter(row => numbers.includes(Number(row.team_number)) && row.owner_user_id === id).length]));
+    const next = random(seed);
+    // First use teams that nobody owns. Existing scouts never trade teams here.
+    for (const number of shuffled(numbers.filter(number => !best.some(row => Number(row.team_number) === number)), next)) {
+      const owner = [...newIds].sort((a,b) => counts.get(a)-counts.get(b))[0];
+      best.push({team_number:number,owner_user_id:owner,locked:false});counts.set(owner,counts.get(owner)+1);
+    }
+    const target = Math.floor(numbers.length / scoutIds.length), score = createScorer(best, future, scoutIds);
+    for (const recipient of newIds) {
+      while (counts.get(recipient) < target) {
+        const donors = best.filter(row => numbers.includes(Number(row.team_number)) && !row.locked && !newIds.includes(row.owner_user_id) && counts.get(row.owner_user_id) > target);
+        if (!donors.length) break;
+        const largest = Math.max(...donors.map(row => counts.get(row.owner_user_id)));
+        let chosen, chosenScore;
+        for (const row of shuffled(donors.filter(row => counts.get(row.owner_user_id) === largest),next)) {
+          const previous = row.owner_user_id;row.owner_user_id = recipient;const trial = score();row.owner_user_id = previous;
+          if (!chosen || better(trial,chosenScore)) { chosen = row;chosenScore = trial; }
+        }
+        counts.set(chosen.owner_user_id,counts.get(chosen.owner_user_id)-1);chosen.owner_user_id = recipient;counts.set(recipient,counts.get(recipient)+1);
+      }
+      if (counts.get(recipient) < target) warnings.push('Not enough unlocked teams can move to give the new scout a full share. Unlock a team or move one explicitly.');
+      if (!counts.get(recipient) && !target) warnings.push('There are fewer teams than participating scouts. Move a team explicitly or use one-match handoffs.');
+    }
+    bestScore = score();
+  } else for (let start = 0; start < 32; start++) {
     const next = random(`${seed}:${start}`), candidate = fixed.map(row => ({ ...row }));
     const counts = new Map(scoutIds.map(id => [id, candidate.filter(row => row.owner_user_id === id).length]));
     for (const number of shuffled(movable, next)) {
@@ -90,14 +127,14 @@ function previewPlan(db, input, userId) {
     if (!best || better(score, bestScore)) { best = candidate; bestScore = score; }
   }
   best.sort((a, b) => a.team_number - b.team_number);
-  const normalized = { event_id: event.id, scout_ids: scoutIds, mode, seed, pit_form_id: forms.pit.id, match_form_id: forms.match.id };
+  const normalized = { event_id: event.id, scout_ids: scoutIds, mode, seed, pit_form_id: forms.pit.id, match_form_id: forms.match.id, ...(mode === 'add_scouts' ? {new_scout_ids:newIds} : {}) };
   const fingerprint = hash({ input: normalized, event, existing, plan: prior, assignments: scoped(rows(db, 'assignments'), event),
     members: rows(db, 'memberships').filter(m => m.team_id === event.team_id), forms: Object.values(forms),
     reports: realReports(db).filter(r => r.team_id === event.team_id && r.event_key === event.event_key).map(r => r.id), allocations: best });
-  const warnings = [];
   for (const row of fixed) if (!scoutIds.includes(row.owner_user_id)) warnings.push(`Team ${row.team_number} remains with a non-participating scout. Move it explicitly${row.locked ? ' or unlock it' : ''}.`);
   if (!future.length) warnings.push('No upcoming schedule is available. Team ownership and pit duties can be saved; match coverage remains unknown until a schedule is downloaded.');
-  return { input: normalized, fingerprint, allocations: best, collision_count: bestScore[0], warnings,
+  const transfers = best.filter(row => existing.some(old => Number(old.team_number) === Number(row.team_number) && old.owner_user_id !== row.owner_user_id)).map(row => ({team_number:row.team_number,from_user_id:existing.find(old => Number(old.team_number) === Number(row.team_number)).owner_user_id,to_user_id:row.owner_user_id}));
+  return { input: normalized, fingerprint, allocations: best, transfers, collision_count: bestScore[0], warnings,
     loads: scoutIds.map(id => ({ user_id: id, teams: best.filter(row => row.owner_user_id === id).length })) };
 }
 function history(db, assignment, previous, actorId, source, handoffId = null) {
@@ -179,7 +216,7 @@ function applyPlan(db, input, userId) {
   event.excluded = rows(db, 'memberships').filter(m => m.team_id === event.team_id && !plan.scout_ids.includes(m.user_id)).map(m => m.user_id);
   event.assignment_revision = (event.assignment_revision || 0) + 1;
   const changes = reconcile(db, event, userId);
-  audit(db, { teamId: event.team_id, eventKey: event.event_key, actorId: userId, action: 'assignments.randomize', targetId: event.id,
+  audit(db, { teamId: event.team_id, eventKey: event.event_key, actorId: userId, action: plan.mode === 'add_scouts' ? 'assignments.add_scouts' : 'assignments.randomize', targetId: event.id,
     detail: { mode: plan.mode, seed: plan.seed, participants: plan.scout_ids.length, teams: allocations.length, ...changes } });
   return { ...viewPlan(db, event), ...changes };
 }

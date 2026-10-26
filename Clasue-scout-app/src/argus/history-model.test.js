@@ -4,6 +4,11 @@ import {assignedTeamNumbers,filterReports,reportQuestions,reportsCsv} from './hi
 import {summarizeReportFields} from './analytics.js';
 const forms=[{id:'f',title:'Match',questions:[{id:'n',text:'Pieces',type:'number'},{id:'note',text:'Notes',type:'text'},{id:'photo',text:'Photo',type:'photo'},{id:'choice',text:'Mode',type:'select'}]}];
 const report=(id,patch={})=>({id,form_id:'f',form_title:'Match',team_id:'w',event_key:'e',match_key:'e_qm1',scouted_team:1,report_kind:'match',answers:{n:0,note:'Stable robot',photo:'data:image/png;base64,private',choice:'Fast'},...patch});
+test('report browsing separates pit and match forms and preserves reports with no team',()=>{
+ const rows=[report('match'),report('pit',{report_kind:'pit'}),report('unassigned',{scouted_team:null})];
+ assert.deepEqual(filterReports(rows,{eventKey:'e',reportKind:'pit'},forms).map(r=>r.id),['pit']);
+ assert.deepEqual(filterReports(rows,{eventKey:'e',team:'__unassigned__'},forms).map(r=>r.id),['unassigned']);
+});
 test('old and new team assignments remain scoped, deduplicated and read-only',()=>{
  const event={team_id:'w',event_key:'e',assignment:{u:{username:'Scout',teams:[1,'2',2,'bad']},other:{teams:[9]}}};
  const before=JSON.stringify(event),data={assignments:[{team_id:'w',event_key:'e',scout_user_id:'u',team_number:3},{team_id:'w',event_key:'other',scout_user_id:'u',team_number:4},{team_id:'other',event_key:'e',scout_user_id:'u',team_number:5},{team_id:'w',event_key:'e',scout_user_id:'u',team_number:6,archived_at:'now'}]};

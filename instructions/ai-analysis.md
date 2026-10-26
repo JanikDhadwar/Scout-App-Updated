@@ -2,10 +2,10 @@
 
 Open Teams, then choose a robot to review statistics, source reports, sample sizes and missing observations. Select two to four teams in the directory to compare them. Event statistics and report exports are linked at the top of Teams.
 
-The AI and scouting analyst screens have been removed. Statistics and alliance rankings use deterministic calculations from authorized scouting records.
+The AI and scouting analyst screens have been removed. Team statistics use deterministic calculations from authorized scouting records. Saved alliance picklists remain manually ordered.
 
-Open Present in the main menu, find a team and choose Present. Use arrow keys to move between slides. Export PDF and Export PowerPoint are at the top. Pit display is a separate shared-screen view, available from Present or More.
+Presentations are part of Teams. Find a team and choose its red Present button. Use arrow keys to move between slides. Export PDF and Export PowerPoint are at the top. Pit display is a separate shared-screen view, available from Teams or More. Old presentation links still work.
 
-For automatic scoring, defense, support and reliability lists, open [Alliance strategy](alliance-strategy.md).
+To build and save your own picklist, open [Alliance strategy](alliance-strategy.md). The automatic alliance selection sheet has been removed.
 
 [Back to contents](contents.md)

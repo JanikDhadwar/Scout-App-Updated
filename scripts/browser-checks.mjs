@@ -24,7 +24,7 @@ try {
   await page.goto(baseURL,{waitUntil:'networkidle'});
   await page.getByRole('heading',{name:'Scout every match. Make every decision count.',exact:true}).waitFor();
   assert.equal(await page.getByLabel('Username',{exact:true}).count(),0);
-  await page.getByRole('heading',{name:'Built by the Flusters',exact:true}).waitFor();
+  await page.getByRole('heading',{name:'Built by Hephaestus',exact:true}).waitFor();
   for(const label of ['Match scouting','Compare and choose','Pit display','Event workspace']){await page.getByRole('button',{name:label,exact:true}).click();assert.ok(await page.locator('#product-preview img').evaluate(image=>image.complete&&image.naturalWidth>0));}
   await page.getByRole('button',{name:'Compare and choose',exact:true}).click();await page.getByText('Read the sample comparison data',{exact:true}).click();await page.getByRole('region',{name:'Sample comparison data',exact:true}).waitFor();
   for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`welcome-${width}.png`),fullPage:true});}
@@ -45,7 +45,7 @@ try {
  }
  const teams=await api(page,'/teams');assert.ok(teams.data.some(t=>t.id==='qa-workspace'&&t.name==='QA robotics'),'Synthetic fixture required.');
  await check('role-aware onboarding, replay, main routes and no topbar event switch',async()=>{
-  await route('/welcome');await page.getByRole('link',{name:'Open workspace',exact:true}).first().click();await page.locator('.argus-app').waitFor();await route('/dashboard');await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
+  await route('/welcome');await page.getByRole('link',{name:'Open workspace',exact:true}).first().click();await page.locator('.argus-app').waitFor();await route('/dashboard');await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();assert.equal(await page.locator('#workspace-main a[href="#/present"]').count(),0,'Teams and presentations share one destination');
   for(const destination of ['assignments','admin','practice','help','analyst','teams','matches','analytics','strategy','events','settings']){await route(`/${destination}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();}
   assert.equal(await page.locator('.a-topbar a[href="#/events"]').count(),0);
   await route('/help');await page.getByRole('button',{name:'Replay welcome guide',exact:true}).click();await page.getByRole('region',{name:'Welcome guide'}).waitFor();await page.getByRole('button',{name:'Skip guide',exact:true}).click();
@@ -85,7 +85,7 @@ try {
  });
  await check('compact phone navigation retains tools, disclosures and modal keyboard access',async()=>{
   await page.setViewportSize({width:390,height:844});await route('/dashboard');
-  assert.equal(await page.locator('.a-mobile-nav a').count(),4);assert.ok(await page.locator('.a-mobile-nav a[href="#/present"]').isVisible());assert.equal(await page.locator('.a-page-tools').count(),0);
+  assert.equal(await page.locator('.a-mobile-nav a').count(),4);assert.ok(await page.locator('.a-mobile-nav a[href="#/matches"]').isVisible());assert.equal(await page.locator('.a-page-tools').count(),0);
   for(const route of ['match','analyst','practice','history','reminders'])assert.equal(await page.locator(`.a-sidebar nav a[href="#/${route}"]`).count(),0);
   const summary=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Event summary'})});
   assert.equal(await summary.getAttribute('open'),null);await summary.locator(':scope > summary').click();assert.ok(await summary.locator('.a-scoreboard').isVisible());await summary.locator(':scope > summary').click();
@@ -106,7 +106,7 @@ try {
   await route('/teams/254');for(const tab of await page.getByRole('tab').all()){await tab.click();assert.equal(await tab.getAttribute('aria-selected'),'true');}
   for(const value of ['254,1678','254,1678,2056,6390']){await route(`/compare?teams=${value}`);await page.getByRole('region',{name:'Team comparison statistics'}).waitFor();}
   await route('/analyst');await page.getByRole('heading',{name:'Team statistics',exact:true}).waitFor();assert.equal(await page.getByRole('button',{name:'Ask locally',exact:true}).count(),0);await page.getByRole('link',{name:'Open teams',exact:true}).click();await page.getByRole('heading',{name:'Teams',exact:true}).waitFor();
-  await page.locator('.a-sidebar nav a[href="#/present"]').click();await page.getByRole('heading',{name:'Present',exact:true}).waitFor();await page.getByLabel('Find a team to present',{exact:true}).fill('254');await page.getByRole('button',{name:'Present team 254',exact:true}).click();await page.getByRole('button',{name:'Next',exact:true}).waitFor();await page.keyboard.press('ArrowRight');await page.getByRole('status').filter({hasText:'Section 2 of 7'}).waitFor();await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.a-sidebar nav a[href="#/present"]').count(),0);await route('/teams');await page.getByLabel('Find a team',{exact:true}).fill('254');await page.getByRole('button',{name:'Present team 254',exact:true}).click();await page.getByRole('button',{name:'Next',exact:true}).waitFor();await page.keyboard.press('ArrowRight');await page.getByRole('status').filter({hasText:'Section 2 of 7'}).waitFor();await page.keyboard.press('Escape');
  });
  await check('picklist reorder, persistent unsaved edits, saved revisions and real exports',async()=>{
   await route('/strategy');await page.getByLabel('Saved picklist').selectOption('qa-picklist');await page.getByRole('button',{name:'Move team 1678 up',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();
@@ -117,18 +117,11 @@ try {
   for(const [label,extension] of [['Export PDF','pdf'],['Export PowerPoint','pptx']]){const [file]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:label,exact:true}).click()]);await file.saveAs(path.join(artifacts,`team-254.${extension}`));assert.ok(fs.statSync(path.join(artifacts,`team-254.${extension}`)).size>1000);}
   await page.keyboard.press('Escape');
  });
- await check('season-independent alliance sheet generates a separate persistent picklist without AI',async()=>{
-  const requests=[];const capture=request=>{if(/groq|\/analyst\//i.test(request.url()))requests.push(request.url());};page.on('request',capture);
-  try{
-   await route('/analytics');await page.getByLabel('Alliance role for Autonomous pieces',{exact:true}).selectOption('scoring');await page.getByRole('button',{name:'Save metric definitions',exact:true}).click();
-   await page.waitForFunction(async()=>{const row=await(await fetch('/api/scout_events/qa-event')).json();return row.analytics_config['qa-match-form:auto'].category==='scoring';});
-   await route('/strategy');const sheet=page.getByRole('region',{name:'Scoring selection sheet',exact:true});await sheet.waitFor();assert.equal(await sheet.locator('tbody tr').first().locator('th').innerText(),'1678');assert.ok((await sheet.innerText()).includes('Small sample'));assert.ok(!(await sheet.locator('tbody').innerText()).includes('6390'));
-   for(const width of widths){await page.setViewportSize({width,height:1000});await page.screenshot({path:path.join(artifacts,`alliance-sheet-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);}
-   await page.setViewportSize({width:1440,height:1000});await page.getByRole('button',{name:'Create scoring picklist',exact:true}).click();await page.getByRole('button',{name:'Save picklist',exact:true}).click();await page.getByText('Picklist saved on the server.',{exact:true}).waitFor();
-   const lists=(await api(page,'/picklists')).data;const generated=lists.find(l=>l.name==='Scoring selection');assert.ok(generated);assert.equal(generated.entries[0].team_number,1678);assert.ok(lists.some(l=>l.id==='qa-picklist'));
-   await route('/dashboard');await route('/strategy');await page.getByLabel('Saved picklist').selectOption(generated.id);assert.equal(await page.getByLabel('Picklist name',{exact:true}).inputValue(),'Scoring selection');
-   await route('/teams');assert.deepEqual(requests,[]);
-  }finally{page.off('request',capture);}
+ await check('automatic alliance sheet is removed and existing manual picklists remain',async()=>{
+  const before=(await api(page,'/picklists')).data;await route('/strategy');await page.getByLabel('Saved picklist').waitFor();
+  assert.equal(await page.getByRole('heading',{name:'Automatic alliance selection sheet',exact:true}).count(),0);
+  assert.equal(await page.getByRole('button',{name:'Create scoring picklist',exact:true}).count(),0);
+  await page.getByLabel('Saved picklist').selectOption('qa-picklist');assert.deepEqual((await api(page,'/picklists')).data,before);
  });
  await check('one-match handoff acceptance preserves permanent owners and other matches',async()=>{
   const receiverContext=await browser.newContext({viewport:{width:390,height:1000},serviceWorkers:'allow'}),receiver=await receiverContext.newPage();
@@ -155,6 +148,18 @@ try {
   const duties=(await api(page,'/assignments')).data;for(const a of owners)assert.ok(duties.some(d=>d.report_kind==='pit'&&d.team_number===a.team_number&&d.scout_user_id===a.owner_user_id));assert.ok(duties.some(d=>d.handoff_id&&d.scout_user_id==='qa-idle'));
   await page.getByText(/Move or lock individual teams/).click();await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).check();await page.getByRole('button',{name:'Save team 254',exact:true}).click();await page.waitForFunction(async()=>{const a=await(await fetch('/api/team_allocations')).json();return a.find(x=>x.team_number===254).locked;});
   await page.reload({waitUntil:'networkidle'});await page.getByRole('heading',{name:'Team assignments',exact:true}).waitFor();await page.getByText(/Move or lock individual teams/).click();assert.ok(await page.getByRole('checkbox',{name:'Lock team 254',exact:true}).isChecked());
+ });
+ await check('late scout preview moves only a small share and keeps existing owners and reports',async()=>{
+  await page.setViewportSize({width:1440,height:1000});await route('/admin?tab=assignments');
+  const before=(await api(page,'/team_allocations')).data, reports=(await api(page,'/submissions')).data;
+  await page.getByLabel('New scout',{exact:true}).selectOption('qa-idle');await page.getByRole('button',{name:'Preview new scout assignments',exact:true}).click();
+  const preview=page.getByRole('region',{name:'Ownership preview',exact:true});await preview.waitFor();assert.deepEqual((await api(page,'/team_allocations')).data,before);
+  for(const width of widths){await page.setViewportSize({width,height:1000});await page.screenshot({path:path.join(artifacts,`add-scout-${width}.png`),fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
+  await page.setViewportSize({width:1440,height:1000});await preview.getByRole('button',{name:'Apply assignments',exact:true}).click();await page.getByText(/Ownership saved\./).waitFor();
+  const after=(await api(page,'/team_allocations')).data, moved=after.filter(a=>a.owner_user_id!==before.find(b=>b.id===a.id)?.owner_user_id);
+  assert.equal(moved.length,1);assert.equal(moved[0].owner_user_id,'qa-idle');assert.ok(!moved[0].locked);assert.deepEqual((await api(page,'/submissions')).data,reports);
+  const original=before.find(a=>a.id===moved[0].id);assert.equal((await api(page,`/team-allocations/${moved[0].id}`,'PATCH',{revision:moved[0].revision,owner_user_id:original.owner_user_id})).status,200);
+  await page.getByRole('button',{name:'Refresh scouts',exact:true}).click();await page.getByRole('region',{name:'Who scouts each team',exact:true}).getByText('No teams assigned',{exact:true}).waitFor();await route('/dashboard');
  });
  await check('simple Admin randomizer and searchable scout/team roster keep preview reversible',async()=>{
   await route('/admin?tab=assignments');await page.getByRole('heading',{name:'Team assignments',exact:true}).waitFor();
@@ -234,6 +239,60 @@ try {
   await page.getByRole('button',{name:'Select official event',exact:true}).click();await modal.getByRole('button',{name:'Activate event and keep history',exact:true}).click();await modal.waitFor({state:'hidden'});assert.equal((await api(page,'/teams/qa-workspace')).data.active_event_id,'qa-next');assert.deepEqual((await api(page,'/submissions')).data.map(r=>r.id).sort(),before.map(r=>r.id).sort());
   assert.equal((await api(page,'/event-transition','POST',{team_id:'qa-workspace',next_event_id:'qa-event',delete_forms:true})).status,409);
   await route('/history');await page.getByLabel('Historical event').selectOption('qa-event');await page.getByRole('heading',{name:'Teams',exact:true}).waitFor();assert.equal((await api(page,'/teams/qa-workspace')).data.active_event_id,'qa-next','History browsing never changes the active event');
+ });
+ await check('pit limits update across scouts without refresh and preserve the blocked draft',async()=>{
+  const form={id:'qa-live-pit',team_id:'qa-workspace',kind:'pit',title:'Live pit limit',allow_team_select:true,max_submissions_per_team:1,questions:[{id:'cycles',type:'number',text:'Observed cycles',required:true}]};
+  assert.equal((await api(page,'/scout_events/qa-next','PATCH',{event_teams:[{team_number:254,nickname:'QA robot'}]})).status,200);
+  assert.equal((await api(page,'/forms','POST',form)).status,200);
+  await route('/pit?form_id=qa-live-pit');await page.getByRole('heading',{name:'Live pit limit',exact:true}).waitFor();await page.getByLabel('Team you are scouting *',{exact:true}).selectOption('254');
+  const number=page.locator('.question-card input[type="number"]');await number.fill('7');
+  const otherContext=await browser.newContext(),other=await otherContext.newPage();
+  try{
+   await login(other,'qa_admin');const report={id:'qa-live-pit-report',form_id:form.id,form_title:form.title,team_id:form.team_id,event_key:'2026next',scouted_team:'254',report_kind:'pit',user_id:'qa-admin',submitted_by:'qa_admin',questions_snapshot:form.questions,answers:{cycles:3},created_at:new Date().toISOString()};
+   assert.equal((await api(other,'/submissions','POST',report)).status,200);
+   await page.waitForFunction(()=>document.querySelector('#report-scouted-team option[value="254"]')?.disabled,null,{timeout:22000});
+   assert.equal(await number.inputValue(),'7');
+   await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('alert').filter({hasText:'Your draft has been kept'}).waitFor();assert.equal(await number.inputValue(),'7');assert.equal((await api(page,'/form-submission-counts/qa-live-pit?event_key=2026next')).data['254'],1);const stored=await page.evaluate(async()=>{const db=await new Promise((r,j)=>{const q=indexedDB.open('scout-device-v1');q.onsuccess=()=>r(q.result);q.onerror=j;});const read=name=>new Promise((r,j)=>{const q=db.transaction(name).objectStore(name).getAll();q.onsuccess=()=>r(q.result);q.onerror=j;});const [drafts,queue]=await Promise.all([read('drafts'),read('queue')]);db.close();return {draft:drafts.find(d=>d.key.endsWith(':qa-live-pit')),queued:queue.filter(q=>q.row.form_id==='qa-live-pit').length};});assert.equal(stored.draft.value.answers.cycles,7);assert.equal(stored.queued,0);
+   await context.setOffline(true);await page.getByRole('status').filter({hasText:'Report limits could not be checked live'}).waitFor();assert.equal(await number.inputValue(),'7');await context.setOffline(false);await page.getByRole('status').filter({hasText:'Report limits update automatically'}).waitFor();
+  }finally{await otherContext.close();}
+ });
+ await check('form browsing starts with a type and team search and downloads only selected evidence',async()=>{
+  await route('/reports');assert.equal(await page.getByRole('region',{name:'Scouting report results',exact:true}).count(),0);
+  await page.getByRole('button',{name:'View pit forms',exact:true}).click();await page.getByLabel('Find a team to view forms',{exact:true}).fill('254');await page.getByRole('button',{name:'View team 254 forms',exact:true}).click();
+  const results=page.getByRole('region',{name:'Scouting report results',exact:true});await results.getByText('Live pit limit',{exact:true}).waitFor();assert.equal(await results.locator('tbody tr').count(),1);
+  const [download]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Export CSV',exact:true}).click()]);await download.saveAs(path.join(artifacts,'pit-team-254.csv'));assert.match(fs.readFileSync(path.join(artifacts,'pit-team-254.csv'),'utf8'),/qa-live-pit-report/);
+  for(const width of widths){await page.setViewportSize({width,height:1000});await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(artifacts,`report-browser-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);}
+  await page.getByRole('button',{name:'View match forms',exact:true}).click();await page.getByLabel('Browse report scope',{exact:true}).selectOption('all');await page.getByLabel('Find a team to view forms',{exact:true}).fill('254');await page.getByRole('button',{name:'View team 254 forms',exact:true}).click();assert.equal(await results.getByText('Live pit limit',{exact:true}).count(),0);assert.ok(await results.locator('tbody tr').count()>0);
+ });
+ await check('official completion reaches the schedule automatically without the admin refresh action',async()=>{
+  const original={key:'2026next_qm1',event_key:'2026next',comp_level:'qm',match_number:1,time:Math.floor(Date.now()/1000)-60,alliances:{red:{team_keys:['frc254'],score:-1},blue:{team_keys:['frc6390'],score:-1}}};
+  assert.equal((await api(page,'/scout_events/qa-next','PATCH',{matches:[original]})).status,200);
+  // Playwright page routing cannot intercept requests owned by a controlling SW.
+  // Offline/PWA behavior is tested in the main context; this context mocks the feed.
+  const liveContext=await browser.newContext({serviceWorkers:'block',viewport:{width:1440,height:1000}}),live=await liveContext.newPage();
+  let calls=0,announce=false;
+  await live.route('**/api/events/qa-next/refresh-live',async request=>{calls++;if(announce){const saved=await live.evaluate(async body=>{const response=await fetch('/api/scout_events/qa-next',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return response.status;},{matches:[{...original,actual_time:Math.floor(Date.now()/1000),alliances:{red:{...original.alliances.red,score:40},blue:{...original.alliances.blue,score:30}}}]});assert.equal(saved,200);}await request.fulfill({json:{status:'live',fetched_at:new Date().toISOString()}});});
+  try{
+   await login(live,'qa_owner');await route('/matches',live);await live.getByRole('region',{name:'Match schedule',exact:true}).getByText('Upcoming',{exact:true}).waitFor();await live.waitForLoadState('networkidle');announce=true;
+   await live.getByRole('region',{name:'Match schedule',exact:true}).getByText('Completed',{exact:true}).waitFor({timeout:45000});assert.ok(calls>1);
+  }finally{await liveContext.close();}
+ });
+ await check('account rename and recovery code reset work through the interface',async()=>{
+  const accountContext=await browser.newContext({viewport:{width:390,height:844}}),account=await accountContext.newPage();
+  try{
+   await account.goto(`${baseURL}/#/login`);assert.equal((await api(account,'/auth/signup','POST',{username:'qa_security',password:'ArgusQA2026!'})).status,200);
+   assert.equal((await api(account,'/auth/join-team','POST',{number:'6390',password:'QA6390'})).status,200);
+   await login(account,'qa_security');await route('/settings',account);
+   const section=account.getByRole('region',{name:'Account security',exact:true});
+   await section.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await section.getByLabel('Current password',{exact:true}).fill('ArgusQA2026!');await section.getByRole('button',{name:'Change username',exact:true}).click();await section.getByText('Username changed. Your reports and assignments are unchanged.',{exact:true}).waitFor();
+   await section.getByLabel('Current password',{exact:true}).fill('ArgusQA2026!');await section.getByRole('button',{name:'Create recovery code',exact:true}).click();const code=await section.getByLabel('Recovery code',{exact:true}).inputValue();assert.match(code,/^[a-f0-9]{48}$/);
+   assert.equal(await account.evaluate(value=>JSON.stringify(localStorage).includes(value),code),false);await section.getByRole('button',{name:'Hide code',exact:true}).click();
+   await account.screenshot({path:path.join(artifacts,'account-security-390.png'),fullPage:true});
+   await api(account,'/auth/logout','POST',{});await account.reload({waitUntil:'networkidle'});await account.goto(`${baseURL}/#/login`);await account.getByRole('button',{name:'Forgot password?',exact:true}).click();
+   await account.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await account.getByLabel('Saved recovery code',{exact:true}).fill(code);await account.getByLabel('New password',{exact:true}).fill('ResetQA2026!');await account.getByRole('button',{name:'Reset password',exact:true}).click();await account.getByText(/Password reset\. Sign in/).waitFor();
+   await account.getByLabel('Password',{exact:true}).fill('ResetQA2026!');await account.locator('.auth-submit').click();await account.locator('.argus-app').waitFor();
+   assert.equal((await api(account,'/auth/me')).data.username,'qa_security_renamed');
+  }finally{await accountContext.close();}
  });
  if(errors.length)results.push({name:'uncaught browser errors',status:'failed',errors});
 }finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({baseURL,results,errors},null,2));console.log(JSON.stringify({artifacts,results},null,2));}

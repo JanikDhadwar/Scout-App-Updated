@@ -8,6 +8,8 @@ __pycache__/
 *.pyc
 
 # Private server credentials
+/brag-output*/
+/release-audit.json
 .env
 .env.*
 !.env.example

@@ -24,7 +24,7 @@ export default function WelcomeScreen({ signedIn=false }) {
     <main id="welcome-main" tabIndex={-1} ref={main}>
       <section className="a-public-hero a-product-hero" aria-labelledby="welcome-title">
         <div className="a-product-intro">
-          <p className="a-public-kicker">Built by FRC 6390 · The Flusters</p>
+          <p className="a-public-kicker">Built by FRC 6390 · Hephaestus</p>
           <h1 id="welcome-title">Scout every match. Make every decision count.</h1>
           <p>From the stands to alliance selection, Argus brings your team’s scouting into one workspace. Capture observations, coordinate scouts, and turn shared evidence into your next decision.</p>
           <div className="a-public-actions"><a className="a-button a-primary" href={access}>{signedIn?'Open workspace':'Start now'}</a><a className="a-button" href="#product-examples" onClick={explore}>See how it works</a></div>
@@ -65,10 +65,10 @@ export default function WelcomeScreen({ signedIn=false }) {
         <details><summary>What to know before going offline</summary><p>Use the same browser or installed app and stay signed in. A first visit, a new login, or joining a new team needs a connection. Clearing browser site data removes locally stored drafts and queued reports. Check sync status after reconnecting to confirm your reports reached the server.</p></details>
       </section>
       <section className="a-public-section a-public-credit" aria-labelledby="credits-argus">
-        <div><p className="a-public-kicker">By a robotics team, for robotics teams</p><h2 id="credits-argus">Built by the Flusters</h2><p>Developed by FRC Team 6390, the Flusters. Argus brings match scouting, pit scouting, and team strategy into one place, so your team can spend more time using its observations.</p></div>
+        <div><p className="a-public-kicker">By a robotics team, for robotics teams</p><h2 id="credits-argus">Built by Hephaestus</h2><p>Developed by FRC Team 6390, Hephaestus. Argus brings match scouting, pit scouting, and team strategy into one place, so your team can spend more time using its observations.</p></div>
         <div className="a-product-final-action"><h3>Bring your scouting together.</h3><a className="a-button a-primary" href={access}>{signedIn?'Open workspace':'Start now'}</a>{!signedIn&&<a href="#/login">Already have an account? Log in</a>}</div>
       </section>
     </main>
-    <footer className="a-public-footer"><span>Argus {APP_VERSION} · FRC 6390</span><a href={signedIn?'#/dashboard':'#/login'}>{signedIn?'Return to your workspace':'Log in to your workspace'}</a></footer>
+    <footer className="a-public-footer"><span>Argus {APP_VERSION} · FRC 6390</span><a href="/third-party-notices.txt">Third-party notices</a><a href={signedIn?'#/dashboard':'#/login'}>{signedIn?'Return to your workspace':'Log in to your workspace'}</a></footer>
   </div>;
 }

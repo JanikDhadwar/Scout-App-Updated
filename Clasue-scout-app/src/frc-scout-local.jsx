@@ -1,4 +1,5 @@
 import { assignedRobots, matchReportError } from './argus/match-access.js';
+import {watchLive} from './argus/live-updates.js';
 import { APP_VERSION } from './app-version.js';
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
@@ -170,16 +171,18 @@ export default function App() {
   async function archiveTeam(){const restoring=!!team.archived_at;if(!confirm(restoring?'Restore this team?':'Archive this team? Reports are retained and the owner can restore it.'))return;try{const result=await apiCall('POST',restoring?'/auth/restore-team':'/auth/archive-team',{team_id:team.id});setTeam(result.team);await saveSession(user,result.team,mem);}catch(error){alert(error.message);}}
   async function deactivate(){if(!confirm('Deactivate your account? Reports will remain with your team. Transfer any active teams you own first.'))return;try{await apiCall('POST','/auth/deactivate-account',{});await clearSession();}catch(error){alert(error.message);}}
   if(booting)return <div className="argus-boot" role="status">Opening ARGUS…</div>;
-  if(publicRoute==='#/welcome'||!user&&!['#/login','#/signup'].includes(publicRoute))return <WelcomeScreen signedIn={!!user&&!!team}/>;
+  if(publicRoute==='#/welcome'||!user&&!['#/login','#/signup','#/reset-password'].includes(publicRoute))return <WelcomeScreen signedIn={!!user&&!!team}/>;
   if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main id="account-main" tabIndex={-1} className="workspace-main">{!user?<AuthScreen key={publicRoute} initialMode={publicRoute==='#/signup'?'signup':'login'} onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
   const renderLegacy=(view,context={})=>view==='match'||view==='pit'?<FormsTab key={`${view}:${context.match_key||''}:${context.scouted_team||''}`} team={team} user={user} role={role} syncState={syncState} reportKind={view} context={context} onPending={()=>{offline.refresh();window.dispatchEvent(new Event('scout-report-saved'));}}/>:view==='news'?<AnnouncementsTab team={team} user={user} role={role}/>:view==='myteam'?<MyTeamTab key={context.event_key} team={team} eventKey={context.event_key}/>:view==='manage'?<ManageTab team={team} user={user} onTeamUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} onRoleChange={refreshMem}/>:view==='sync'?<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>{window.location.hash='/settings';}}/>:null;
-  return <ArgusWorkspace workspace={team} user={user} role={role} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={()=>updateServiceWorker(true)}/>;
+  return <ArgusWorkspace workspace={team} user={user} role={role} onUserUpdate={async u=>{setUser(u);await saveSession(u,team,mem?{...mem,username:u.username}:mem);await offline.invalidateReadCache();}} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={()=>updateServiceWorker(true)}/>;
 }
 
 // ─── Auth Screen ──────────────────────────────────────────────────────────────
 function AuthScreen({ onLogin, initialMode='login' }) {
-  const [mode,setMode]=useState(initialMode);
+  const [mode,setMode]=useState(window.location.hash==='#/reset-password'?'reset':initialMode);
+  const [recoveryCode,setRecoveryCode]=useState('');
+  const [notice,setNotice]=useState('');
   const heading=useRef(null);
   useEffect(()=>{heading.current?.focus();},[]);
   const [username,setUsername]=useState("");
@@ -191,7 +194,7 @@ function AuthScreen({ onLogin, initialMode='login' }) {
     if (busy) return;
     if (!username.trim()||!password.trim()) { setErr("All fields required."); return; }
     setBusy(true); setErr("");
-    try {const u=await apiCall('POST',mode==='signup'?'/auth/signup':'/auth/login',{username:username.trim(),password});await onLogin(u);}
+    try {if(mode==='reset'){await apiCall('POST','/auth/reset-password',{username:username.trim(),recovery_code:recoveryCode.trim(),new_password:password});setPassword('');setRecoveryCode('');setMode('login');setNotice('Password reset. Sign in with your new password. Create a new recovery code in Settings.');}else{const u=await apiCall('POST',mode==='signup'?'/auth/signup':'/auth/login',{username:username.trim(),password});await onLogin(u);}}
     catch(error){setErr(error.message||'Could not sign in. Try again.');}
     setBusy(false);
   }
@@ -201,7 +204,7 @@ function AuthScreen({ onLogin, initialMode='login' }) {
       <section className="auth-form-area" aria-label="Account access"><form className="auth-form-card" onSubmit={e=>{e.preventDefault();submit();}}>
         <a href="#/welcome">About Argus</a>
         <div className="auth-wordmark">Argus</div>
-        <h1 tabIndex={-1} ref={heading}>{mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='login'?'Open your team scouting app.':'You can join your team after signing up.'}</p>
+        <h1 tabIndex={-1} ref={heading}>{mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='reset'?'Use the recovery code you saved from Settings. Without a saved code, this form cannot recover your account.':mode==='login'?'Open your team scouting app.':'You can join your team after signing up. Save a recovery code from Settings after joining.'}</p>
         <div className="auth-tabs" aria-label="Account options">
           {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}
@@ -209,10 +212,12 @@ function AuthScreen({ onLogin, initialMode='login' }) {
         </div>
         <label htmlFor="scout-username" style={sx.lbl}>Username</label>
         <input id="scout-username" autoComplete="username" style={sx.inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="scouter42" autoCapitalize="none" />
-        <label htmlFor="scout-password" style={sx.lbl}>Password</label>
+        {mode==='reset'&&<><label htmlFor="scout-recovery" style={sx.lbl}>Saved recovery code</label><input id="scout-recovery" style={sx.inp} autoComplete="off" autoCapitalize="none" maxLength={48} value={recoveryCode} onChange={e=>setRecoveryCode(e.target.value)} required/></>}
+        <label htmlFor="scout-password" style={sx.lbl}>{mode==='reset'?'New password':'Password'}</label>
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" />
-        {err && <div role="alert" style={sx.err}>{err}</div>}
-        <button type="submit" className="primary-button auth-submit" disabled={busy}>{busy?(mode==="login"?"Signing in…":"Creating account…"):mode==="login"?"Sign in":"Create account"}</button>
+        {err && <div role="alert" style={sx.err}>{err}</div>}{notice&&<p role="status">{notice}</p>}
+        <button type="submit" className="primary-button auth-submit" disabled={busy}>{busy?'Please wait…':mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create account'}</button>
+        {mode==='login'&&<button type="button" className="a-button" onClick={()=>{setMode('reset');setErr('');setNotice('');setPassword('');}}>Forgot password?</button>}
       </form><span className="auth-footer">Argus {APP_VERSION} · Match and pit scouting</span></section>
     </div>
   );
@@ -660,32 +665,33 @@ export function FormFiller({ form, user, team, onDone, onCancel, reportKind, con
   const reportMatch=reportEvent?.matches?.find(match=>match.key===draft.value.match_key);
   const allowedReportRobots=assignedRobots({event:reportEvent,match:reportMatch,assignments:assignmentData,userId:user.id});
   const selectableTeams=isMatchForm?allowedReportRobots.map(slot=>eventTeams.find(team=>String(team.team_number)===slot.teamNumber)||{team_number:slot.teamNumber}):eventTeams;
-  const [subCounts,setSubCounts]=useState({}); // team_number -> count
-
+  const [subCounts,setSubCounts]=useState({});
+  const [countsFresh,setCountsFresh]=useState(false);
+  const countsRefresh=useRef(null),knownCounts=useRef({});
   useEffect(()=>{
-    let active=true;
-    (async()=>{
-      // Load event teams
-      try {
-        const [evs,assigned] = await Promise.all([idbAll("scout_events"),idbAll("assignments")]);
-        if(active)setAssignmentData(assigned);
-        const owned=evs.filter(e=>e.team_id===team.id);
-        const ev=owned.find(e=>e.event_key===draft.value.event_key);
-        if(active){setAvailableEvents(owned);setEventTeams(ev?.event_teams || []);}
-      } catch { /* Offline event metadata may not be downloaded yet. Manual context stays available. */ }
-      // Load submission counts per team for this form
-      if (!practice&&form.max_submissions_per_team) {
-        try {
-          const counts = await apiCall('GET',`/form-submission-counts/${encodeURIComponent(form.id)}?event_key=${encodeURIComponent(draft.value.event_key||'')}`);
-          const queued=await offline.pending();
-          for(const entry of queued){const s=entry.row;if(s.team_id===team.id&&s.form_id===form.id&&(s.event_key||'')===(draft.value.event_key||'')&&s.scouted_team)counts[s.scouted_team]=(counts[s.scouted_team]||0)+1;}
-          if(active)setSubCounts(counts);
-        } catch {
-          try {const subs=await fbSelect('submissions',{form_id:form.id});const counts={};for(const s of subs)if((s.event_key||'')===(draft.value.event_key||'')&&s.scouted_team)counts[s.scouted_team]=(counts[s.scouted_team]||0)+1;if(active)setSubCounts(counts);}catch{if(active)setSubCounts({});}
-        }
+    let active=true,metadataLoaded=false,sequence=0;
+    async function load(updateContext=false){
+      const version=++sequence;
+      if(!metadataLoaded||updateContext)try {
+        const [events,assigned]=await Promise.all([idbAll('scout_events'),idbAll('assignments')]);
+        const owned=events.filter(e=>e.team_id===team.id),event=owned.find(e=>e.event_key===draft.value.event_key);
+        if(active&&version===sequence){setAssignmentData(assigned);setAvailableEvents(owned);setEventTeams(event?.event_teams||[]);metadataLoaded=true;}
+      }catch{/* Keep the last downloaded context and draft. */}
+      if(practice||!form.max_submissions_per_team)return {};
+      let counts;
+      try{
+        counts={...await apiCall('GET',`/form-submission-counts/${encodeURIComponent(form.id)}?event_key=${encodeURIComponent(draft.value.event_key||'')}`)};
+        for(const entry of await offline.pending()){const row=entry.row;if(row.team_id===team.id&&row.form_id===form.id&&(row.event_key||'')===(draft.value.event_key||'')&&row.scouted_team)counts[row.scouted_team]=(counts[row.scouted_team]||0)+1;}
+        if(active&&version===sequence)setCountsFresh(navigator.onLine!==false);
+      }catch{
+        if(active&&version===sequence)setCountsFresh(false);
+        try{const reports=await fbSelect('submissions',{form_id:form.id});counts={};for(const row of reports)if((row.event_key||'')===(draft.value.event_key||'')&&row.scouted_team)counts[row.scouted_team]=(counts[row.scouted_team]||0)+1;}catch{return knownCounts.current;}
       }
-    })();
-    return ()=>{active=false;};
+      if(active&&version===sequence){knownCounts.current=counts;setSubCounts(counts);}return counts;
+    }
+    countsRefresh.current=load;
+    const stop=watchLive(()=>load()),changed=()=>load(true),disconnected=()=>setCountsFresh(false);window.addEventListener('argus-live-updated',changed);window.addEventListener('scout-report-saved',changed);window.addEventListener('offline',disconnected);
+    return()=>{active=false;stop();countsRefresh.current=null;window.removeEventListener('argus-live-updated',changed);window.removeEventListener('scout-report-saved',changed);window.removeEventListener('offline',disconnected);};
   },[draft.value.event_key,team.id,form.id,form.max_submissions_per_team,practice]);
 
   const shownQuestions = visibleQuestions(questions, ans);
@@ -694,14 +700,18 @@ export function FormFiller({ form, user, team, onDone, onCancel, reportKind, con
   async function submit() {
     if (busy) return;
     if (form.allow_team_select && !scoutedTeam) { setErr("Please select the team you are scouting."); return; }
-    if (!practice&&form.max_submissions_per_team && scoutedTeam) {
-      const count = subCounts[scoutedTeam]||0;
-      if (count >= form.max_submissions_per_team) { setErr(`Team #${scoutedTeam} has already been scouted ${count} times (max: ${form.max_submissions_per_team}).`); return; }
-    }
     const missing=shownQuestions.filter(q=>q.required&&!hasAnswer(ans[q.id]));
     if (missing.length){ setErr(`Required: ${missing.map(q=>q.text).join(", ")}`); return; }
     if(draft.value.match_number!=null&&draft.value.match_number!==''&&!Number.isFinite(Number(draft.value.match_number))){setErr('Enter a valid match number.');return;}
     setBusy(true); setErr("");
+    if(!practice&&form.max_submissions_per_team&&scoutedTeam){
+      const latest=await countsRefresh.current?.()||knownCounts.current;
+      const count=latest[scoutedTeam]||0;
+      if(count>=form.max_submissions_per_team){
+        try{await draft.flush();setErr(`Team #${scoutedTeam} has already been scouted ${count} times (max: ${form.max_submissions_per_team}). Your draft has been kept.`);}catch{setErr('This team has reached its report limit, and the draft could not be saved. Keep this page open and free up browser storage.');}
+        setBusy(false);return;
+      }
+    }
     const sub={id:draft.value.id,form_id:form.id,form_title:draft.value.form_title||form.title,team_id:team.id,scouted_team:scoutedTeam||null,submitted_by:user.username,user_id:user.id,event_key:draft.value.event_key||null,match_key:draft.value.match_key||null,match_number:draft.value.match_number==null||draft.value.match_number===''?null:Number(draft.value.match_number),alliance:draft.value.alliance||null,assignment_id:draft.value.assignment_id||null,report_kind:draft.value.report_kind||form.kind||reportKind||'match',questions_snapshot:structuredClone(questions||[]),answers:visibleAnswers(questions,ans),created_at:tsNow()};
     try {
       if(isMatchForm){const [events,assignments]=await Promise.all([idbAll('scout_events'),idbAll('assignments')]);const event=events.find(event=>event.team_id===team.id&&event.event_key===sub.event_key);const accessError=matchReportError({event,assignments,userId:user.id,report:sub});if(accessError)throw new Error(accessError);}
@@ -739,6 +749,7 @@ export function FormFiller({ form, user, team, onDone, onCancel, reportKind, con
         <label style={sx.lbl} htmlFor="report-kind">Report type</label><select id="report-kind" disabled style={sx.inp} value={draft.value.report_kind||form.kind||reportKind||'match'} onChange={e=>setContext('report_kind',e.target.value)}><option value="match">Match scouting</option><option value="pit">Pit scouting</option></select>
         <label style={sx.lbl} htmlFor="report-scout">Scout identity</label><input id="report-scout" style={sx.inp} value={user.username} readOnly/><p className="muted" style={{fontSize:12}}>Reports use your signed-in identity.{draft.value.assignment_id?' Linked assignment: '+draft.value.assignment_id:''}</p>
       </section>
+      {!practice&&form.max_submissions_per_team&&<p className="muted" role="status">{countsFresh?'Report limits update automatically while connected.':'Report limits could not be checked live. Downloaded counts may be out of date; the server checks the limit when reports upload.'}</p>}
       {/* Team selector */}
       {(form.allow_team_select||isMatchForm)&&(
         <div style={sx.card}>

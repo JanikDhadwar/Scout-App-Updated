@@ -10,4 +10,6 @@ You can scout only your assigned robot or accepted coverage. If two owned teams 
 
 Match keys identify playoff sets as well as match numbers. Do not manually reuse another match's draft context. Saved drafts with different context are preserved and show a warning.
 
+Official match results are checked automatically about every thirty seconds while Argus is visible and online. Devices check for team-data changes every ten seconds. A scheduled start time alone does not mark a match completed. If the official service or connection is unavailable, Argus keeps the downloaded schedule and shows the freshness limitation.
+
 [Back to contents](contents.md)

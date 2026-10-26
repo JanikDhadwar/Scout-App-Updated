@@ -1,6 +1,0 @@
-<template><style>#root{position:absolute;inset:0}</style><div data-hf-id="hf-rpet" id="root" data-composition-id="play" data-width="1920" data-height="1080"><div data-hf-id="hf-tan6" class="stage"><video data-hf-id="hf-21im" id="rebuilt-play" class="clip film" data-start="0" data-duration="4" data-track-index="1" data-has-audio="true" data-volume="0.18" playsinline src="assets/6390-rebuilt.mp4"></video><div data-hf-id="hf-ro7b" class="film-label">6390 · REBUILT<small data-hf-id="hf-sxjq">User-supplied match footage</small></div></div></div><script>const tl=gsap.timeline({paused:true});tl.fromTo('.film-label',{x:-30,opacity:0},{x:0,opacity:1,duration:.24},.12);
-
-// Scale the original scene's action timing; keep the original illustrations and copy.
-for(const child of tl.getChildren(false,true,true)){child.startTime(child.startTime()*1);child.duration(child.duration()*1);}
-tl.to('.film',{scale:1.025,duration:.1,ease:'power3.out'},2.45);tl.to('.film',{x:7,duration:.035},2.48);tl.to('.film',{x:-5,duration:.035},2.515);tl.to('.film',{x:0,scale:1,duration:.2,ease:'power2.out'},2.55);
-window.__timelines['play']=tl;</script></template>

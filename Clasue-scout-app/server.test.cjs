@@ -37,9 +37,13 @@ test('authenticated API preserves legacy data, isolates workspaces, and rejects 
     for(let i=0;i<22;i++)assert.equal((await owner('/api/auth/login','POST',{username:'Legacy',password:'legacy-secret'})).status,200,'Successful sign-ins must not exhaust the failure limit');
     const created=await owner('/api/auth/create-team','POST',{number:'6390',name:'Test team'});assert.equal(created.status,200);const team=created.data.team,ownerMem=created.data.mem;
     const signup=await member('/api/auth/signup','POST',{username:'Scout',password:'scout-secret'});assert.equal(signup.status,200);const scout=signup.data;
+    assert.equal((await member(`/api/live/revision?workspaceId=${team.id}`)).status,403);
     assert.equal((await anonymous('/api/auth/signup','POST',{username:'Scout',password:'other-secret'})).status,409);
     assert.equal((await member('/api/auth/join-team','POST',{number:'6390',password:'wrong'})).status,403);
     const joined=await member('/api/auth/join-team','POST',{number:'6390',password:team.password});assert.equal(joined.status,200);assert.equal(joined.data.team.password,undefined);
+    assert.match((await member(`/api/live/revision?workspaceId=${team.id}`)).data.revision,/^[a-f0-9]{64}$/);
+    assert.equal((await anonymous(`/api/live/revision?workspaceId=${team.id}`)).status,403,'Authenticated non-member cannot read the change token');
+    assert.equal((await member('/api/events/not-your-event/refresh-live','POST',{})).status,403);
     await outsider('/api/auth/signup','POST',{username:'Other',password:'other-secret'});const otherTeam=(await outsider('/api/auth/create-team','POST',{number:'42',name:'Other'})).data.team;
     assert.equal((await outsider(`/api/match13/rating?workspaceId=${team.id}&team=254&year=2026`)).status,403);
     assert.equal((await owner(`/api/match13/rating?workspaceId=${team.id}&team=bad&year=2026`)).status,400);

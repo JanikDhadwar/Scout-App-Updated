@@ -11,7 +11,6 @@ export const destinations = [
   ["reminders", "Reminders"],
   ["admin", "Admin control centre"],
   ["strategy", "Alliance selection"],
-  ["present", "Present"],
   ["display", "Pit display"],
   ["events", "Event data"],
   ["settings", "Settings"],
@@ -19,8 +18,8 @@ export const destinations = [
 export const mainDestinations = [
   ["dashboard", "Home"],
   ["assignments", "Scout"],
+  ["matches", "Matches"],
   ["teams", "Teams"],
-  ["present", "Present"],
   ["more", "More"],
 ];
 export const sidebarDestinations = [
@@ -29,7 +28,6 @@ export const sidebarDestinations = [
   ['matches', 'Matches'],
   ['teams', 'Teams'],
   ['strategy', 'Alliance selection'],
-  ['present', 'Present'],
   ['admin', 'Admin'],
   ['settings', 'Settings'],
   ['help', 'Help'],
@@ -37,7 +35,8 @@ export const sidebarDestinations = [
 export function navigationGroup(section) {
   if (["match", "pit", "assignments"].includes(section)) return "assignments";
   if (section === 'matches') return 'matches';
-  if (['present', 'display'].includes(section)) return 'present';
+  if (section === 'present') return 'teams';
+  if (section === 'display') return 'settings';
   if (['strategy', 'admin', 'help'].includes(section)) return section;
   if (
     [

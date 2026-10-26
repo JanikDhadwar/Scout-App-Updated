@@ -31,13 +31,14 @@ import { EventData, MetricConfiguration } from "./operations.jsx";
 import { ReportLibrary } from "./report-library.jsx";
 import { SetupGuidance } from "./setup-guidance.jsx";
 import { MobileMore } from './workspace-navigation.jsx';
-import { PresentationPicker } from './presentations.jsx';
+import {watchLive} from './live-updates.js';
 import { PitDisplay, PitDisplaySettings } from "./restored-features.jsx";
 import { offline } from "../offline.js";
 import "./workspace.css";
 import './upgrade.css';
 import './mobile-workspace.css';
 import { IntegrationSettings } from "./integration-settings.jsx";
+import AccountSecurity from './account-security.jsx';
 import {Match13Settings} from './match13.jsx';
 import { APP_VERSION } from "../app-version.js";
 import { EventTransition } from "./event-transition.jsx";
@@ -232,6 +233,7 @@ export default function ArgusWorkspace({
   needRefresh,
   onUpdate,
   onWorkspaceUpdate,
+  onUserUpdate,
   onLeaveWorkspace,
 }) {
   const [route, setRoute] = useState(readRoute),
@@ -294,6 +296,7 @@ export default function ArgusWorkspace({
     setData((previous) => ({ ...previous, ...next }));
     setError(failed.join(" "));
     setLoading(false);
+    return failed.length===0&&offline.getState().connection==='online';
   }, [api]);
   useEffect(() => {
     let mounted = true;
@@ -404,6 +407,20 @@ export default function ArgusWorkspace({
     () => analyticsForData({...scoped,submissions:(scoped.submissions||[]).filter(r=>!(scoped.pendingReportIds||[]).includes(r.id))}, workspace, event),
     [scoped, workspace, event],
   );
+  const [liveStatus,setLiveStatus]=useState(null);
+  useEffect(()=>{
+    let active=true,revision='',lastOfficial=0;
+    const stop=watchLive(async()=>{
+      if(event?.id&&Date.now()-lastOfficial>=30000){
+        lastOfficial=Date.now();
+        try{const result=await api('POST',`/events/${encodeURIComponent(event.id)}/refresh-live`,{});if(active)setLiveStatus(result);}catch{if(active)setLiveStatus({status:'unavailable',message:'Keeping the downloaded schedule. Official updates are unavailable.'});}
+      }
+      const current=await api('GET',`/live/revision?workspaceId=${encodeURIComponent(workspace.id)}`);
+      if(!active)return;
+      if(current.revision!==revision){const loaded=await refresh();if(!active)return;if(loaded)revision=current.revision;window.dispatchEvent(new Event('argus-live-updated'));}
+    });
+    return()=>{active=false;stop();};
+  },[api,workspace.id,event?.id,refresh]);
   const [sharedSummary,setSharedSummary]=useState(null);
   const summaryKey=`${user.id}:${workspace.id}:${event?.id||''}:${role}:${event?.sharing_revision||0}`;
   useEffect(()=>{let active=true;if(event)api('GET',`/events/${encodeURIComponent(event.id)}/analytics`).then(value=>{if(active)setSharedSummary({key:summaryKey,value});}).catch(()=>{/* Own downloaded evidence remains available offline. */});return()=>{active=false;};},[api,event,summaryKey,syncState.lastSync,scoped.submissions]);
@@ -529,20 +546,21 @@ export default function ArgusWorkspace({
         onOpenReport={openReport}
       />
     );
-  else if (section === "teams")
+  else if (section === "teams" || section === "present")
     body = (
-      <TeamDirectory
+      <><TeamDirectory
         api={api} workspaceId={workspace.id} season={event?.event_key?.slice(0,4)}
         analytics={analytics}
         onOpenTeam={openTeam}
         onCompare={compare}
         onPresent={present}
-      />
+      />{section==='present'&&id&&<TeamPresentation analytics={analytics} teamNumber={id} onClose={()=>openTeam(id)} onExport={exportTeam}/>}</>
     );
   else if (section === "matches")
     body = (
       <MatchSchedule
         {...common}
+        liveStatus={liveStatus}
         matchKey={id ? decodeURIComponent(id) : null}
         onOpenTeam={openTeam}
       />
@@ -575,18 +593,6 @@ export default function ArgusWorkspace({
         onOpenTeam={openTeam}
         onPresent={present}
       />
-    );
-  else if (section === "present")
-    body = (
-      <>
-        <PresentationPicker analytics={analytics} onPresent={present}/>
-        {id && <TeamPresentation
-          analytics={analytics}
-          teamNumber={id}
-          onClose={() => openTeam(id)}
-          onExport={exportTeam}
-        />}
-      </>
     );
   else if (section === "strategy")
     body = (
@@ -715,6 +721,7 @@ export default function ArgusWorkspace({
           <a className="a-button" href="#/welcome">About Argus</a>
         </header>
         <nav className="a-tool-list" aria-label="Settings tools">{utilityDestinations.filter(([key])=>key!=='settings'&&canSeeDestination(key,role)).map(([key,label])=><a key={key} className="a-button" href={`#/${key}`}>{label}</a>)}</nav>
+        <AccountSecurity api={api} user={user} onUserUpdate={onUserUpdate} workspace={workspace} role={role} onWorkspaceUpdate={onWorkspaceUpdate}/>
         <IntegrationSettings api={api} workspaceId={workspace.id} role={role} />
         <Match13Settings api={api} workspaceId={workspace.id} role={role}/>
         <section className="a-panel a-stack">
@@ -1016,18 +1023,19 @@ export default function ArgusWorkspace({
             >
               The Blue Alliance
             </a>
+            {" · "}<a href="/third-party-notices.txt">Third-party notices</a>
           </footer>
         </main>
       </div>
       <nav className="a-mobile-nav" aria-label="Mobile navigation">
-        {["dashboard", "assignments", "teams", "present"].map((key) => (
+        {mainDestinations.filter(([key])=>key!=='more').map(([key,label]) => (
           <a
             href={`#/${key}`}
             key={key}
             aria-current={activeGroup===key?'page':undefined}
           >
             <RouteIcon name={key} />
-            <span>{mainDestinations.find((row) => row[0] === key)[1]}</span>
+            <span>{label}</span>
           </a>
         ))}
         <button

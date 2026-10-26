@@ -10,7 +10,7 @@ export function Walkthrough({ user, workspace, role, api, section }) {
     ['Your teams stay yours', 'Scout lists permanent teams, pit progress and every scheduled match duty. Check conflicts before a match.', '/assignments', 'My assignments'],
     ['Pit and match scouting', 'Open the assigned form. Drafts save on this device; submitted reports stay pending until the server confirms them.', '/help?topic=offline-and-sync', 'Learn offline saving'],
     ['Need a short break?', 'Request cover for one robot in one match. You remain responsible until an eligible connected teammate accepts.', '/help?topic=handoffs-and-breaks', 'Learn handoffs'],
-    ['Use evidence for strategy', 'Open Teams for statistics and comparisons. Open Present to show a team or download its slides.', '/teams', 'Browse teams'],
+    ['Use evidence for strategy', 'Open Teams for statistics and comparisons. Choose Present on a team to show its slides or download them.', '/teams', 'Browse teams'],
     ...(admin ? [['Coordinate the team', 'Use Admin control centre to manage participants, owners, missing reports, roles and activity history.', '/admin', 'Open Admin tools']] : []),
   ];
   useEffect(() => { let active = true; api('GET', `/preferences?team_id=${encodeURIComponent(workspace.id)}`).then(p => { if (active && p.guide_dismissed) setDismissed(true); }).catch(() => {}); const replay = () => { setStep(0); setDismissed(false); }; window.addEventListener('argus-guide-replay', replay); return () => { active = false; window.removeEventListener('argus-guide-replay', replay); }; }, [api, workspace.id]);

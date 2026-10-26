@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assignmentReports, buildSearchIndex, searchIndex, isCompleted, mainDestinations, sidebarDestinations, navigationGroup, utilityDestinations, canSeeDestination } from './workspace-model.js';
 
-test('one scouting destination and a visible presentation destination keep task context',()=>{
- assert.deepEqual(mainDestinations.map(([key])=>key),['dashboard','assignments','teams','present','more']);
+test('one scouting destination and one combined Teams presentation keep task context',()=>{
+ assert.deepEqual(mainDestinations.map(([key])=>key),['dashboard','assignments','matches','teams','more']);
  for(const section of ['match','pit','assignments'])assert.equal(navigationGroup(section),'assignments');
- for(const section of ['present','display'])assert.equal(navigationGroup(section),'present');
+ assert.equal(navigationGroup('present'),'teams');assert.equal(navigationGroup('display'),'settings');
  for(const section of ['teams','analytics','compare','reports'])assert.equal(navigationGroup(section),'teams');
  assert.equal(navigationGroup('matches'),'matches');
  assert.equal(navigationGroup('strategy'),'strategy');
@@ -14,7 +14,7 @@ test('one scouting destination and a visible presentation destination keep task 
 test('pit assignments and unavailable schedule rows have no completed match',()=>{assert.equal(isCompleted(undefined),false);assert.equal(isCompleted(null),false);assert.equal(isCompleted({}),false);});
 
 test('visible task links are unique, secondary tools remain accessible and Admin is role scoped',()=>{
- assert.ok(sidebarDestinations.some(([key])=>key==='present'));
+ assert.ok(!sidebarDestinations.some(([key])=>key==='present'));assert.ok(sidebarDestinations.some(([key])=>key==='teams'));
  assert.equal(new Set(sidebarDestinations.map(([key])=>key)).size,sidebarDestinations.length);
  for(const key of ['events','sync','history','practice','display','reports'])assert.ok(utilityDestinations.some(([route])=>route===key));
  assert.equal(canSeeDestination('admin','member'),false);

@@ -19,10 +19,16 @@ const domain = require('./domain.cjs');
 const assignmentsService = require('./assignment-service.cjs');
 const submissionService = require('./submission-service.cjs');
 const { registerUpgradeRoutes } = require('./upgrade-routes.cjs');
+const {createLimiter}=require('./auth-limits.cjs');
+const authLimit=createLimiter();
 const scoutPresence=new Map();
 const match13=require('./match13-service.cjs').createMatch13Client(),match13Requests=new Map();
 const statbotics=require('./statbotics-service.cjs').createStatboticsClient(),statboticsRequests=new Map();
 const app = express();
+// Opt in only when a trusted reverse proxy runs on this same host. Direct LAN
+// clients remain untrusted; never accept arbitrary forwarded client addresses.
+if(process.env.ARGUS_TRUST_PROXY&&process.env.ARGUS_TRUST_PROXY!=='loopback')throw Error('ARGUS_TRUST_PROXY must be loopback or unset.');
+app.set('trust proxy',process.env.ARGUS_TRUST_PROXY==='loopback'?'loopback':false);
 app.disable('x-powered-by');
 app.disable('etag');
 const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'db.json');
@@ -31,12 +37,19 @@ const integrations=createIntegrationStore(path.join(path.dirname(DB_FILE),'argus
 function integrationKey(req,name,workspaceId=req.headers['x-argus-workspace']){return (typeof workspaceId==='string'&&membership(readDB(),req.user.id,workspaceId)?integrations.key(workspaceId,name):undefined)||process.env[name];}
 const STORES = ['users','teams','memberships','forms','submissions','announcements','scout_events','pit_scouts','assignments','picklists','team_allocations'];
 const database = createDatabase(DB_FILE);
+const {createRevision,createMatchRefresh}=require('./live-scouting.cjs');
+const liveRevision=createRevision(),revisionCache=new Map();let revisionStamp='';
+const liveMatches=createMatchRefresh({readDB,writeDB,fetchMatches:async(eventKey,key)=>{
+  const result=await fetch(`https://www.thebluealliance.com/api/v3/event/${encodeURIComponent(eventKey)}/matches`,{headers:{'X-TBA-Auth-Key':key},signal:AbortSignal.timeout(10000)});
+  if(!result.ok)throw Error('Official schedule unavailable');return result.json();
+}});
 const sessions = createSessions(path.join(path.dirname(DB_FILE), 'argus-sessions.private.json')), attempts = new Map();
 function readDB() {
   return database.read();
 }
 function writeDB(db) {
   database.write(db);
+  revisionCache.clear();
 }
 function rows(db, store) { return Array.isArray(db[store]) ? db[store] : []; }
 function publicUser(u) { return {id:u.id, username:u.username, created_at:u.created_at}; }
@@ -80,9 +93,10 @@ app.use('/api',(req,res,next)=>{
   req.sessionToken=token;next();
 });
 app.post(['/api/auth/login','/api/auth/signup'],(req,res)=>{
+  if(!authLimit.take(`auth-ip:${req.ip}`,300)||!authLimit.take('auth-global',3000)||req.path.endsWith('/signup')&&(!authLimit.take(`signup-ip:${req.ip}`,60)||!authLimit.take('signup-global',500)))return fail(res,429,'Too many attempts. Try again in 15 minutes.');
   const now=Date.now(),ip=`${req.ip}:${typeof req.body?.username==='string'?req.body.username.trim().toLowerCase().slice(0,80):''}`;
   req.authAttemptKey=ip;
-  if(attempts.size>10000)for(const [k,v] of attempts)if(v.until<now)attempts.delete(k);
+  if(attempts.size>=10000){for(const [k,v] of attempts)if(v.until<=now)attempts.delete(k);if(!attempts.has(ip)&&attempts.size>=10000)return fail(res,429,'Too many attempts. Try again in 15 minutes.');}
   const bucket=attempts.get(ip);if(bucket?.until>now && bucket.count>=20)return fail(res,429,'Too many attempts. Try again in 15 minutes.');
   attempts.set(ip,{count:bucket?.until>now?bucket.count+1:1,until:bucket?.until>now?bucket.until:now+900000});
   const {username,password}=req.body||{};
@@ -98,11 +112,25 @@ app.post(['/api/auth/login','/api/auth/signup'],(req,res)=>{
   if(!found.password_hash.startsWith('scrypt$')){found.password_hash=passwordHash(password);writeDB(db);}
   return login(req,res,found);
 });
+require('./account-security.cjs').registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit:authLimit});
 app.use('/api',(req,res,next)=>req.user?next():fail(res,401,'Sign in required'));
 app.get('/api/auth/me',(req,res)=>res.json(publicUser(req.user)));
+app.get('/api/live/revision',(req,res)=>{
+  const id=req.query.workspaceId,db=readDB();if(typeof id!=='string'||!membership(db,req.user.id,id))return fail(res,403,'Team membership required.');
+  const stat=fs.statSync(DB_FILE),stamp=`${stat.mtimeMs}:${stat.size}`;if(stamp!==revisionStamp){revisionCache.clear();revisionStamp=stamp;}
+  if(!revisionCache.has(id)){if(revisionCache.size>=200)revisionCache.delete(revisionCache.keys().next().value);revisionCache.set(id,liveRevision(db,id));}
+  res.json({revision:revisionCache.get(id)});
+});
+app.post('/api/events/:id/refresh-live',async(req,res)=>{
+  const db=readDB(),event=rows(db,'scout_events').find(e=>e.id===req.params.id);
+  if(!event||!membership(db,req.user.id,event.team_id))return fail(res,403,'Team membership required.');
+  if(activeEvent(db,event.team_id)?.id!==event.id)return fail(res,409,'Only the active event receives live updates.');
+  res.json(await liveMatches(event.id,integrationKey(req,'TBA_API_KEY',event.team_id)));
+});
 app.post('/api/auth/logout',(req,res)=>{sessions.delete(req.sessionToken);res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});});
 app.post('/api/auth/create-team',(req,res)=>{
   const {number,name,password}=req.body||{};
+  if(password!=null&&(typeof password!=='string'||password.trim().length<8||password.length>128))return fail(res,400,'Use a join password of 8 to 128 characters, or leave it out to generate one.');
   if(!/^\d{1,6}$/.test(String(number))||typeof name!=='string'||!name.trim()||name.length>120)return fail(res,400,'A team number and name are required');
   const db=readDB();if(rows(db,'teams').some(t=>String(t.number)===String(number)))return fail(res,409,'Team number is already registered');
   const joinPassword=typeof password==='string'&&password.trim()?password.trim().toUpperCase():crypto.randomBytes(6).toString('hex').toUpperCase();
@@ -111,6 +139,7 @@ app.post('/api/auth/create-team',(req,res)=>{
   db.teams=[...rows(db,'teams'),team];db.memberships=[...rows(db,'memberships'),mem];writeDB(db);res.json({team,mem});
 });
 app.post('/api/auth/join-team',(req,res)=>{
+  if(!authLimit.take(`join-user:${req.user.id}`,20)||!authLimit.take(`join-ip:${req.ip}`,200)||!authLimit.take('join-global',2000))return fail(res,429,'Too many join attempts. Try again in 15 minutes.');
   const {number,password}=req.body||{},db=readDB();
   const team=rows(db,'teams').find(t=>String(t.number)===String(number));
   if(!team||typeof password!=='string'||!equal(password.trim().toUpperCase(),team.password))return fail(res,403,'Invalid team number or join password');
@@ -131,6 +160,9 @@ app.post('/api/auth/deactivate-account',(req,res)=>{
   db.memberships=rows(db,'memberships').filter(m=>m.user_id!==req.user.id);
   writeDB(db);sessions.revoke(req.user.id);
   res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});
+});
+app.use(['/api/assignment-plan/preview','/api/assignment-plan/apply','/api/assignment-plan/reconcile'],(req,res,next)=>{
+  if(req.method==='POST'&&(!authLimit.take(`plan:${req.user.id}`,20,60000)||!authLimit.take('plan-global',100,60000)))return fail(res,429,'Wait a minute before calculating more assignments.');next();
 });
 registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, dbFile:DB_FILE });
 app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:false,match13Configured:!!integrationKey(req,'MATCH13_API_KEY',workspaceId)});});
@@ -276,6 +308,7 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!['admin','member'].includes(row.role))return fail(res,400,'Invalid role');
   } else if(store==='teams') {
     if(role(db,req.user.id,tid)!=='owner')return fail(res,403,'Owner permission required');
+    if(Object.hasOwn(body,'password')&&body.password!==original?.password)return fail(res,409,'Replace the team join code in Settings instead.');
     if(req.method==='DELETE')return fail(res,409,'Team deletion would orphan scouting records. Archive the workspace instead.');
     if(!original||row.owner_id!==original.owner_id||row.number!==original.number)return fail(res,400,'Team identity cannot be changed');
     if(Object.hasOwn(body,'active_event_id')&&body.active_event_id!==original.active_event_id||Object.hasOwn(body,'event_transition')&&!isDeepStrictEqual(body.event_transition,original.event_transition))return fail(res,409,'Use Change event to switch events and retain history.');

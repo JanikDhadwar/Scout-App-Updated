@@ -8,12 +8,10 @@ Move entries with the up/down buttons on touch or keyboard; drag is optional. Sa
 
 Strategy notes and Needs review markers record your judgement. Pick order is not official ranking and is not a predicted match outcome.
 
-## Automatic selection sheet
+## Manual selection
 
-In Analytics → Metric definitions, assign each numeric field an alliance role (scoring, defense, support or reliability) and preferred direction. Save the definitions. Use fields relevant to your current game; no season-specific code update is needed.
+The automatic alliance selection sheet and generated category picklists have been removed. Existing saved picklists and their order are retained. Add, compare, reorder and save teams using your own observations and judgement.
 
-Strategy automatically displays one sheet per role. Each field uses the average of one median per linked match, then compares teams with the same field. A category score equally averages the field percentiles, with ties shared. These are relative event scores out of 100, not game points or win probabilities. A single observed team gets 50. Teams missing any configured field remain unranked. Your own team, pit evidence and unlinked reports do not enter these rankings.
-
-Review source reports, small samples, disagreements and coverage. Admins/Owners can use Create scoring picklist (or another category) to make a new editable draft. Review and save it to share; existing lists are preserved. The sheet recalculates as reports change, while saved picklist order stays under your control.
+Teams and presentations share the Teams page. Search for a team and use its Present button to open slides or export a PDF or PowerPoint. Open pit display from Teams or Settings.
 
 [Back to contents](contents.md)

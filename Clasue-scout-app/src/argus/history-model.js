@@ -14,10 +14,11 @@ export function reportQuestions(reports,forms=[]) {
   return [...result.values()];
 }
 
-export function filterReports(reports,{eventKey,scope='event',formId='',team='',question='',answer='',query=''}={},forms=[]) {
+export function filterReports(reports,{eventKey,scope='event',formId='',team='',question='',answer='',query='',reportKind=''}={},forms=[]) {
   return reports.filter(row=>{
     if(scope==='event'&&(!eventKey||row.event_key!==eventKey)||scope==='legacy'&&row.event_key)return false;
-    if(formId&&row.form_id!==formId||team&&String(row.scouted_team)!==team)return false;
+    if(formId&&row.form_id!==formId||team&&(team==='__unassigned__'?!!row.scouted_team:String(row.scouted_team)!==team))return false;
+    if(reportKind&&(row.report_kind||forms.find(f=>f.id===row.form_id)?.kind||'match')!==reportKind)return false;
     if(query&&!`${row.scouted_team||''} ${row.form_title||''} ${row.match_key||''} ${row.submitted_by||''}`.toLowerCase().includes(query.toLowerCase()))return false;
     if(!answer)return true;
     const questions=reportQuestions([row],forms),types=new Map(questions.map(q=>[q.id,q.type]));

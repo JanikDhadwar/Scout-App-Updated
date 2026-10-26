@@ -10,6 +10,14 @@ A permanent owner receives a list of robot teams for the entire event. That scou
 
 Team counts are balanced when unconstrained. Locked or preserved ownership can limit balance. Collision minimization is a heuristic and cannot guarantee zero conflicts.
 
+## When another scout joins
+
+Open Admin → Assignments → Add a scout. If their name is missing, choose Refresh scouts after they join your team. Select their name, then Preview new scout assignments. Review the exact teams moving and choose Apply assignments.
+
+Unassigned teams go to the newcomer first. If every team is owned, only enough unlocked teams move to give the newcomer a share. Existing scouts do not swap teams with each other. Locked teams, completed reports and accepted match handoffs stay protected. Future generated duties follow the updated owner; manual overrides stay in place.
+
+If too many teams are locked, the preview explains why it cannot give the newcomer a full share. You can unlock or move an individual team. Randomize teams is still available when you deliberately want to reshuffle everyone.
+
 Use Move or lock individual teams for permanent changes. Accepted handoffs and explicit match overrides are preserved. Deselection prevents new ownership; it does not silently abandon existing teams. Move those teams explicitly.
 
 Scout shows permanent teams, pit progress, next duties, conflicts and coverage. Use Match scouting or Pit scouting to start. Pending upload is not server-confirmed completion. Schedule refresh reconciles new duties without duplicating them.
