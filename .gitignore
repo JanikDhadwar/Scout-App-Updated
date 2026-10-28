@@ -37,6 +37,8 @@ argus-sessions.private.json
 argus-sessions.private.json.tmp
 argus-push.private.json
 argus-push.private.json.tmp
+argus-mfa.private.json
+argus-mfa.private.json.tmp
 *.writer.lock
 *.writer.lock.reclaim
 *.initialized

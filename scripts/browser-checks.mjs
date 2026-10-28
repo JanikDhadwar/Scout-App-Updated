@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 const require = createRequire(new URL('../Clasue-scout-app/package.json', import.meta.url));
 const { chromium,firefox,webkit } = require('playwright');
+const {hotp}=require('../Clasue-scout-app/mfa-service.cjs');
 const baseURL = process.env.QA_BASE_URL || 'http://127.0.0.1:4173';
 assert.ok(['localhost','127.0.0.1','[::1]'].includes(new URL(baseURL).hostname),'Use a local fixture server only.');
 const artifacts = process.env.QA_ARTIFACT_DIR || fs.mkdtempSync(path.join(os.tmpdir(),'argus-browser-qa-'));
@@ -14,7 +15,7 @@ assert.ok(['edge','chromium','firefox','webkit'].includes(qaBrowser),'QA_BROWSER
 const browser = await ({edge:chromium,chromium,firefox,webkit}[qaBrowser]).launch({headless:true,...(qaBrowser==='edge'?{channel:'msedge',...(process.env.EDGE_EXECUTABLE?{executablePath:process.env.EDGE_EXECUTABLE}:{})}:{})});
 let context = await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'allow'});
 let page = await context.newPage(); page.setDefaultTimeout(12000);
-const results=[],errors=[],policyErrors=[];
+const results=[],errors=[],policyErrors=[],checkMatch=process.env.QA_CHECK_MATCH||'';
 const diagnostics=target=>{target.setDefaultTimeout(12000);target.on('pageerror',error=>errors.push(error.message));target.on('console',message=>{if(message.type()==='error'&&/content security policy|violates.*directive|refused to.*(?:script|style|connect|worker)/i.test(message.text()))policyErrors.push(message.text());});};
 diagnostics(page);
 const route=async(destination,target=page)=>{await target.evaluate(value=>{location.hash=value;},destination);await target.waitForTimeout(200);};
@@ -27,7 +28,7 @@ const withPreparedWorkerContext=async run=>{
  try{await page.goto(baseURL,{waitUntil:'networkidle'});await page.locator('.argus-app').waitFor();await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);await run();}
  finally{await context.setOffline(false);await context.close();context=mainContext;page=mainPage;}
 };
-const check=async(name,run)=>{try{await run();results.push({name,status:'passed'});}catch(error){results.push({name,status:'failed',error:error.message});await page.screenshot({path:path.join(artifacts,`failure-${results.length}.png`),fullPage:true}).catch(()=>{});}finally{await context.setOffline(false);await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});console.log(JSON.stringify(results.at(-1)));}};
+const check=async(name,run)=>{if(checkMatch&&!name.includes(checkMatch))return;try{await run();results.push({name,status:'passed'});}catch(error){results.push({name,status:'failed',error:error.message});await page.screenshot({path:path.join(artifacts,`failure-${results.length}.png`),fullPage:true}).catch(()=>{});}finally{await context.setOffline(false);await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});console.log(JSON.stringify(results.at(-1)));}};
 const widths=[1440,1280,1024,768,390,360];
 try {
  await check('public welcome, account entry and offline public reload',async()=>{
@@ -309,13 +310,14 @@ try {
  });
  await check('account rename and recovery code reset work through the interface',async()=>{
   const accountContext=await browser.newContext({viewport:{width:390,height:844}}),account=await accountContext.newPage();
+ diagnostics(account);
   try{
    await account.goto(`${baseURL}/#/login`);assert.equal((await api(account,'/auth/signup','POST',{username:'qa_security',password:'ArgusQA2026!'})).status,200);
    assert.equal((await api(account,'/auth/join-team','POST',{number:'6390',password:'QA6390'})).status,200);
    // Signup already sets a session. Explicitly sign out before testing the
    // sign-in UI; otherwise fast restoration can correctly skip that screen.
    assert.equal((await api(account,'/auth/logout','POST',{})).status,200);
-   await login(account,'qa_security');await route('/settings',account);
+   await login(account,'qa_security');await route('/settings',account);await account.getByRole('region',{name:'Account security',exact:true}).waitFor();
    const section=account.getByRole('region',{name:'Account security',exact:true});
    await section.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await section.getByLabel('Current password',{exact:true}).fill('ArgusQA2026!');await section.getByRole('button',{name:'Change username',exact:true}).click();await section.getByText('Username changed. Your reports and assignments are unchanged.',{exact:true}).waitFor();
    await section.getByLabel('Current password',{exact:true}).fill('ArgusQA2026!');await section.getByRole('button',{name:'Create recovery code',exact:true}).click();const code=await section.getByLabel('Recovery code',{exact:true}).inputValue();assert.match(code,/^[a-f0-9]{48}$/);
@@ -325,7 +327,9 @@ try {
    await account.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await account.getByLabel('Saved recovery code',{exact:true}).fill(code);await account.getByLabel('New password',{exact:true}).fill('ResetQA2026!');await account.getByRole('button',{name:'Reset password',exact:true}).click();await account.getByText(/Password reset\. Sign in/).waitFor();
    await account.getByLabel('Password',{exact:true}).fill('ResetQA2026!');await account.locator('.auth-submit').click();await account.locator('.argus-app').waitFor();
    assert.equal((await api(account,'/auth/me')).data.username,'qa_security_renamed');
-  }finally{await accountContext.close();}
+   await route('/settings',account);const mfaSection=account.getByRole('region',{name:'Account security',exact:true});await mfaSection.getByLabel('Current password',{exact:true}).fill('ResetQA2026!');await mfaSection.getByText(/Multi-factor authentication/).click();await mfaSection.getByRole('button',{name:'Start MFA enrollment',exact:true}).click();const secret=await mfaSection.getByLabel('Authenticator secret',{exact:true}).inputValue();await mfaSection.getByLabel('Current six-digit code',{exact:true}).fill(hotp(secret,Math.floor(Date.now()/30000)));await mfaSection.getByRole('button',{name:'Confirm and enable MFA',exact:true}).click();const codes=(await mfaSection.locator('textarea').inputValue()).trim().split('\n');assert.equal(codes.length,10);
+   await api(account,'/auth/logout','POST',{});await account.reload({waitUntil:'networkidle'});await account.goto(`${baseURL}/#/login`);await account.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await account.getByLabel('Password',{exact:true}).fill('ResetQA2026!');await account.locator('.auth-submit').click();await account.getByRole('heading',{name:'Multi-factor authentication',exact:true}).waitFor();await account.getByLabel('Authenticator or recovery code',{exact:true}).fill(codes[0]);await account.getByRole('button',{name:'Verify and sign in',exact:true}).click();await account.locator('.argus-app').waitFor();assert.equal((await api(account,'/auth/me')).data.username,'qa_security_renamed');
+  }catch(error){await account.screenshot({path:path.join(artifacts,'account-security-failure.png'),fullPage:true}).catch(()=>{});throw error;}finally{await accountContext.close();}
  });
  if(errors.length)results.push({name:'uncaught browser errors',status:'failed',errors});
  if(policyErrors.length)results.push({name:'content security policy violations',status:'failed',errors:[...new Set(policyErrors)]});

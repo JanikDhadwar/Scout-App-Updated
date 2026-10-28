@@ -12,7 +12,7 @@ const appDirectory=path.resolve(__dirname,'../Clasue-scout-app');
 function settings(options){
  const defaults={teams:8,scoutsPerTeam:3,reportsPerScout:12,seedReports:100,concurrency:8};
  for(const key of Object.keys(options))if(!Object.hasOwn(defaults,key))throw Error(`Unsupported option: ${key}`);
- const limits={teams:[2,100],scoutsPerTeam:[1,20],reportsPerScout:[1,200],seedReports:[0,10000],concurrency:[1,32]};
+ const limits={teams:[1,100],scoutsPerTeam:[1,20],reportsPerScout:[1,200],seedReports:[0,10000],concurrency:[1,32]};
  const result={...defaults,...options};
  for(const [key,value]of Object.entries(result))if(!Number.isInteger(value)||value<limits[key][0]||value>limits[key][1])throw Error(`${key} must be an integer in range ${limits[key].join(' to ')}.`);
  if(result.teams*result.scoutsPerTeam>1000||result.teams*result.seedReports>100000||result.teams*result.scoutsPerTeam*result.reportsPerScout>20000)throw Error('Workload exceeds the bounded local option range.');
@@ -93,7 +93,7 @@ async function runReadinessLoad(options={}){
    const own=await request('scopedRead','/api/submissions',{cookie:client.cookie});
    expect(own.status===200&&Array.isArray(own.data),'Scoped report read failed.');
    crossTeamLeaks+=own.data.filter(row=>row.team_id!==client.teamId).length;
-   const foreign=`load-team-${(client.t+1)%config.teams}`;
+   const foreign=config.teams>1?`load-team-${(client.t+1)%config.teams}`:'load-team-not-owned';
    const forbidden=await request('foreignRevision',`/api/live/revision?workspaceId=${foreign}`,{cookie:client.cookie});expect(forbidden.status===403,'Foreign revision was not rejected.');
    const foreignBody={...reports.find(r=>r.client===client).body,id:`foreign-${client.id}`,team_id:foreign};
    const rejected=await request('foreignWrite','/api/submissions',{method:'POST',body:foreignBody,cookie:client.cookie});expect(rejected.status===403,'Foreign write was not rejected.');

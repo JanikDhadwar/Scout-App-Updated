@@ -40,6 +40,8 @@ jobs:
         run: npm test
       - name: Lint active application and services
         run: npm run lint:active
+      - name: Scan release tree for private artifacts and unsafe sinks
+        run: npm run security:scan
       - name: Build release
         run: npm run build
       - name: Record verification summary

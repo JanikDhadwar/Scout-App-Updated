@@ -7,7 +7,7 @@ const { changeReportState,validateReport } = require('./submission-service.cjs')
 const { analyticsForUser, sharedInputs } = require('./shared-analytics.cjs');
 const { refreshStates } = require('./match-handoffs.cjs');
 
-function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions, dbFile }) {
+function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions, dbFile, requireSensitiveMfa=()=>{}, mfa, requirePrivilegedMfa=false }) {
   require('./notification-service.cjs').registerNotificationRoutes(app,{readDB,writeDB,dbFile});
   // All handlers are mounted after authentication and before generic collections.
   const route = (method, path, handler) => app[method](path, async (req, res, next) => {
@@ -75,10 +75,12 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions,
     return { entries: entries.slice(start, start + limit), next: entries[start + limit]?.id ? entries[start + limit - 1]?.id : null };
   });
   for (const action of ['remove', 'role']) route('post', `/api/memberships/:id/${action}`, req => {
+    if(action==='role')requireSensitiveMfa(req);
     const db = readDB(), result = members.changeMember(db, { id: req.params.id, actorId: req.user.id, action, nextRole: req.body?.role });
     writeDB(db); return result;
   });
   route('post', '/api/auth/transfer-ownership', async req => {
+    requireSensitiveMfa(req);
     const snapshot = readDB();
     if (role(snapshot, req.user.id, req.body?.team_id) !== 'owner') reject('Owner permission required.', 403);
     const account=rows(snapshot,'users').find(u=>u.id===req.user.id);
@@ -94,7 +96,7 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions,
       .map(t => ({ ...t, status: t.status === 'pending' && t.expires_at <= Date.now() ? 'expired' : t.status }));
   });
   route('post', '/api/ownership-transfers/:id/respond', req => {
-    const db = readDB(), result = members.respondTransfer(db, { actorId: req.user.id, id: req.params.id, action: req.body?.action }); writeDB(db); return result;
+    const db = readDB();if(req.body?.action==='accept'&&(requirePrivilegedMfa&&!mfa?.enrolled(req.user.id)))reject('Enroll MFA before accepting ownership.',403);if(req.body?.action==='accept'&&mfa?.enrolled(req.user.id))requireSensitiveMfa(req);const result = members.respondTransfer(db, { actorId: req.user.id, id: req.params.id, action: req.body?.action }); writeDB(db); return result;
   });
   for (const removed of [true, false]) route('post', `/api/submissions/:id/${removed ? 'remove' : 'restore'}`, req => {
     const db = readDB(), result = changeReportState(db, { id: req.params.id, actorId: req.user.id, removed, reason: req.body?.reason, revision: req.body?.revision });

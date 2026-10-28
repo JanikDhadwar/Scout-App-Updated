@@ -16,7 +16,7 @@ const exited=child=>new Promise((resolve,reject)=>{child.once('error',reject);ch
  if(!fs.existsSync(path.join(appDirectory,'dist/index.html')))throw new Error('Run npm run build before browser QA.');
  const baseURL=`http://127.0.0.1:${port}`;
  console.log(`Browser QA fixture: ${fixture.dbFile}\nBrowser QA URL: ${baseURL}`);
- const server=spawn(process.execPath,[path.join(appDirectory,'server.cjs')],{cwd:appDirectory,env:{...process.env,APP_PORT:String(port),DB_FILE:fixture.dbFile,ARGUS_ENV_FILE:envFile,TBA_API_KEY:'',GROQ_API_KEY:'',MATCH13_API_KEY:'',ARGUS_TRUST_PROXY:'',NODE_ENV:nodeEnv},stdio:['ignore','pipe','pipe'],windowsHide:true});
+ const server=spawn(process.execPath,[path.join(appDirectory,'server.cjs')],{cwd:appDirectory,env:{...process.env,APP_PORT:String(port),DB_FILE:fixture.dbFile,ARGUS_ENV_FILE:envFile,TBA_API_KEY:'',GROQ_API_KEY:'',MATCH13_API_KEY:'',ARGUS_MFA_KEY:Buffer.alloc(32,7).toString('base64'),ARGUS_TRUST_PROXY:'',NODE_ENV:nodeEnv},stdio:['ignore','pipe','pipe'],windowsHide:true});
  let serverOutput='';server.stdout.on('data',data=>{serverOutput+=data;});server.stderr.on('data',data=>{serverOutput+=data;});const stopped=exited(server);
  try{
   let ready=false;const deadline=Date.now()+20000;

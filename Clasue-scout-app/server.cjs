@@ -51,6 +51,9 @@ const liveMatches=createMatchRefresh({readDB,writeDB,fetchMatches:async(eventKey
   if(!result.ok)throw Error('Official schedule unavailable');return result.json();
 }});
 const sessions = createSessions(path.join(path.dirname(DB_FILE), 'argus-sessions.private.json')), attempts = new Map();
+const mfa=require('./mfa-service.cjs').createMfaService(path.join(path.dirname(DB_FILE),'argus-mfa.private.json'));
+if(process.env.ARGUS_REQUIRE_PRIVILEGED_MFA&&!['true','false'].includes(process.env.ARGUS_REQUIRE_PRIVILEGED_MFA))throw Error('ARGUS_REQUIRE_PRIVILEGED_MFA must be true, false or unset.');
+const requirePrivilegedMfa=process.env.ARGUS_REQUIRE_PRIVILEGED_MFA==='true';
 function readDB() {
   return database.read();
 }
@@ -58,6 +61,7 @@ function writeDB(db) {
   database.write(db);
   revisionCache.clear();
 }
+if(requirePrivilegedMfa){const initial=readDB(),privileged=rows(initial,'memberships').filter(member=>['owner','admin'].includes(member.role));if(!privileged.length)throw Error('ARGUS_REQUIRE_PRIVILEGED_MFA cannot be enabled before initial workspace setup.');if(privileged.some(member=>!mfa.enrolled(member.user_id)))throw Error('ARGUS_REQUIRE_PRIVILEGED_MFA cannot start until every Owner and Admin is enrolled.');}
 function rows(db, store) { return Array.isArray(db[store]) ? db[store] : []; }
 function publicUser(u) { return {id:u.id, username:u.username, created_at:u.created_at}; }
 const passwords=require('./password-service.cjs').createPasswordService();
@@ -67,11 +71,12 @@ function equal(a,b) {const x=Buffer.from(String(a)), y=Buffer.from(String(b));re
 function membership(db, uid, tid) {return rows(db,'memberships').find(m=>m.user_id===uid && m.team_id===tid);}
 function role(db,uid,tid) {return membership(db,uid,tid)?.role;}
 function admin(db,uid,tid) {return ['owner','admin'].includes(role(db,uid,tid));}
+function requireSensitiveMfa(req){const session=sessions.get(req.sessionToken);if(requirePrivilegedMfa&&!mfa.enrolled(req.user.id))throw Object.assign(Error('Enroll MFA before using privileged controls.'),{status:403});if(mfa.enrolled(req.user.id)&&!session?.mfa)throw Object.assign(Error('Complete MFA sign-in before using privileged controls.'),{status:403});}
 function publicTeam(db,t,uid) {const {password,password_hash,...safe}=t;safe.active_event_id=activeEvent(db,t.id)?.id||null;if(role(db,uid,t.id)==='owner' && password)safe.password=password;return safe;}
 function fail(res,status,message) {return res.status(status).json({error:message});}
-function login(req,res,u) {
+function login(req,res,u,mfaVerified=false) {
   if(req.authAttemptKey)attempts.delete(req.authAttemptKey);
-  const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{userId:u.id,expires:Date.now()+7*86400000});
+  const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{userId:u.id,expires:Date.now()+7*86400000,mfa:!!mfaVerified});
   res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure || process.env.COOKIE_SECURE==='true' || process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});
   return res.json(publicUser(u));
 }
@@ -125,11 +130,29 @@ app.post(['/api/auth/login','/api/auth/signup'],async(req,res)=>{
   const current=readDB(),user=rows(current,'users').find(u=>u.id===found.id);
   if(!user||user.disabled||user.disabled_at||user.password_hash!==found.password_hash||user.username!==found.username)return fail(res,401,'Account changed. Sign in again.');
   if(upgraded){user.password_hash=upgraded;writeDB(current);}
+  if(mfa.enrolled(user.id))return res.status(202).json(mfa.startLogin(user.id));
   return login(req,res,user);
 });
-require('./account-security.cjs').registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit:authLimit});
+app.post('/api/auth/mfa/verify',(req,res)=>{
+  if(!authLimit.take(`mfa-ip:${req.ip}`,60)||!authLimit.take('mfa-global',1000))return fail(res,429,'Too many MFA attempts. Try again in 15 minutes.');
+  try{const userId=mfa.verify(req.body?.challenge_id,req.body?.code),user=rows(readDB(),'users').find(u=>u.id===userId&&!u.disabled&&!u.disabled_at);if(!user)return fail(res,401,'Account is unavailable.');return login(req,res,user,true);}catch(error){return fail(res,error.status||401,error.message);}
+});
+require('./account-security.cjs').registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit:authLimit,requireSensitiveMfa});
 app.use('/api',(req,res,next)=>req.user?next():fail(res,401,'Sign in required'));
 app.get('/api/auth/me',(req,res)=>res.json(publicUser(req.user)));
+app.get('/api/auth/mfa/status',(req,res)=>res.json(mfa.status(req.user.id)));
+async function mfaReauth(req,res){
+ const snapshot=rows(readDB(),'users').find(u=>u.id===req.user.id),session=sessions.get(req.sessionToken);
+ if(!snapshot||typeof req.body?.current_password!=='string'||req.body.current_password.length>1024||!await verifyPassword(req.body.current_password,snapshot.password_hash))return fail(res,401,'Current password is incorrect.');
+ const current=rows(readDB(),'users').find(u=>u.id===req.user.id),currentSession=sessions.get(req.sessionToken);
+ if(!current||current.disabled||current.disabled_at||current.password_hash!==snapshot.password_hash||!currentSession||currentSession.userId!==current.id)return fail(res,401,'Account changed. Sign in again.');
+ if(mfa.enrolled(req.user.id)&&!(session?.mfa&&currentSession.mfa))return fail(res,403,'Complete MFA sign-in before changing MFA settings.');
+ return current;
+}
+app.post('/api/auth/mfa/enroll/start',async(req,res)=>{const user=await mfaReauth(req,res);if(!user)return;try{res.json(mfa.begin(user.id,user.username));}catch(error){fail(res,error.status||500,error.message);}});
+app.post('/api/auth/mfa/enroll/confirm',(req,res)=>{try{const result=mfa.confirm(req.user.id,req.body?.enrollment_id,req.body?.code);sessions.update(req.sessionToken,{mfa:true});sessions.revoke(req.user.id);const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{userId:req.user.id,expires:Date.now()+7*86400000,mfa:true});res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure||process.env.COOKIE_SECURE==='true'||process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});res.json(result);}catch(error){fail(res,error.status||400,error.message);}});
+app.post('/api/auth/mfa/recovery-codes',async(req,res)=>{const user=await mfaReauth(req,res);if(!user)return;try{res.json(mfa.regenerate(user.id));}catch(error){fail(res,error.status||400,error.message);}});
+app.post('/api/auth/mfa/disable',async(req,res)=>{const user=await mfaReauth(req,res);if(!user)return;mfa.disable(user.id);sessions.revoke(user.id);res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true,sign_in_again:true});});
 app.get('/api/live/revision',(req,res)=>{
   const id=req.query.workspaceId,db=readDB();if(typeof id!=='string'||!membership(db,req.user.id,id))return fail(res,403,'Team membership required.');
   const stat=fs.statSync(DB_FILE),stamp=`${stat.mtimeMs}:${stat.size}`;if(stamp!==revisionStamp){revisionCache.clear();revisionStamp=stamp;}
@@ -144,6 +167,7 @@ app.post('/api/events/:id/refresh-live',async(req,res)=>{
 });
 app.post('/api/auth/logout',(req,res)=>{sessions.delete(req.sessionToken);res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});});
 app.post('/api/auth/create-team',(req,res)=>{
+  if(requirePrivilegedMfa&&!mfa.enrolled(req.user.id))return fail(res,403,'Enroll MFA before creating an Owner account.');
   const unavailable=admission.createTeam(readDB());if(unavailable)return fail(res,503,unavailable);
   const {number,name,password}=req.body||{};
   if(password!=null&&(typeof password!=='string'||password.trim().length<8||password.length>128))return fail(res,400,'Use a join password of 8 to 128 characters, or leave it out to generate one.');
@@ -180,9 +204,9 @@ app.post('/api/auth/deactivate-account',(req,res)=>{
 app.use(['/api/assignment-plan/preview','/api/assignment-plan/apply','/api/assignment-plan/reconcile'],(req,res,next)=>{
   if(req.method==='POST'&&(!authLimit.take(`plan:${req.user.id}`,20,60000)||!authLimit.take('plan-global',100,60000)))return fail(res,429,'Wait a minute before calculating more assignments.');next();
 });
-registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, sessions, dbFile:DB_FILE });
+registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, sessions, dbFile:DB_FILE, requireSensitiveMfa, mfa, requirePrivilegedMfa });
 app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:false,match13Configured:!!integrationKey(req,'MATCH13_API_KEY',workspaceId)});});
-app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{res.json(integrations.save(workspaceId,values));}catch{fail(res,400,'Could not save private settings. Check the key format and server storage permissions.');}});
+app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{requireSensitiveMfa(req);res.json(integrations.save(workspaceId,values));}catch(error){fail(res,error.status||400,error.status?error.message:'Could not save private settings. Check the key format and server storage permissions.');}});
 const connectionChecks=new Map();
 app.post('/api/integrations/check',async(req,res)=>{
   const {workspaceId}=req.body||{};

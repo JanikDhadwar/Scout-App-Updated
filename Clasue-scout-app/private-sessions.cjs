@@ -19,6 +19,7 @@ function createSessions(filename) {
   return {
     get: token => values.get(hash(token)),
     set(token, value) { values.set(hash(token), value); save(); },
+    update(token, patch) { const key=hash(token),value=values.get(key);if(!value)return false;values.set(key,{...value,...patch});save();return true; },
     delete(token) { values.delete(hash(token)); save(); },
     revoke(userId) { for (const [key, value] of values) if (value.userId === userId) values.delete(key); save(); },
   };

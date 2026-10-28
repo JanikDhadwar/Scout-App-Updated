@@ -179,6 +179,16 @@ live phone/provider behavior is not claimed verified.
 
 ## Remaining work and next action
 
+### Security hardening increment — 2026-10-28
+
+- Local branch: `security/hardening-5.12`; candidate version 5.12.0. This increment has not been pushed or deployed.
+- Completed: provider-HTML sink removal, decoded raster validation, optional TOTP MFA with encrypted private storage and recovery codes, privileged MFA step-up, private-file symlink rejection, security scan/CI gate, and the complete `docs/security/` operator set.
+- Verification: 184/184 automated tests; 25/25 browser workflows; 47 accessibility states with zero automated violations; active lint, production build, security scan, deployment-shell syntax and diff checks passed. Production dependency audit is clean; four Low build-only advisories remain documented. Full-tree lint still has pre-existing inactive/legacy violations.
+- Bounded synthetic workloads at 1/5/10/20/30 clients completed with zero errors, cross-team leaks or integrity failures. These short localhost runs do not establish production capacity.
+- Blockers before deployment: authorized Cloudflare/origin verification, actual-host resource rehearsal, encrypted off-site backup/restore drill, MFA key custody and staged privileged-user enrollment. See `docs/security/PRODUCTION_SECURITY_CHECKLIST.md`.
+
+The earlier release/push notes below are historical and do not authorize pushing this security branch.
+
 No production database was accessed. Release implementation is committed at
 `af7f46ac92bdd76602271d985c66d0830e2fa7c4`. Both terminal `git push origin HEAD:main`
 and the connected GitHub integration's tree creation were rejected with HTTP 403

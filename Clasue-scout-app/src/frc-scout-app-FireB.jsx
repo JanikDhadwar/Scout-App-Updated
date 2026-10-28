@@ -2262,7 +2262,7 @@ function MyTeamTab({ team, user, role, online }) {
                     {!streamMode&&(
                       <>
                         {liveData.status?.overall_status_str&&(
-                          <div style={{background:C.bg0,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px",marginBottom:10,fontSize:12,lineHeight:1.6}} dangerouslySetInnerHTML={{__html:liveData.status.overall_status_str}}/>
+                          <div style={{background:C.bg0,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px",marginBottom:10,fontSize:12,lineHeight:1.6,whiteSpace:"pre-wrap"}}>{String(liveData.status.overall_status_str||"")}</div>
                         )}
                         {liveData.status?.playoff&&liveData.status.playoff.status!=="not_picked"&&(
                           <div style={{background:C.orange+"18",border:`1px solid ${C.orange}44`,borderRadius:8,padding:"8px 12px",marginBottom:10}}>
@@ -2365,7 +2365,7 @@ function MyTeamTab({ team, user, role, online }) {
                       )}
                       {/* TBA status string */}
                       {liveData?.status?.overall_status_str&&(
-                        <div style={{...sx.card,fontSize:12,lineHeight:1.6,marginTop:8}} dangerouslySetInnerHTML={{__html:liveData.status.overall_status_str}}/>
+                        <div style={{...sx.card,fontSize:12,lineHeight:1.6,marginTop:8,whiteSpace:"pre-wrap"}}>{String(liveData.status.overall_status_str||"")}</div>
                       )}
                       {/* Playoff status */}
                       {liveData?.status?.playoff&&liveData.status.playoff.status!=="not_picked"&&(

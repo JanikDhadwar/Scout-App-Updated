@@ -1,7 +1,7 @@
 {
   "name": "scout-app",
   "private": true,
-  "version": "5.11.0",
+  "version": "5.12.0",
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "test:readiness": "node ../scripts/readiness-load.cjs",
     "notices": "node ../scripts/dependency-notices.cjs",
-    "test:accessibility": "node ../scripts/run-browser-checks.cjs --accessibility"
+    "test:accessibility": "node ../scripts/run-browser-checks.cjs --accessibility",
+    "security:scan": "node ../scripts/security-scan.cjs"
   },
   "dependencies": {
     "concurrently": "^9.2.1",

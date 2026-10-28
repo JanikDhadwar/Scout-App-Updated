@@ -1,5 +1,5 @@
 const crypto=require('node:crypto');
-function registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit}){
+function registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit,requireSensitiveMfa=()=>{}}){
  const digest=code=>crypto.createHash('sha256').update(code).digest('hex');
  const same=(a,b)=>{if(typeof a!=='string'||typeof b!=='string')return false;const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&crypto.timingSafeEqual(x,y);};
  const fail=(res,status,error)=>res.status(status).json({error});
@@ -22,6 +22,7 @@ function registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash
   const db=readDB(),user=db.users.find(u=>u.id===req.user.id),session=sessions.get(req.sessionToken);
   if(!user||user.disabled||user.disabled_at||user.password_hash!==snapshot.password_hash||!session||session.userId!==user.id||session.expires<=Date.now())return fail(res,401,'Account changed. Sign in again.');
   if(req.path.endsWith('/rotate-join-code')){
+   try{requireSensitiveMfa(req);}catch(error){return fail(res,error.status||403,error.message);}
    const team=db.teams.find(t=>t.id===req.body.team_id);
    if(!team||team.owner_id!==user.id)return fail(res,403,'Team owner permission required.');
    team.password=crypto.randomBytes(12).toString('hex').toUpperCase();writeDB(db);return res.json({team:publicTeam(db,team,user.id)});

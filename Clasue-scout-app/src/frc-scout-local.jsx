@@ -192,14 +192,17 @@ function AuthScreen({ onLogin, initialMode='login' }) {
   useEffect(()=>{heading.current?.focus();},[]);
   const [username,setUsername]=useState("");
   const [password,setPassword]=useState("");
+  const [mfaChallenge,setMfaChallenge]=useState('');
+  const [mfaCode,setMfaCode]=useState('');
   const [err,setErr]=useState("");
   const [busy,setBusy]=useState(false);
 
   async function submit() {
     if (busy) return;
-    if (!username.trim()||!password.trim()) { setErr("All fields required."); return; }
+    if(mode==='mfa'&&!mfaCode.trim()){setErr('Enter an authenticator or recovery code.');return;}
+    if (mode!=='mfa'&&(!username.trim()||!password.trim())) { setErr("All fields required."); return; }
     setBusy(true); setErr("");
-    try {if(mode==='reset'){await apiCall('POST','/auth/reset-password',{username:username.trim(),recovery_code:recoveryCode.trim(),new_password:password});setPassword('');setRecoveryCode('');setMode('login');setNotice('Password reset. Sign in with your new password. Create a new recovery code in Settings.');}else{const u=await apiCall('POST',mode==='signup'?'/auth/signup':'/auth/login',{username:username.trim(),password});await onLogin(u);}}
+    try {if(mode==='mfa'){const u=await apiCall('POST','/auth/mfa/verify',{challenge_id:mfaChallenge,code:mfaCode.trim()});await onLogin(u);}else if(mode==='reset'){await apiCall('POST','/auth/reset-password',{username:username.trim(),recovery_code:recoveryCode.trim(),new_password:password});setPassword('');setRecoveryCode('');setMode('login');setNotice('Password reset. Sign in with your new password. Create a new recovery code in Settings.');}else{const u=await apiCall('POST',mode==='signup'?'/auth/signup':'/auth/login',{username:username.trim(),password});if(u.mfa_required){setMfaChallenge(u.challenge_id);setPassword('');setMode('mfa');setNotice('Password accepted. Complete multi-factor authentication.');}else await onLogin(u);}}
     catch(error){setErr(error.message||'Could not sign in. Try again.');}
     setBusy(false);
   }
@@ -209,19 +212,21 @@ function AuthScreen({ onLogin, initialMode='login' }) {
       <section className="auth-form-area" aria-label="Account access"><form className="auth-form-card" onSubmit={e=>{e.preventDefault();submit();}}>
         <a href="#/welcome">About Argus</a>
         <div className="auth-wordmark">Argus</div>
-        <h1 tabIndex={-1} ref={heading}>{mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='reset'?'Use the recovery code you saved from Settings. Without a saved code, this form cannot recover your account.':mode==='login'?'Open your team scouting app.':'You can join your team after signing up. Save a recovery code from Settings after joining.'}</p>
-        <div className="auth-tabs" role="group" aria-label="Account options">
+        <h1 tabIndex={-1} ref={heading}>{mode==='mfa'?'Multi-factor authentication':mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create an account'}</h1><p className="muted">{mode==='mfa'?'Enter the six-digit code from your authenticator, or one unused MFA recovery code.':mode==='reset'?'Use the recovery code you saved from Settings. Without a saved code, this form cannot recover your account.':mode==='login'?'Open your team scouting app.':'You can join your team after signing up. Save a recovery code from Settings after joining.'}</p>
+        {mode!=='mfa'&&<div className="auth-tabs" role="group" aria-label="Account options">
           {["login","signup"].map(m=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>{setMode(m);setErr("");}}>
             {m==="login"?"Sign in":"Create account"}
           </button>)}
-        </div>
+        </div>}
+        {mode==='mfa'?<><label htmlFor="scout-mfa" style={sx.lbl}>Authenticator or recovery code</label><input id="scout-mfa" autoComplete="one-time-code" autoCapitalize="none" style={sx.inp} value={mfaCode} onChange={e=>setMfaCode(e.target.value)} autoFocus/><button type="button" className="a-button" onClick={()=>{setMode('login');setMfaChallenge('');setMfaCode('');setErr('');}}>Start sign-in again</button></>:<>
         <label htmlFor="scout-username" style={sx.lbl}>Username</label>
         <input id="scout-username" autoComplete="username" style={sx.inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="scouter42" autoCapitalize="none" />
         {mode==='reset'&&<><label htmlFor="scout-recovery" style={sx.lbl}>Saved recovery code</label><input id="scout-recovery" style={sx.inp} autoComplete="off" autoCapitalize="none" maxLength={48} value={recoveryCode} onChange={e=>setRecoveryCode(e.target.value)} required/></>}
         <label htmlFor="scout-password" style={sx.lbl}>{mode==='reset'?'New password':'Password'}</label>
         <input id="scout-password" autoComplete={mode==="login" ? "current-password" : "new-password"} style={sx.inp} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" />
+        </>}
         {err && <div role="alert" style={sx.err}>{err}</div>}{notice&&<p role="status">{notice}</p>}
-        <button type="submit" className="primary-button auth-submit" disabled={busy}>{busy?'Please wait…':mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create account'}</button>
+        <button type="submit" className="primary-button auth-submit" disabled={busy}>{busy?'Please wait…':mode==='mfa'?'Verify and sign in':mode==='reset'?'Reset password':mode==='login'?'Sign in':'Create account'}</button>
         {mode==='login'&&<button type="button" className="a-button" onClick={()=>{setMode('reset');setErr('');setNotice('');setPassword('');}}>Forgot password?</button>}
       </form><span className="auth-footer">Argus {APP_VERSION} · Match and pit scouting</span></section>
     </div>

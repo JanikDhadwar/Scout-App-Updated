@@ -1,6 +1,7 @@
 const { isDeepStrictEqual } = require('node:util');
 const { visibleQuestions, hasAnswer, validateConditions } = require('./src/form-conditions.js');
 const { rows, reject, requireAdmin, audit, reportRemoved } = require('./domain.cjs');
+const { validateImageDataUrl } = require('./media-validation.cjs');
 
 function validateReport(db, form, report) {
   if (!report.answers || typeof report.answers !== 'object' || Array.isArray(report.answers)) return 'Report answers must be an object.';
@@ -25,7 +26,7 @@ function validateReport(db, form, report) {
     }
     if (q.type === 'select' && !(q.options || []).includes(value)) return `Choose an available option for ${q.text}.`;
     if (q.type === 'boolean' && ![true, false, 'Yes', 'No'].includes(value)) return `Choose Yes or No for ${q.text}.`;
-    if (['photo', 'draw', 'drawing'].includes(q.type) && (typeof value !== 'string' || !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(value) || value.length > 6000000)) return `Choose a valid image for ${q.text}.`;
+    if (['photo', 'draw', 'drawing'].includes(q.type) && !validateImageDataUrl(value)) return `Choose a valid image for ${q.text}.`;
   }
   return null;
 }
