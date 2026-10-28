@@ -13,7 +13,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
   let releaseEpoch=0;
   const readVersion = owner => (readVersions.get(keyFor('',owner)) || 0)+releaseEpoch;
   const requireCurrentRead = (owner,version) => {
-    if(readVersion(owner)!==version)throw new RequestError('Read access changed. Reload data for your current role.',409);
+    if(readVersion(owner)!==version)throw Object.assign(new RequestError('Read access changed. Reload data for your current role.',409),{code:owner?.userId===scope?.userId&&owner?.teamId===scope?.teamId?'READ_ACCESS_CHANGED':'READ_SCOPE_CHANGED'});
   };
   async function invalidateReadCache() {
     if(!scope)return;

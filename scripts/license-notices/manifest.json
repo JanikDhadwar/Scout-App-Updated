@@ -1,0 +1,262 @@
+{
+  "reviewed": "2026-10-27",
+  "description": "Offline supplements for exact locked package versions. Not an Argus license or general legal certification.",
+  "packages": [
+    {
+      "name": "@humanfs/types",
+      "version": "0.15.0",
+      "license": "Apache-2.0",
+      "integrity": "sha512-ZZ1w0aoQkwuUuC7Yf+7sdeaNfqQiiLcSRbfI08oAxqLtpXQr9AIVX7Ay7HLDuiLYAaFPu8oBYNq/QIi9URHJ3Q==",
+      "file": "_humanfs_types-0.15.0.txt",
+      "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/%40humanfs%2Ftypes/0.15.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: Apache-2.0"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/humanwhocodes/humanfs/85069f193cbacc371c3beb649ce746f8c5a493be/packages/core/LICENSE",
+          "evidence": "The exact types release declares Apache-2.0 in packages/types/package.json and README.md. This is the unchanged standard Apache-2.0 text from the same monorepo revision, not a different grant or invented copyright."
+        }
+      ]
+    },
+    {
+      "name": "@rolldown/binding-win32-x64-msvc",
+      "version": "1.2.14",
+      "license": "MIT",
+      "integrity": "sha512-9mE94bf2GZUaR/fUSXCMpBoWkctu421Mi0ORpm4zqfbkjKep7RxzPFa5etcGs5h+2KApoWBOA/hAJa/7saGgEQ==",
+      "file": "_rolldown_binding-win32-x64-msvc-1.2.14.txt",
+      "sha256": "23ecfff35a5a2e80d92142f75228912c3b1abc4b5a8337a821ff4397e2f9f734",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/%40rolldown%2Fbinding-win32-x64-msvc/1.2.14",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/rolldown/rolldown/c9a8cda42bc0fdd84c7b4b4e6d7f95ae83e8b5f7/LICENSE",
+          "evidence": "Official v1.2.14 tag resolved to this commit; packages/rolldown/package.json is version 1.2.14. Native binding package declares MIT and ships as this exact version."
+        }
+      ]
+    },
+    {
+      "name": "@rollup/rollup-win32-x64-gnu",
+      "version": "4.60.3",
+      "license": "MIT",
+      "integrity": "sha512-E5Eb5H/DpxaoXH++Qkv28RcUJboMopmdDUALBczvHMf7hNIxaDZqwY5lK12UK1BHacSmvupoEWGu+n993Z0y1A==",
+      "file": "_rollup_rollup-win32-x64-gnu-4.60.3.txt",
+      "sha256": "ad457a6619017a7f47cdbead25a8ec61907818be3e0834f1885bdf6c3ddfb668",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-gnu/4.60.3",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/rollup/rollup/b47bdabeccbb7aa1b1d4117f2f4a781a9f6de297/LICENSE.md",
+          "evidence": "Exact package npm gitHead; full upstream core and bundled third-party license document retained."
+        }
+      ]
+    },
+    {
+      "name": "@rollup/rollup-win32-x64-msvc",
+      "version": "4.60.3",
+      "license": "MIT",
+      "integrity": "sha512-hPt/bgL5cE+Qp+/TPHBqptcAgPzgj46mPcg/16zNUmbQk0j+mOEQV/+Lqu8QRtDV3Ek95Q6FeFITpuhl6OTsAA==",
+      "file": "_rollup_rollup-win32-x64-msvc-4.60.3.txt",
+      "sha256": "ad457a6619017a7f47cdbead25a8ec61907818be3e0834f1885bdf6c3ddfb668",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-msvc/4.60.3",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/rollup/rollup/b47bdabeccbb7aa1b1d4117f2f4a781a9f6de297/LICENSE.md",
+          "evidence": "Exact package npm gitHead; full upstream core and bundled third-party license document retained."
+        }
+      ]
+    },
+    {
+      "name": "esrecurse",
+      "version": "4.3.0",
+      "license": "BSD-2-Clause",
+      "integrity": "sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==",
+      "file": "esrecurse-4.3.0.txt",
+      "sha256": "cb1764d4708e870cc694de13d499af2e6ee98d2751026e3a3f79de608f4f4ea0",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/esrecurse/4.3.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: BSD-2-Clause"
+        },
+        {
+          "url": "https://registry.npmjs.org/esrecurse/-/esrecurse-4.3.0.tgz",
+          "evidence": "Complete license section extracted from node_modules/esrecurse/README.md; installed README SHA-256 a7007c78c9d9da690ef6cdb0e7a3427d05832edb00abd1f5a9882700d73be4ad; tarball integrity is pinned above."
+        }
+      ]
+    },
+    {
+      "name": "filelist",
+      "version": "1.0.6",
+      "license": "Apache-2.0",
+      "integrity": "sha512-5giy2PkLYY1cP39p17Ech+2xlpTRL9HLspOfEgm0L6CwBXBTgsK5ou0JtzYuepxkaQ/tvhCFIJ5uXo0OrM2DxA==",
+      "file": "filelist-1.0.6.txt",
+      "sha256": "6235e9264bf59842b69d8831c2d889cf2e576653d71d28b797181f7e3f3ac398",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/filelist/1.0.6",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: Apache-2.0"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/mde/filelist/7032f94d04ad905b4f32b92d2278785859e1d55f/LICENSE",
+          "evidence": "Official v1.0.6 tag resolved to this commit. Package/source declares Apache-2.0; the installed source copyright header is included below."
+        }
+      ]
+    },
+    {
+      "name": "http_ece",
+      "version": "1.2.0",
+      "license": "MIT",
+      "integrity": "sha512-JrF8SSLVmcvc5NducxgyOrKXe3EsyHMgBFgSaIUGmArKe+rwr0uphRkRXvwiom3I+fpIfoItveHrfudL8/rxuA==",
+      "file": "http_ece-1.2.0.txt",
+      "sha256": "7d71f48c474da1de82fbdaac7fea5a1eaa41e4ac998dd44fd2897812812138d9",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/http_ece/1.2.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/martinthomson/encrypted-content-encoding/0562510a30819f52424724a6fd5504becacd98a1/LICENSE",
+          "evidence": "Exact package npm gitHead, containing the complete MIT notice and copyright."
+        }
+      ]
+    },
+    {
+      "name": "imurmurhash",
+      "version": "0.1.4",
+      "license": "MIT",
+      "integrity": "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==",
+      "file": "imurmurhash-0.1.4.txt",
+      "sha256": "2f3de7ca97e07e9814e9a8dd61a561079ae6eb303579837e12d3d51f867ef7a6",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/imurmurhash/0.1.4",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz",
+          "evidence": "Complete license section extracted from node_modules/imurmurhash/README.md; installed README SHA-256 4491517f7deb68d0b2a3bb590e785e276a60f12448447a9650d0bd50161a101c; tarball integrity is pinned above."
+        }
+      ]
+    },
+    {
+      "name": "is-module",
+      "version": "1.0.0",
+      "license": "MIT",
+      "integrity": "sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==",
+      "file": "is-module-1.0.0.txt",
+      "sha256": "ba5b3ee9e5d2f5112707230d984a1510dcebdf74c9142305248ae3ed58e89360",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/is-module/1.0.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz",
+          "evidence": "Complete license section extracted from node_modules/is-module/README.md; installed README SHA-256 17259ca2b9369bd675251b0e2a882f59d7d40fd11caba850bdd2307f29fd34b1; tarball integrity is pinned above."
+        }
+      ]
+    },
+    {
+      "name": "is-regexp",
+      "version": "1.0.0",
+      "license": "MIT",
+      "integrity": "sha512-7zjFAPO4/gwyQAAgRRmqeEeyIICSdmCqa3tsVHMdBzaXXRiqopZL4Cyghg/XulGWrtABTpbnYYzzIRffLkP4oA==",
+      "file": "is-regexp-1.0.0.txt",
+      "sha256": "6fb9754611c20f6649f68805e8c990e83261f29316e29de9e6cedae607b8634c",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/is-regexp/1.0.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/sindresorhus/is-regexp/ccbe7faf479d3abc4c958df1cf94898f902c2dc4/license",
+          "evidence": "Official v1.0.0 tag resolved to this commit; complete MIT notice corresponding to the shipped version."
+        }
+      ]
+    },
+    {
+      "name": "isarray",
+      "version": "1.0.0",
+      "license": "MIT",
+      "integrity": "sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==",
+      "file": "isarray-1.0.0.txt",
+      "sha256": "66aa9feab8bb39aceebd69f2a357015d57ceab486d3c7a19ff8d3d4110a6d101",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/isarray/1.0.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz",
+          "evidence": "Complete license section extracted from node_modules/readable-stream/node_modules/isarray/README.md; installed README SHA-256 ff138e683771b187f3629c383db72ee7d632009010a36d08e18e8d2a34222ec7; tarball integrity is pinned above."
+        }
+      ]
+    },
+    {
+      "name": "jake",
+      "version": "10.9.4",
+      "license": "Apache-2.0",
+      "integrity": "sha512-wpHYzhxiVQL+IV05BLE2Xn34zW1S223hvjtqk0+gsPrwd/8JNLXJgZZM/iPFsYc1xyphF+6M6EvdE5E9MBGkDA==",
+      "file": "jake-10.9.4.txt",
+      "sha256": "6235e9264bf59842b69d8831c2d889cf2e576653d71d28b797181f7e3f3ac398",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/jake/10.9.4",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: Apache-2.0"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jakejs/jake/28a9960b506d3259dd2f708ea9bc82f615be91b5/LICENSE",
+          "evidence": "Official v10.9.4 tag resolved to this commit. Package/source declares Apache-2.0; the installed source copyright header is included below."
+        }
+      ]
+    },
+    {
+      "name": "keyv",
+      "version": "4.5.4",
+      "license": "MIT",
+      "integrity": "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==",
+      "file": "keyv-4.5.4.txt",
+      "sha256": "1f7dca26d2d328c3dbb9b6fe3b15ec3cda08ffe2288e47b73d617454b256f959",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/keyv/4.5.4",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jaredwray/keyv/e4d608eccdfc094b80f6e9545c5307ee0810af72/LICENSE",
+          "evidence": "The version-bump commit contains packages/keyv/package.json version 4.5.4. Its packages/keyv/src/index.js was SHA-256 matched to the installed 4.5.4 entrypoint. Full monorepo MIT notice includes Luke Childs and Jared Wray copyrights."
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jaredwray/keyv/e4d608eccdfc094b80f6e9545c5307ee0810af72/packages/keyv/src/index.js",
+          "evidence": "SHA-256 matched installed src/index.js: 4987708b4b13159c654c09d239bd0c439533b0b792a6fd4e8769d8a509ad4da6"
+        }
+      ]
+    },
+    {
+      "name": "natural-compare",
+      "version": "1.4.0",
+      "license": "MIT",
+      "integrity": "sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==",
+      "file": "natural-compare-1.4.0.txt",
+      "sha256": "8c78f1b2aa0a1f580f3e8b2f63dd8c89f719a6d1de525ecb2e2f8b1469b79405",
+      "sources": [
+        {
+          "url": "https://registry.npmjs.org/natural-compare/1.4.0",
+          "evidence": "Exact version metadata and dist.integrity matched to package-lock.json. Declared license: MIT"
+        },
+        {
+          "url": "https://lauri.rooden.ee/mit-license.txt",
+          "evidence": "This author-hosted license URL is linked by the README in the exact installed 1.4.0 package. Captured 2026-10-27 and pinned by SHA-256; the URL is mutable, so this is a recorded snapshot, not proof of historical contents. The shipped README copyright is retained."
+        }
+      ]
+    }
+  ]
+}

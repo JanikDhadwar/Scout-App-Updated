@@ -4,7 +4,10 @@ const path = require('node:path');
 const APP_VERSION = require('./package.json').version;
 // Keep local integration credentials outside source and browser build files.
 const privateEnv = process.env.ARGUS_ENV_FILE || (process.env.DB_FILE ? path.join(path.dirname(path.resolve(process.env.DB_FILE)), 'argus.env') : null);
-for (const file of [privateEnv,path.join(__dirname,'.env')].filter(Boolean)) if(fs.existsSync(file))process.loadEnvFile(file);
+// An explicit environment file is exclusive, so fixture/staging servers can
+// select an empty file without importing this checkout's private credentials.
+if(process.env.ARGUS_ENV_FILE&&!fs.existsSync(privateEnv))throw Error('Configured environment file is missing.');
+for (const file of (process.env.ARGUS_ENV_FILE?[privateEnv]:[privateEnv,path.join(__dirname,'.env')]).filter(Boolean)) if(fs.existsSync(file))process.loadEnvFile(file);
 const crypto = require('node:crypto');
 const { isDeepStrictEqual } = require('node:util');
 const { createIntegrationStore } = require('./integration-store.cjs');
@@ -21,6 +24,7 @@ const submissionService = require('./submission-service.cjs');
 const { registerUpgradeRoutes } = require('./upgrade-routes.cjs');
 const {createLimiter}=require('./auth-limits.cjs');
 const authLimit=createLimiter();
+const admission=require('./admission-policy.cjs').createAdmissionPolicy();
 const scoutPresence=new Map();
 const match13=require('./match13-service.cjs').createMatch13Client(),match13Requests=new Map();
 const statbotics=require('./statbotics-service.cjs').createStatboticsClient(),statboticsRequests=new Map();
@@ -32,11 +36,14 @@ app.set('trust proxy',process.env.ARGUS_TRUST_PROXY==='loopback'?'loopback':fals
 app.disable('x-powered-by');
 app.disable('etag');
 const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'db.json');
+const { acquireWriterLock, bindWriterLifecycle } = require('./writer-lock.cjs');
+const writerLock = acquireWriterLock(DB_FILE);
 const DIST_DIR = path.join(__dirname, 'dist');
 const integrations=createIntegrationStore(path.join(path.dirname(DB_FILE),'argus-integrations.private.json'));
 function integrationKey(req,name,workspaceId=req.headers['x-argus-workspace']){return (typeof workspaceId==='string'&&membership(readDB(),req.user.id,workspaceId)?integrations.key(workspaceId,name):undefined)||process.env[name];}
 const STORES = ['users','teams','memberships','forms','submissions','announcements','scout_events','pit_scouts','assignments','picklists','team_allocations'];
-const database = createDatabase(DB_FILE);
+const database = require('./request-database.cjs').createRequestDatabase(createDatabase(DB_FILE),DB_FILE);
+app.use((_req,_res,next)=>database.run(next));
 const {createRevision,createMatchRefresh}=require('./live-scouting.cjs');
 const liveRevision=createRevision(),revisionCache=new Map();let revisionStamp='';
 const liveMatches=createMatchRefresh({readDB,writeDB,fetchMatches:async(eventKey,key)=>{
@@ -53,15 +60,10 @@ function writeDB(db) {
 }
 function rows(db, store) { return Array.isArray(db[store]) ? db[store] : []; }
 function publicUser(u) { return {id:u.id, username:u.username, created_at:u.created_at}; }
-function legacyHash(s) {let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h.toString(16);}
-function passwordHash(password) {const salt=crypto.randomBytes(16).toString('hex'); return `scrypt$${salt}$${crypto.scryptSync(password,salt,64).toString('hex')}`;}
+const passwords=require('./password-service.cjs').createPasswordService();
+const passwordHash=password=>passwords.hash(password);
+const verifyPassword=(password,hash)=>passwords.verify(password,hash);
 function equal(a,b) {const x=Buffer.from(String(a)), y=Buffer.from(String(b));return x.length===y.length && crypto.timingSafeEqual(x,y);}
-function verifyPassword(password, hash) {
-  if(typeof hash!=='string')return false;
-  if(!hash.startsWith('scrypt$')) return equal(legacyHash(password),hash);
-  const [,salt,digest]=hash.split('$');
-  return !!salt && !!digest && equal(crypto.scryptSync(password,salt,64).toString('hex'),digest);
-}
 function membership(db, uid, tid) {return rows(db,'memberships').find(m=>m.user_id===uid && m.team_id===tid);}
 function role(db,uid,tid) {return membership(db,uid,tid)?.role;}
 function admin(db,uid,tid) {return ['owner','admin'].includes(role(db,uid,tid));}
@@ -73,8 +75,14 @@ function login(req,res,u) {
   res.cookie('argus_session',token,{httpOnly:true,sameSite:'strict',secure:req.secure || process.env.COOKIE_SECURE==='true' || process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});
   return res.json(publicUser(u));
 }
-app.use((_req,res,next)=>{res.set({'Cache-Control':'no-store, max-age=0','CDN-Cache-Control':'no-store','Cloudflare-CDN-Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin'});next();});
-app.use(express.json({limit:'10mb'}));
+const contentSecurityPolicy="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-src https://www.youtube.com https://player.twitch.tv; media-src 'self' blob: data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
+// IDs are generated here, never echoed from untrusted headers. Parser failures
+// are correlated before any body/cookie is inspected or logged.
+app.use((req,res,next)=>{req.requestId=crypto.randomUUID();res.set('X-Request-ID',req.requestId);next();});
+app.use((req,res,next)=>{res.set({'Cache-Control':'no-store, max-age=0','CDN-Cache-Control':'no-store','Cloudflare-CDN-Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin','Permissions-Policy':'geolocation=(), microphone=()','Content-Security-Policy':contentSecurityPolicy});if(req.secure)res.set('Strict-Transport-Security','max-age=31536000');next();});
+// Account settings need only short scalar fields, unlike reports with media.
+app.use('/api/auth',express.json({limit:'16kb',strict:true}));
+app.use(express.json({limit:'10mb',strict:true}));
 app.use('/api',(req,res,next)=>{
   res.set('Cache-Control','no-store');
   // SameSite plus an origin check prevents writes through cross-origin browser requests.
@@ -92,7 +100,7 @@ app.use('/api',(req,res,next)=>{
   else if(token)sessions.delete(token);
   req.sessionToken=token;next();
 });
-app.post(['/api/auth/login','/api/auth/signup'],(req,res)=>{
+app.post(['/api/auth/login','/api/auth/signup'],async(req,res)=>{
   if(!authLimit.take(`auth-ip:${req.ip}`,300)||!authLimit.take('auth-global',3000)||req.path.endsWith('/signup')&&(!authLimit.take(`signup-ip:${req.ip}`,60)||!authLimit.take('signup-global',500)))return fail(res,429,'Too many attempts. Try again in 15 minutes.');
   const now=Date.now(),ip=`${req.ip}:${typeof req.body?.username==='string'?req.body.username.trim().toLowerCase().slice(0,80):''}`;
   req.authAttemptKey=ip;
@@ -103,14 +111,21 @@ app.post(['/api/auth/login','/api/auth/signup'],(req,res)=>{
   if(typeof username!=='string'||!username.trim()||username.length>80||typeof password!=='string'||password.length>1024||!password.trim())return fail(res,400,'Username and password are required');
   const db=readDB(),found=rows(db,'users').find(u=>typeof u?.username==='string'&&u.username.toLowerCase()===username.trim().toLowerCase());
   if(req.path.endsWith('/signup')) {
+    const unavailable=admission.signup(db);if(unavailable)return fail(res,503,unavailable);
     if(found)return fail(res,409,'Username is already registered');
     if(password.length<8)return fail(res,400,'Use at least 8 characters for your password');
-    const user={id:crypto.randomUUID(),username:username.trim(),password_hash:passwordHash(password),created_at:new Date().toISOString()};
-    db.users=[...rows(db,'users'),user];writeDB(db);return login(req,res,user);
+    const hash=await passwordHash(password),current=readDB();
+    const capacityChanged=admission.signup(current);if(capacityChanged)return fail(res,503,capacityChanged);
+    if(rows(current,'users').some(u=>typeof u?.username==='string'&&u.username.toLowerCase()===username.trim().toLowerCase()))return fail(res,409,'Username is already registered');
+    const user={id:crypto.randomUUID(),username:username.trim(),password_hash:hash,created_at:new Date().toISOString()};
+    current.users=[...rows(current,'users'),user];writeDB(current);return login(req,res,user);
   }
-  if(!found||found.disabled||found.disabled_at||!verifyPassword(password,found.password_hash))return fail(res,401,'Invalid username or password');
-  if(!found.password_hash.startsWith('scrypt$')){found.password_hash=passwordHash(password);writeDB(db);}
-  return login(req,res,found);
+  if(!found||found.disabled||found.disabled_at||!await verifyPassword(password,found.password_hash))return fail(res,401,'Invalid username or password');
+  const upgraded=found.password_hash.startsWith('scrypt$')?null:await passwordHash(password);
+  const current=readDB(),user=rows(current,'users').find(u=>u.id===found.id);
+  if(!user||user.disabled||user.disabled_at||user.password_hash!==found.password_hash||user.username!==found.username)return fail(res,401,'Account changed. Sign in again.');
+  if(upgraded){user.password_hash=upgraded;writeDB(current);}
+  return login(req,res,user);
 });
 require('./account-security.cjs').registerAccountSecurity(app,{readDB,writeDB,verifyPassword,passwordHash,publicUser,publicTeam,sessions,limit:authLimit});
 app.use('/api',(req,res,next)=>req.user?next():fail(res,401,'Sign in required'));
@@ -129,6 +144,7 @@ app.post('/api/events/:id/refresh-live',async(req,res)=>{
 });
 app.post('/api/auth/logout',(req,res)=>{sessions.delete(req.sessionToken);res.clearCookie('argus_session',{path:'/',httpOnly:true,sameSite:'strict'});res.json({ok:true});});
 app.post('/api/auth/create-team',(req,res)=>{
+  const unavailable=admission.createTeam(readDB());if(unavailable)return fail(res,503,unavailable);
   const {number,name,password}=req.body||{};
   if(password!=null&&(typeof password!=='string'||password.trim().length<8||password.length>128))return fail(res,400,'Use a join password of 8 to 128 characters, or leave it out to generate one.');
   if(!/^\d{1,6}$/.test(String(number))||typeof name!=='string'||!name.trim()||name.length>120)return fail(res,400,'A team number and name are required');
@@ -164,7 +180,7 @@ app.post('/api/auth/deactivate-account',(req,res)=>{
 app.use(['/api/assignment-plan/preview','/api/assignment-plan/apply','/api/assignment-plan/reconcile'],(req,res,next)=>{
   if(req.method==='POST'&&(!authLimit.take(`plan:${req.user.id}`,20,60000)||!authLimit.take('plan-global',100,60000)))return fail(res,429,'Wait a minute before calculating more assignments.');next();
 });
-registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, dbFile:DB_FILE });
+registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, publicTeam, sessions, dbFile:DB_FILE });
 app.get('/api/integrations/status',(req,res)=>{const {workspaceId}=req.query;if(typeof workspaceId!=='string'||!membership(readDB(),req.user.id,workspaceId))return fail(res,403,'Workspace permission required');res.json({tbaConfigured:!!integrationKey(req,'TBA_API_KEY',workspaceId),groqConfigured:false,match13Configured:!!integrationKey(req,'MATCH13_API_KEY',workspaceId)});});
 app.post('/api/integrations/configure',(req,res)=>{const {workspaceId,...values}=req.body||{};if(typeof workspaceId!=='string'||role(readDB(),req.user.id,workspaceId)!=='owner')return fail(res,403,'Workspace owner permission required');try{res.json(integrations.save(workspaceId,values));}catch{fail(res,400,'Could not save private settings. Check the key format and server storage permissions.');}});
 const connectionChecks=new Map();
@@ -283,7 +299,9 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
     if(!rows(db,'forms').some(f=>f.id===row.form_id&&f.team_id===tid))return fail(res,400,'Choose a form in this workspace');
     row.submitted_by=req.user.username;
     if(domain.reportRemoved(db,key))return fail(res,409,'This report was removed by an administrator. Its ID remains reserved.');
-    if(original)return isDeepStrictEqual(original,{...body,submitted_by:req.user.username})?res.json(original):fail(res,409,'A different report already uses this ID. Your local copy is preserved.');
+    // Attribution belongs to the immutable report, not today's account label.
+    // A lost acknowledgement may be retried after a legitimate username change.
+    if(original)return isDeepStrictEqual(original,{...body,submitted_by:original.submitted_by})?res.json(original):fail(res,409,'A different report already uses this ID. Your local copy is preserved.');
     const form=rows(db,'forms').find(form=>form.id===row.form_id);
     const validationError=submissionService.validateReport(db,form,row);if(validationError)return fail(res,400,validationError);
     if(form.kind&&row.report_kind&&form.kind!==row.report_kind)return fail(res,400,'Use the report type configured for this form.');
@@ -375,5 +393,13 @@ app.use('/api',(_req,res)=>fail(res,404,'Unknown API route'));
 app.use((req,res,next)=>STORES.includes(req.path.split('/')[1])||req.path.startsWith('/session')?fail(res,404,'Unknown route'):next());
 app.use(express.static(DIST_DIR,{etag:false,lastModified:false,cacheControl:false}));
 app.use((req,res,next)=>{if(req.method!=='GET')return next();const index=path.join(DIST_DIR,'index.html');if(!fs.existsSync(index))return res.status(503).send('App build not found. Run npm run build first.');res.set('Cache-Control','no-store, max-age=0');res.sendFile(index,{etag:false,lastModified:false,cacheControl:false});});
-app.use((err,_req,res,_next)=>{console.error(err.message);fail(res,err.status||500,'Request failed. Please try again.');});
-app.listen(Number(process.env.APP_PORT||3001),()=>{console.log(`Argus DB server running`);console.log(`Data file: ${DB_FILE}`);});
+app.use((err,req,res,_next)=>{
+ const status=Number.isInteger(err.status)&&err.status>=400&&err.status<=599?err.status:500;
+ const category=err.type==='entity.too.large'?'request_too_large':err.type==='entity.parse.failed'?'invalid_json':status===429?'busy':'request_error';
+ // Error messages may contain parser input, private paths or upstream secrets.
+ // Keep operational metadata bounded and content-free instead.
+ console.error(JSON.stringify({event:'request.failed',requestId:req.requestId,status,category}));
+ fail(res,status,category==='request_too_large'?'Request is too large.':category==='invalid_json'?'Invalid JSON request.':status===429?'Authentication is busy. Try again shortly.':'Request failed. Please try again.');
+});
+const server = app.listen(Number(process.env.APP_PORT||3001),()=>{console.log(`Argus DB server running`);console.log(`Data file: ${DB_FILE}`);});
+bindWriterLifecycle(server, writerLock);

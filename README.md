@@ -1,8 +1,8 @@
 # Argus — FRC Team 6390 Scouting App
 
-**Argus** is the scouting workspace for FRC Team 6390 (Hephaustus), live at [6390scout.app](https://6390scout.app). It replaces paper scouting sheets with a phone-friendly app that works offline at competitions.
+**Argus** is an FRC scouting workspace developed by Team 6390 (Hephaestus), available at [6390scout.app](https://6390scout.app). Teams collect match and pit evidence in isolated workspaces, with offline scouting on prepared devices.
 
-Argus 5.0.0 adds persistent team ownership, conflict-aware match duties, an Admin control centre, isolated practice, shared evidence controls, onboarding and offline help. Existing scouting drafts, synchronization, handoffs and strategy exports are retained. Start with the [instructions](instructions/contents.md), [release notes](docs/argus-2/argus-5-release.md) and [verified implementation status](docs/ARGUS_IMPLEMENTATION_PROGRESS.md).
+Start with the [instructions](instructions/contents.md), [first-event and device guide](docs/argus-2/device-support-and-field-guide.md), and [public release checklist](docs/argus-2/public-release-checklist.md). Public availability for every team/device is subject to the checklist's verified support, privacy, capacity and operational gates; an existing deployment is not evidence that all gates are cleared.
 
 ## What it is
 
@@ -19,7 +19,7 @@ A web app for FIRST Robotics Competition scouting — collecting match and pit d
 
 ## Under the hood
 
-- React 19 + Vite frontend, installed as a PWA — offline support via service worker and IndexedDB
+- React 19 + Vite frontend, optional PWA installation — offline support via service worker and IndexedDB
 - Express server (`server.cjs`) on port 3001 with a JSON-file database (`db.json`) — no external database needed
 - Live competition data from The Blue Alliance API
 
@@ -31,6 +31,10 @@ Create an account and create or join your team. Demo accounts are not provisione
 The active app is `Clasue-scout-app/src/frc-scout-local.jsx`, served by
 `server.cjs` on port **3001**. It saves scouting data to a JSON file on your
 server. The Firebase component is not used.
+
+Firebase, JSON-server and CORS packages used by historical/unused entries are no longer installed. Those entries remain as source history/reference and are not supported launch targets. Run the active `npm start`/`npm run build` commands. Server authentication is same-origin and needs no permissive CORS middleware.
+
+Before operating publicly, adopt the [operations handbook](docs/argus-2/public-operations-handbook.md), rehearse the [backup and recovery procedure](docs/argus-2/storage-recovery.md), and complete the [release evidence](docs/argus-2/public-readiness-evidence.md). The operator must supply actual contacts, legal/audience decisions and production verification; these are not invented by the implementation.
 
 ## One-time setup on your existing Debian server
 

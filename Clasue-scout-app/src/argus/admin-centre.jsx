@@ -40,8 +40,8 @@ function Reports({ workspace, event, api, onRefresh }) {
   </section>;
 }
 
-function Sharing({ event, data, api, onRefresh }) {
-  const [ids, setIds] = useState(() => event.shared_summary_policy?.metric_ids || []), [message, setMessage] = useState(''), [busy, setBusy] = useState(false);
+function Sharing({ event, data, api, onRefresh, message, setMessage }) {
+  const [ids, setIds] = useState(() => event.shared_summary_policy?.metric_ids || []), [busy, setBusy] = useState(false);
   const fields = (data.forms || []).flatMap(f => (f.questions || []).filter(q => ['number', 'scale', 'boolean', 'select'].includes(q.type)).map(q => ({ id: `${f.id}:${q.id}`, label: `${f.title}: ${q.text}` })));
   async function save(e) { e.preventDefault(); setBusy(true); try { await api('PATCH', `/events/${encodeURIComponent(event.id)}/sharing`, { revision: event.sharing_revision || 0, metric_ids: ids }); setMessage('Approved summaries saved. Private reports and notes remain restricted.'); await onRefresh(); } catch (e) { setMessage(e.message); } finally { setBusy(false); } }
   return <form className="a-panel a-stack" onSubmit={save}><h2>Approved shared measurements</h2><p className="a-muted">Choose measurements Scouters can see across the event. Raw private reports, scout names, notes and photos are not included.</p><fieldset disabled={busy}><legend>Publish structured evidence</legend>{fields.map(field => <label className="a-check-row" key={field.id}><input type="checkbox" checked={ids.includes(field.id)} onChange={e => setIds(current => e.target.checked ? [...current, field.id] : current.filter(id => id !== field.id))} />{field.label}</label>)}</fieldset><button className="a-button" disabled={busy}>Save approved measurements</button>{message && <p role="status">{message}</p>}</form>;
@@ -56,6 +56,9 @@ function Activity({ workspace, api, data }) {
 export default function AdminCentre(props) {
   const { event, role, api, data, onRefresh } = props;
   const [busy, setBusy] = useState(false);
+  // A successful save advances sharing_revision and remounts the editable form.
+  // Keep its confirmation outside that revision-keyed form, scoped to the event.
+  const [sharingNotice,setSharingNotice]=useState(null);
   const [selectedTeam,setSelectedTeam]=useState(()=>new URLSearchParams(location.hash.split('?')[1]||'').get('team'));
   const overviewRequest=useRef(0);
   const cancelOverview=useCallback(()=>{overviewRequest.current++;},[]);
@@ -76,7 +79,7 @@ export default function AdminCentre(props) {
   if (!['owner', 'admin'].includes(role)) return <section className="a-panel"><h1>Administrator access required</h1><p>The backend also rejects protected requests.</p></section>;
   const name = id => (data.memberships || []).find(m => m.user_id === id)?.username || overview?.people?.find(p=>p.id===id)?.username || (id ? 'Former member — reassign' : 'Unassigned');
   return <div className="a-stack"><header><h1>Admin control centre</h1><p className="a-muted">{event?.event_name || 'Activate an event in Settings to review scouting progress.'}</p></header><nav className="a-admin-tabs" aria-label="Admin sections">{adminSections.map(([id, label]) => <button className="a-button" key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>{label}</button>)}</nav><label className="a-admin-section">Admin section<select aria-label="Admin section" className="a-input" value={tab} onChange={e=>setTab(e.target.value)}>{adminSections.map(([id,label])=><option value={id} key={id}>{label}</option>)}</select></label>{error && <p role="alert" className="a-danger">{error}</p>}
-    {tab === 'members' ? <Members {...props} onRefresh={refresh} /> : tab === 'reports' ? <Reports {...props} onRefresh={refresh} /> : tab === 'activity' ? <Activity {...props} /> : !event ? <section className="a-panel"><p>No active event.</p><a className="a-button" href="#/events">Manage events</a></section> : tab === 'assignments' ? <><OwnershipManager key={event.id} {...props} initialTeam={selectedTeam} onSaved={load} /><details className="a-panel a-disclosure"><summary>Adjust one-match or pit responsibility</summary><DutyEditor {...props} onRefresh={refresh}/></details></> : tab === 'sharing' ? <Sharing key={`${event.id}:${event.sharing_revision || 0}`} {...props} /> : <>
+    {tab === 'members' ? <Members {...props} onRefresh={refresh} /> : tab === 'reports' ? <Reports {...props} onRefresh={refresh} /> : tab === 'activity' ? <Activity {...props} /> : !event ? <section className="a-panel"><p>No active event.</p><a className="a-button" href="#/events">Manage events</a></section> : tab === 'assignments' ? <><OwnershipManager key={event.id} {...props} initialTeam={selectedTeam} onSaved={load} /><details className="a-panel a-disclosure"><summary>Adjust one-match or pit responsibility</summary><DutyEditor {...props} onRefresh={refresh}/></details></> : tab === 'sharing' ? <Sharing key={`${event.id}:${event.sharing_revision || 0}`} {...props} message={sharingNotice?.eventId===event.id?sharingNotice.message:''} setMessage={message=>setSharingNotice({eventId:event.id,message})} /> : <>
       {!overview&&<p role="status">Loading scouting progress…</p>}
       {overview&&<CoverageBoard key={event.id} teams={overview.team_coverage||[]} event={event} name={name} busy={busy} error={error} onDismiss={dismiss} onDismissTeam={dismissTeam} onAssignments={number=>{setSelectedTeam(number);setTab('assignments');}} onRefresh={load}/>}
       <details className="a-disclosure a-admin-support"><summary>More progress details</summary><div className="a-stack">

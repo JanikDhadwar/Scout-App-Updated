@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { matchLabel } from './workspace-model.js';
 import { usePhoneLayout } from './phone-layout.js';
 import './coverage-board.css';
@@ -18,6 +18,7 @@ function CoverageMatches({team,slots,event,name,busy,onDismiss,dismissed=false})
  </section>;
 }
 export function CoverageBoard({teams,event,name,busy,error,onDismiss,onDismissTeam,onAssignments,onRefresh}){
+ const coverageId=useId();
  const [query,setQuery]=useState(''),[filter,setFilter]=useState('all'),[page,setPage]=useState(0),[selected,setSelected]=useState(null);
  const dialog=useRef(null),phone=usePhoneLayout(),pageSize=phone?6:12;
  const visible=teams.filter(team=>(filter==='all'||team.status===filter)&&`${team.team_number} ${team.team_name}`.toLowerCase().includes(query.toLowerCase()));
@@ -29,7 +30,7 @@ export function CoverageBoard({teams,event,name,busy,error,onDismiss,onDismissTe
   <header className="a-row"><h2 id="coverage-heading">Scouting by team</h2><button className="a-button" disabled={busy} onClick={onRefresh}>Refresh overview</button></header>
   <p className="a-coverage-legend"><span className="a-coverage-green"><CoverageStatus status="green"/>Green: covered or dismissed</span><span className="a-coverage-yellow"><CoverageStatus status="yellow"/>Yellow: missed matches</span><span className="a-coverage-red"><CoverageStatus status="red"/>Red: no pit report</span></p>
   <div className="a-coverage-controls"><label>Find team<input type="search" className="a-input" placeholder="Number or name" value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}}/></label><label>Show<select aria-label="Show team coverage" className="a-input" value={filter} onChange={e=>{setFilter(e.target.value);setPage(0);}}><option value="all">All teams ({teams.length})</option>{Object.entries(statusText).map(([value,label])=><option key={value} value={value}>{label} ({teams.filter(t=>t.status===value).length})</option>)}</select></label></div>
-  <div className="a-coverage-grid" aria-label="Event team coverage">{visible.slice(current*pageSize,(current+1)*pageSize).map(row=><button className={`a-coverage-tile is-${row.status}`} key={row.team_number} onClick={()=>setSelected(row.team_number)} aria-label={`Team ${row.team_number} · ${row.team_name||'Name unavailable'}: ${statusText[row.status]}`} aria-haspopup="dialog"><strong><CoverageStatus status={row.status}/>{row.team_number}</strong><span>{row.team_name||'Name unavailable'}</span></button>)}</div>
+   <div className="a-coverage-grid" role="group" aria-label="Event team coverage">{visible.slice(current*pageSize,(current+1)*pageSize).map(row=><button className={`a-coverage-tile is-${row.status}`} key={row.team_number} onClick={()=>setSelected(row.team_number)} aria-describedby={`${coverageId}-${row.team_number}-status`} aria-haspopup="dialog"><strong id={`${coverageId}-${row.team_number}-number`}><CoverageStatus status={row.status}/><span className="a-sr-only">Team </span>{row.team_number}</strong><span id={`${coverageId}-${row.team_number}-name`}>{row.team_name||'Name unavailable'}</span><span id={`${coverageId}-${row.team_number}-status`} className="a-sr-only">{statusText[row.status]}</span></button>)}</div>
   {!visible.length&&<p>{teams.length?'No matching teams. Change the search or filter.':'No event teams downloaded. Download teams in Event setup.'}</p>}
   <div className="a-row a-coverage-pages"><button className="a-button" disabled={current===0} onClick={()=>setPage(current-1)}>Previous teams</button><span role="status">{visible.length?`${current*pageSize+1}–${Math.min((current+1)*pageSize,visible.length)} of ${visible.length}`:'0 teams'}</span><button className="a-button" disabled={current===lastPage} onClick={()=>setPage(current+1)}>Next teams</button></div>
   <dialog ref={dialog} className="a-coverage-dialog" aria-labelledby="coverage-team-heading" onClose={()=>setSelected(null)}><div className="a-stack">

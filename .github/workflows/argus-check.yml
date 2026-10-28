@@ -49,3 +49,33 @@ jobs:
           CHECKED_COMMIT: ${{ github.sha }}
         run: |
           printf 'Argus verification: %s\nCommit: %s\n' "$CHECK_RESULT" "$CHECKED_COMMIT" >> "$GITHUB_STEP_SUMMARY"
+
+  browser-qa:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: Clasue-scout-app
+    env:
+      TBA_API_KEY: ''
+      GROQ_API_KEY: ''
+      MATCH13_API_KEY: ''
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Clasue-scout-app/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --include=dev --no-fund
+      - name: Build fixture application
+        run: npm run build
+      - name: Check Edge workflows on disposable data
+        run: npm run test:browser
+      - name: Check accessibility on disposable data
+        run: npm run test:accessibility
+      - name: Check isolated multi-team workload
+        run: npm run test:readiness

@@ -7,7 +7,7 @@ const { changeReportState,validateReport } = require('./submission-service.cjs')
 const { analyticsForUser, sharedInputs } = require('./shared-analytics.cjs');
 const { refreshStates } = require('./match-handoffs.cjs');
 
-function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, dbFile }) {
+function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions, dbFile }) {
   require('./notification-service.cjs').registerNotificationRoutes(app,{readDB,writeDB,dbFile});
   // All handlers are mounted after authentication and before generic collections.
   const route = (method, path, handler) => app[method](path, async (req, res, next) => {
@@ -78,10 +78,14 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, dbFile })
     const db = readDB(), result = members.changeMember(db, { id: req.params.id, actorId: req.user.id, action, nextRole: req.body?.role });
     writeDB(db); return result;
   });
-  route('post', '/api/auth/transfer-ownership', req => {
-    const db = readDB();
-    if (role(db, req.user.id, req.body?.team_id) !== 'owner') reject('Owner permission required.', 403);
-    if (typeof req.body?.password !== 'string' || !verifyPassword(req.body.password, rows(db, 'users').find(u => u.id === req.user.id)?.password_hash)) reject('Re-enter your password to request ownership transfer.', 403);
+  route('post', '/api/auth/transfer-ownership', async req => {
+    const snapshot = readDB();
+    if (role(snapshot, req.user.id, req.body?.team_id) !== 'owner') reject('Owner permission required.', 403);
+    const account=rows(snapshot,'users').find(u=>u.id===req.user.id);
+    if (typeof req.body?.password !== 'string' || req.body.password.length>1024 || !await verifyPassword(req.body.password, account?.password_hash)) reject('Re-enter your password to request ownership transfer.', 403);
+    const db=readDB(),current=rows(db,'users').find(u=>u.id===req.user.id),session=sessions.get(req.sessionToken);
+    if(!current||current.disabled||current.disabled_at||current.password_hash!==account.password_hash||!session||session.userId!==current.id||session.expires<=Date.now())reject('Account changed. Sign in again.',401);
+    if(role(db,req.user.id,req.body?.team_id)!=='owner')reject('Owner permission required.',403);
     const result = members.requestTransfer(db, { actorId: req.user.id, teamId: req.body.team_id, targetId: req.body.user_id }); writeDB(db); return result;
   });
   route('get', '/api/ownership-transfers', req => {

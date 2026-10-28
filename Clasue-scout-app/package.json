@@ -1,7 +1,7 @@
 {
   "name": "scout-app",
   "private": true,
-  "version": "5.10.1",
+  "version": "5.11.0",
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
@@ -11,13 +11,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:active": "eslint src/frc-scout-local.jsx src/argus src/offline*.js src/form-conditions*.js src/use-report-draft.js src/report-media.jsx *.cjs vite.config.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:readiness": "node ../scripts/readiness-load.cjs",
+    "notices": "node ../scripts/dependency-notices.cjs",
+    "test:accessibility": "node ../scripts/run-browser-checks.cjs --accessibility"
   },
   "dependencies": {
     "concurrently": "^9.2.1",
-    "cors": "^2.8.6",
     "express": "^5.2.1",
-    "firebase": "^12.13.0",
     "jspdf": "^4.2.1",
     "pptxgenjs": "^4.0.1",
     "react": "^19.2.5",
@@ -25,6 +26,7 @@
     "web-push": "3.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@playwright/cli": "^0.1.22",
     "@types/react": "^19.2.14",
@@ -35,12 +37,14 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "fake-indexeddb": "^6.2.5",
     "globals": "^17.5.0",
-    "json-server": "^0.17.4",
     "vite": "^8.0.10",
     "vite-plugin-pwa": "^1.3.0"
   },
   "overrides": {
     "@grpc/grpc-js": "^1.14.6",
     "image-size": "^2.0.4"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

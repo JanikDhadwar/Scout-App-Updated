@@ -30,7 +30,11 @@ export function reportsCsv(reports,forms=[]) {
   const metadata=['id','event_key','match_key','scouted_team','report_kind','form_id','form_title','submitted_by','created_at'];
   const questions=reportQuestions(reports,forms),known=new Set(questions.map(q=>q.key));
   for(const row of reports)for(const id of Object.keys(row.answers||{})){const key=`${row.form_id}:${id}`;if(!known.has(key)){known.add(key);questions.push({key,id,formId:row.form_id,formTitle:row.form_title||row.form_id,text:id});}}
-  const cell=value=>{let text=typeof value==='object'&&value!==null?JSON.stringify(value):String(value??'');if(/^[=+@-]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`;};
+  // Spreadsheet importers can ignore leading whitespace/control characters when
+  // deciding whether a cell is a formula. Preserve the original text after an
+  // apostrophe, including for metadata and question-header cells.
+  // eslint-disable-next-line no-control-regex -- Match ignored CSV control prefixes intentionally.
+  const cell=value=>{let text=typeof value==='object'&&value!==null?JSON.stringify(value):String(value??'');if(/^[\s\u0000-\u001f\u007f]*[=+@-]/u.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`;};
   const header=[...metadata,...questions.map(q=>`${q.formTitle}: ${q.text} [${q.key}]`)];
   return [header.map(cell).join(','),...reports.map(row=>[...metadata.map(key=>row[key]),...questions.map(q=>q.formId===row.form_id?row.answers?.[q.id]:null)].map(cell).join(','))].join('\r\n');
 }

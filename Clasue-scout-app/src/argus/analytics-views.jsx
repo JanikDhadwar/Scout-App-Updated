@@ -1157,6 +1157,7 @@ export function TeamComparison({
       <section className="a-panel av-comparison-controls">
         <div
           className="av-selected-teams"
+          role="group"
           aria-label="Selected comparison teams"
         >
           {teams.map((team) => (

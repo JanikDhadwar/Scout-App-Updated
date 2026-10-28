@@ -26,6 +26,17 @@ test('CSV keeps same-ID questions from different forms separate and escapes form
  const rows=[report('a'),report('b',{form_id:'other',form_title:'Other',questions_snapshot:[{id:'n',text:'Speed',type:'number'}],answers:{n:'=BAD'}})];
  const csv=reportsCsv(rows,forms);assert.ok(csv.includes('Match: Pieces [f:n]'));assert.ok(csv.includes('Other: Speed [other:n]'));assert.ok(csv.includes("'=BAD"));assert.equal(reportQuestions(rows,forms).filter(q=>q.id==='n').length,2);
 });
+test('CSV neutralizes formulas after whitespace/control prefixes without losing original cell text',()=>{
+ const inputs=[' =SUM(1,2)','\t@SUM(A1:A2)','\r\n+CMD','\u0000-2+3','\uFEFF=1+1','=HYPERLINK("https://example.invalid")'];
+ for(const input of inputs){
+  const csv=reportsCsv([report('formula',{answers:{note:input}})],forms);
+  assert.ok(csv.includes(`"'${input.replaceAll('"','""')}"`),JSON.stringify(input));
+ }
+ for(const input of ['A robot note','42','0','false','line\nnext line']){
+  assert.ok(reportsCsv([report('plain',{answers:{note:input}})],forms).includes(`"${input}"`));
+ }
+ assert.ok(reportsCsv([report('header',{form_title:'\t=BAD',questions_snapshot:[{id:'note',text:'Notes'}],answers:{note:'safe'}})],forms).includes('"\'\t=BAD: Notes [f:note]"'),'Question headers are cells too');
+});
 test('filtered summaries preserve zero, distinguish missing/invalid and separate pit evidence',()=>{
  const rows=[report('a'),report('b',{answers:{n:10,choice:'Slow'}}),report('c',{match_key:'e_qm2',answers:{n:'invalid'}}),report('d',{answers:{note:'Only notes'}}),report('pit',{report_kind:'pit',answers:{n:100}})];
  const summary=summarizeReportFields(rows,forms),numeric=summary.find(row=>row.questionId==='n'&&row.reportKind==='match');

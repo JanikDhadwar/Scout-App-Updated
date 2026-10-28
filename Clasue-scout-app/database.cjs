@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { createHash } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const { rows } = require('./domain.cjs');
 const VERSION = 1;
 const COLLECTIONS = ['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements',
@@ -45,21 +45,80 @@ function migrate(input,copy=true) {
   return db;
 }
 function createDatabase(filename) {
-  function read() { return migrate(fs.existsSync(filename) ? JSON.parse(fs.readFileSync(filename, 'utf8')) : {},false); }
+  filename = path.resolve(filename);
+  function rejectSymlink() {
+    let info;
+    try { info = fs.lstatSync(filename); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    if (info?.isSymbolicLink()) throw Error('Database file symlinks are not supported. Configure the actual persistent file path.');
+  }
+  rejectSymlink();
+  const marker = `${filename}.initialized`;
+  let established = fs.existsSync(filename) || fs.existsSync(marker);
+  function checkPresent() {
+    rejectSymlink();
+    const present = fs.existsSync(filename);
+    if (!present && (established || fs.existsSync(marker))) throw Error('Established database is missing or unavailable. No empty replacement was created; recover a verified copy to a new location.');
+    return present;
+  }
+  function markEstablished() {
+    established = true;
+    if (fs.existsSync(marker)) return;
+    let descriptor;
+    try {
+      descriptor = fs.openSync(marker, 'wx', 0o600);
+      fs.writeFileSync(descriptor, 'Argus database initialized\n');
+      fs.fsyncSync(descriptor);
+    } catch (error) { if (error.code !== 'EEXIST') throw error; }
+    finally { if (descriptor !== undefined) fs.closeSync(descriptor); }
+    if (descriptor !== undefined) syncDirectory();
+  }
+  function syncDirectory() {
+    let descriptor;
+    try { descriptor = fs.openSync(path.dirname(filename), 'r'); fs.fsyncSync(descriptor); }
+    catch (error) {
+      // Windows does not expose POSIX directory fsync through Node. File fsync
+      // still runs before rename; do not hide real durability errors on Unix.
+      if (process.platform !== 'win32' || !['EPERM', 'EISDIR', 'EINVAL', 'EBADF'].includes(error.code)) throw error;
+    } finally { if (descriptor !== undefined) fs.closeSync(descriptor); }
+  }
+  function read() {
+    if (!checkPresent()) return migrate({}, false);
+    const db = migrate(JSON.parse(fs.readFileSync(filename, 'utf8')), false);
+    markEstablished();
+    return db;
+  }
   function write(db) {
     const validated = migrate(db,false);
-    fs.mkdirSync(path.dirname(filename), { recursive: true });
-    if (fs.existsSync(filename)) {
+    const present = checkPresent();
+    fs.mkdirSync(path.dirname(filename), { recursive: true, mode: 0o700 });
+    if (present) {
       const previous = JSON.parse(fs.readFileSync(filename, 'utf8'));
-      if (!previous.argus_schema_version) {
+      const needsUpgradeBackup = !previous.argus_schema_version;
+      // A malformed or future-schema committed file must never be replaced by
+      // a caller holding a previously read snapshot.
+      migrate(previous, false);
+      if (needsUpgradeBackup) {
         const backup = `${filename}.pre-upgrade-v${VERSION}.bak`;
         if (!fs.existsSync(backup)) fs.copyFileSync(filename, backup, fs.constants.COPYFILE_EXCL);
         fs.chmodSync(backup, 0o600);
       }
     }
-    fs.writeFileSync(`${filename}.tmp`, JSON.stringify(validated, null, 2), { mode: 0o600 });
-    const descriptor=fs.openSync(`${filename}.tmp`,'r+');try{fs.fsyncSync(descriptor);}finally{fs.closeSync(descriptor);}
-    fs.renameSync(`${filename}.tmp`, filename);
+    const temporary = `${filename}.${process.pid}.${randomUUID()}.tmp`;
+    let descriptor;
+    try {
+      descriptor = fs.openSync(temporary, 'wx', 0o600);
+      fs.writeFileSync(descriptor, JSON.stringify(validated, null, 2));
+      fs.fsyncSync(descriptor);
+      fs.closeSync(descriptor); descriptor = undefined;
+      fs.renameSync(temporary, filename);
+      markEstablished();
+      syncDirectory();
+    } finally {
+      if (descriptor !== undefined) fs.closeSync(descriptor);
+      // Unique temporary names never truncate another writer's pending file.
+      // The application still requires exactly one database writer process.
+      if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    }
   }
   return { read, write };
 }

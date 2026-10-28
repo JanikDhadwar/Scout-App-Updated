@@ -6,12 +6,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const buildId=randomUUID()
-const imageCache=`argus-images-${buildId}`
 const releaseAssets={
   name:'argus-release-assets',
   generateBundle(){
     this.emitFile({type:'asset',fileName:'release.json',source:JSON.stringify({version:packageInfo.version,buildId,revision:/^[a-f0-9]{40,64}$/.test(process.env.ARGUS_REVISION||'')?process.env.ARGUS_REVISION:null})})
-    this.emitFile({type:'asset',fileName:'argus-cache-cleanup.js',source:`self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key==='scout-images'||key.startsWith('argus-images-')&&key!==${JSON.stringify(imageCache)}).map(key=>caches.delete(key))))));`})
+    // Remove the old account-independent image caches. Draft/queue media stays
+    // in scoped IndexedDB; upgrades must never clear that device evidence.
+    this.emitFile({type:'asset',fileName:'argus-cache-cleanup.js',source:`self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key==='scout-images'||key.startsWith('argus-images-')).map(key=>caches.delete(key))))));`})
   }
 }
 
@@ -37,7 +38,10 @@ server: {
         start_url: '/',
         scope: '/',
         icons: [
-          { src: '/app-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
+          { src: '/app-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/app-icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {
@@ -47,11 +51,10 @@ server: {
         cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/api\//],
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        runtimeCaching: [{
-          urlPattern: ({ request }) => request.destination === 'image',
-          handler: 'NetworkFirst',
-          options: { cacheName:imageCache, networkTimeoutSeconds:4, expiration:{maxEntries:80,maxAgeSeconds:2592000}, cacheableResponse:{statuses:[0,200]} }
-        }]
+        // Only public files from this build are precached. Runtime image URLs
+        // can contain private form/scouting content and must bypass shared SW
+        // storage; the offline client owns account/workspace-scoped evidence.
+        runtimeCaching: []
       }
     })
   ]

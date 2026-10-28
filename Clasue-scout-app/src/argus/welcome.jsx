@@ -32,7 +32,7 @@ export default function WelcomeScreen({ signedIn=false }) {
         </div>
         <figure className="a-product-hero-image"><img src="/product/workspace.svg" width="1120" height="680" fetchPriority="high" alt={examples[0].alt}/><figcaption>One workspace, from your next assignment to your next match. Illustrative preview with sample data.</figcaption></figure>
       </section>
-      <div className="a-product-capabilities" aria-label="Argus capabilities"><span>Match + pit scouting</span><span>Offline on prepared devices</span><span>Evidence behind the numbers</span><span>Built by an FRC team</span></div>
+      <div className="a-product-capabilities" role="group" aria-label="Argus capabilities"><span>Match + pit scouting</span><span>Offline on prepared devices</span><span>Evidence behind the numbers</span><span>Built by an FRC team</span></div>
       <section id="product-examples" tabIndex={-1} className="a-public-section a-product-examples" aria-labelledby="examples-title">
         <div className="a-product-section-intro"><p className="a-public-kicker">See the workflow</p><h2 id="examples-title">Less scattered information. More shared understanding.</h2><p>Explore how Argus fits into a competition day. These are illustrated product previews; all teams, names, and numbers are sample data.</p></div>
         <div className="a-product-selector" role="group" aria-label="Product examples">{examples.map((item,index)=><button key={item.id} className="a-button" type="button" aria-pressed={selected===index} aria-controls="product-preview" onClick={()=>setSelected(index)}>{item.label}</button>)}</div>

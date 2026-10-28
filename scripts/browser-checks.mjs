@@ -4,19 +4,29 @@ import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 const require = createRequire(new URL('../Clasue-scout-app/package.json', import.meta.url));
-const { chromium } = require('playwright');
+const { chromium,firefox,webkit } = require('playwright');
 const baseURL = process.env.QA_BASE_URL || 'http://127.0.0.1:4173';
 assert.ok(['localhost','127.0.0.1','[::1]'].includes(new URL(baseURL).hostname),'Use a local fixture server only.');
 const artifacts = process.env.QA_ARTIFACT_DIR || fs.mkdtempSync(path.join(os.tmpdir(),'argus-browser-qa-'));
 fs.mkdirSync(artifacts,{recursive:true});
-const browser = await chromium.launch({channel:'msedge',headless:true,...(process.env.EDGE_EXECUTABLE?{executablePath:process.env.EDGE_EXECUTABLE}:{})});
-const context = await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'allow'});
-const page = await context.newPage(); page.setDefaultTimeout(12000);
-const results=[],errors=[];
-page.on('pageerror',error=>errors.push(error.message));
+const qaBrowser=process.env.QA_BROWSER||'edge';
+assert.ok(['edge','chromium','firefox','webkit'].includes(qaBrowser),'QA_BROWSER must be edge, chromium, firefox or webkit.');
+const browser = await ({edge:chromium,chromium,firefox,webkit}[qaBrowser]).launch({headless:true,...(qaBrowser==='edge'?{channel:'msedge',...(process.env.EDGE_EXECUTABLE?{executablePath:process.env.EDGE_EXECUTABLE}:{})}:{})});
+let context = await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'allow'});
+let page = await context.newPage(); page.setDefaultTimeout(12000);
+const results=[],errors=[],policyErrors=[];
+const diagnostics=target=>{target.setDefaultTimeout(12000);target.on('pageerror',error=>errors.push(error.message));target.on('console',message=>{if(message.type()==='error'&&/content security policy|violates.*directive|refused to.*(?:script|style|connect|worker)/i.test(message.text()))policyErrors.push(message.text());});};
+diagnostics(page);
 const route=async(destination,target=page)=>{await target.evaluate(value=>{location.hash=value;},destination);await target.waitForTimeout(200);};
 const api=(target,url,method='GET',body)=>target.evaluate(async({url,method,body})=>{const r=await fetch(`/api${url}`,{method,headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});return{status:r.status,data:await r.json()};},{url,method,body});
-const login=async(target,username)=>{await target.goto(`${baseURL}/#/login`,{waitUntil:'networkidle'});await target.getByLabel('Username',{exact:true}).fill(username);await target.getByLabel('Password',{exact:true}).fill('ArgusQA2026!');await target.locator('.auth-submit').click();await target.locator('.argus-app').waitFor();};
+const login=async(target,username)=>{await target.goto(`${baseURL}/#/login`,{waitUntil:'networkidle'});await target.getByLabel('Username',{exact:true}).fill(username);await target.getByLabel('Password',{exact:true}).fill('ArgusQA2026!');await target.locator('.auth-submit').click();await target.locator('.argus-app').waitFor();await target.waitForLoadState('networkidle');};
+const withPreparedWorkerContext=async run=>{
+ const mainContext=context,mainPage=page;
+ context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'allow',storageState:await mainContext.storageState()});
+ page=await context.newPage();diagnostics(page);
+ try{await page.goto(baseURL,{waitUntil:'networkidle'});await page.locator('.argus-app').waitFor();await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);await run();}
+ finally{await context.setOffline(false);await context.close();context=mainContext;page=mainPage;}
+};
 const check=async(name,run)=>{try{await run();results.push({name,status:'passed'});}catch(error){results.push({name,status:'failed',error:error.message});await page.screenshot({path:path.join(artifacts,`failure-${results.length}.png`),fullPage:true}).catch(()=>{});}finally{await context.setOffline(false);await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});console.log(JSON.stringify(results.at(-1)));}};
 const widths=[1440,1280,1024,768,390,360];
 try {
@@ -25,7 +35,7 @@ try {
   await page.getByRole('heading',{name:'Scout every match. Make every decision count.',exact:true}).waitFor();
   assert.equal(await page.getByLabel('Username',{exact:true}).count(),0);
   await page.getByRole('heading',{name:'Built by Hephaestus',exact:true}).waitFor();
-  for(const label of ['Match scouting','Compare and choose','Pit display','Event workspace']){await page.getByRole('button',{name:label,exact:true}).click();assert.ok(await page.locator('#product-preview img').evaluate(image=>image.complete&&image.naturalWidth>0));}
+  for(const label of ['Match scouting','Compare and choose','Pit display','Event workspace']){await page.getByRole('button',{name:label,exact:true}).click();await page.waitForFunction(()=>{const image=document.querySelector('#product-preview img');return image?.complete&&image.naturalWidth>0;});}
   await page.getByRole('button',{name:'Compare and choose',exact:true}).click();await page.getByText('Read the sample comparison data',{exact:true}).click();await page.getByRole('region',{name:'Sample comparison data',exact:true}).waitFor();
   for(const width of widths){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(artifacts,`welcome-${width}.png`),fullPage:true});}
   await page.getByRole('link',{name:'Start now',exact:true}).first().click();
@@ -39,6 +49,12 @@ try {
   await context.setOffline(true);await page.reload({waitUntil:'domcontentloaded'});await page.locator('.argus-public').waitFor();
   await context.setOffline(false);await page.setViewportSize({width:1440,height:1000});
  });
+ // WebKit's worker-controlled fetches bypass Playwright route interception.
+ // Keep the real offline tests in allow contexts; use block for routed upstream
+ // fixtures so those tests never accidentally call a real provider.
+ await context.close();
+ context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'block'});
+ page=await context.newPage();diagnostics(page);
  await login(page,'qa_owner');
  if(process.env.QA_NODE_ENV==='production'){
   const session=(await context.cookies()).find(cookie=>cookie.name==='argus_session');assert.ok(session?.secure&&session.httpOnly&&session.sameSite==='Strict','Production sessions require Secure, HttpOnly and SameSite=Strict.');
@@ -92,9 +108,11 @@ try {
   const observations=page.locator('.a-compact-details').filter({has:page.locator(':scope > summary').filter({hasText:'Scouting observations'})});assert.equal(await observations.getAttribute('open'),null);
   await page.screenshot({path:path.join(artifacts,'compact-home-390.png'),fullPage:true});
   await page.getByRole('button',{name:'More',exact:true}).click();const more=page.getByRole('dialog',{name:'More',exact:true});await more.waitFor();
+  await page.keyboard.press('Shift+Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('#mobile-more')));
   await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>!!document.activeElement.closest('#mobile-more')));
   await more.getByRole('link',{name:'Alliance selection',exact:true}).click();await more.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Alliance strategy',exact:true}).waitFor();
   await page.getByRole('button',{name:'More',exact:true}).click();await page.keyboard.press('Escape');await more.waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('.a-mobile-nav button[aria-controls="mobile-more"]').getAttribute('aria-expanded')==='false');
+  assert.equal(await page.getByRole('button',{name:'More',exact:true}).evaluate(node=>document.activeElement===node),true,'Escape returns focus to More');
   await page.getByRole('button',{name:'More',exact:true}).click();await page.setViewportSize({width:1280,height:1000});await more.waitFor({state:'hidden'});
   await route('/dashboard');assert.ok(await page.locator('.a-scoreboard').isVisible());
  });
@@ -136,10 +154,16 @@ try {
   }finally{await receiverContext.close();}
  });
  await check('autosaved real draft survives offline reload and synchronizes once',async()=>{
+  const mainContext=context,mainPage=page;
+  context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'allow',storageState:await mainContext.storageState()});
+  page=await context.newPage();diagnostics(page);
+  try{
+  await page.goto(baseURL,{waitUntil:'networkidle'});await page.locator('.argus-app').waitFor();
   await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await route('/match?event_key=2026qa&match_key=2026qa_qm4&scouted_team=6390&form_id=qa-match-form&assignment_id=qa-assignment');const note=`Offline evidence ${Date.now()}`;
   await page.getByLabel('Autonomous pieces',{exact:true}).fill('0');await page.getByLabel('Scout notes',{exact:true}).fill(note);await page.getByText('Draft saved as you go',{exact:true}).waitFor();await context.setOffline(true);await page.reload({waitUntil:'domcontentloaded'});await page.getByLabel('Scout notes',{exact:true}).waitFor();assert.equal(await page.getByLabel('Scout notes',{exact:true}).inputValue(),note);
   await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('heading',{name:'Report saved.',exact:true}).waitFor();await page.goto(baseURL,{waitUntil:'domcontentloaded'});await page.locator('.argus-app').waitFor();assert.equal(await page.locator('.argus-public').count(),0,'Prepared scouts bypass the public welcome page on an offline root reload');await context.setOffline(false);await route('/sync');await page.getByRole('button',{name:'Sync & prepare device',exact:true}).click();await page.waitForFunction(async note=>{const r=await(await fetch('/api/submissions')).json();return r.filter(x=>x.answers?.notes===note).length===1;},note);
+  }finally{await context.setOffline(false);await context.close();context=mainContext;page=mainPage;}
  });
  await check('ownership preview, selected scouts, generated duties and locked manual changes persist',async()=>{
   await route('/assignments');assert.equal(await page.getByRole('button',{name:'Manage ownership',exact:true}).count(),0);await page.getByRole('link',{name:'Manage assignments in Admin',exact:true}).click();await page.getByText('Choose scouts and forms',{exact:true}).click();await page.getByRole('checkbox',{name:'qa_idle',exact:true}).uncheck();
@@ -205,11 +229,11 @@ try {
   const before=(await api(page,'/submissions')).data.length;await route('/practice');await page.getByRole('button',{name:'Practice: QA pit report',exact:true}).click();const note=`Practice only ${Date.now()}`;await page.getByLabel('Scout notes',{exact:true}).fill(note);await page.getByText('Draft saved as you go',{exact:true}).waitFor();await route('/help');await page.getByRole('heading',{name:'Help and learning',exact:true}).waitFor();await route('/practice');await page.getByRole('button',{name:'Practice: QA pit report',exact:true}).click();assert.equal(await page.getByLabel('Scout notes',{exact:true}).inputValue(),note);
   await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('heading',{name:'Practice report saved.',exact:true}).waitFor();await page.waitForFunction(async note=>(await(await fetch('/api/practice?team_id=qa-workspace')).json()).some(r=>r.answers.notes===note),note);assert.equal((await api(page,'/submissions')).data.length,before);
  });
- await check('offline help, preference persistence and push refusal safety',async()=>{
-  await route('/help?topic=handoffs-and-breaks');await page.getByRole('article',{name:'Handoffs and breaks'}).waitFor();await route('/reminders');await page.getByRole('checkbox',{name:'Upcoming match push (about five minutes before)',exact:true}).uncheck();await page.getByRole('button',{name:'Save reminder preferences',exact:true}).click();await page.getByText(/Preferences saved/).waitFor();await page.reload({waitUntil:'networkidle'});assert.equal(await page.getByRole('checkbox',{name:'Upcoming match push (about five minutes before)',exact:true}).isChecked(),false);
+ await check('offline help, preference persistence and push refusal safety',async()=>withPreparedWorkerContext(async()=>{
+  await route('/help?topic=handoffs-and-breaks');await page.getByRole('article',{name:'Handoffs and breaks'}).waitFor();await route('/reminders');await page.getByRole('checkbox',{name:'Upcoming match push (about five minutes before)',exact:true}).uncheck();await page.getByRole('button',{name:'Save reminder preferences',exact:true}).click();await page.getByText(/Preferences saved/).waitFor();await page.reload({waitUntil:'networkidle'});await page.waitForFunction(()=>[...document.querySelectorAll('input[type="checkbox"]')].some(node=>node.labels?.[0]?.textContent.includes('Upcoming match push')&&!node.checked));
   assert.equal((await api(page,'/push/subscribe','POST',{team_id:'qa-workspace',subscription:{endpoint:'https://127.0.0.1/private'}})).status,400);
   await context.setOffline(true);await route('/help?topic=offline-and-sync');await page.getByRole('article',{name:'Offline and synchronization'}).waitFor();await context.setOffline(false);
- });
+ }));
  await check('responsive task/Admin/help screens, five mobile destinations and dialog focus',async()=>{
   for(const width of widths){await page.setViewportSize({width,height:1000});for(const section of ['dashboard','assignments','teams','present','admin','practice','help','strategy','events','settings']){await route(`/${section}`);await page.locator('#workspace-main h1,#workspace-main h2').first().waitFor();if(section==='admin')await page.locator('.a-coverage-tile').first().waitFor();await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(artifacts,`${section}-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${section} overflow at ${width}`);}}
   assert.equal(await page.locator('.a-mobile-nav a,.a-mobile-nav button').count(),5);assert.ok(await page.locator('.a-mobile-nav a[href="#/assignments"]').isVisible());
@@ -244,12 +268,17 @@ try {
   const form={id:'qa-live-pit',team_id:'qa-workspace',kind:'pit',title:'Live pit limit',allow_team_select:true,max_submissions_per_team:1,questions:[{id:'cycles',type:'number',text:'Observed cycles',required:true}]};
   assert.equal((await api(page,'/scout_events/qa-next','PATCH',{event_teams:[{team_number:254,nickname:'QA robot'}]})).status,200);
   assert.equal((await api(page,'/forms','POST',form)).status,200);
-  await route('/pit?form_id=qa-live-pit');await page.getByRole('heading',{name:'Live pit limit',exact:true}).waitFor();await page.getByLabel('Team you are scouting *',{exact:true}).selectOption('254');
+  await route('/pit?form_id=qa-live-pit&event_key=2026next');await page.getByRole('heading',{name:'Live pit limit',exact:true}).waitFor();await page.locator('select#report-scouted-team option[value="254"]').waitFor({state:'attached'});await page.getByLabel('Team you are scouting *',{exact:true}).selectOption('254');
   const number=page.locator('.question-card input[type="number"]');await number.fill('7');
   const otherContext=await browser.newContext(),other=await otherContext.newPage();
   try{
    await login(other,'qa_admin');const report={id:'qa-live-pit-report',form_id:form.id,form_title:form.title,team_id:form.team_id,event_key:'2026next',scouted_team:'254',report_kind:'pit',user_id:'qa-admin',submitted_by:'qa_admin',questions_snapshot:form.questions,answers:{cycles:3},created_at:new Date().toISOString()};
    assert.equal((await api(other,'/submissions','POST',report)).status,200);
+   // Live refresh intentionally pauses hidden pages. Return to the waiting
+   // scout as a real user would after the other device's submission.
+   await otherContext.close();
+   await page.bringToFront();
+   assert.equal(await page.evaluate(()=>document.hidden),false,'Waiting scout must be foregrounded before testing its live refresh');
    await page.waitForFunction(()=>document.querySelector('#report-scouted-team option[value="254"]')?.disabled,null,{timeout:22000});
    assert.equal(await number.inputValue(),'7');
    await page.getByRole('button',{name:'Submit scouting report',exact:true}).click();await page.getByRole('alert').filter({hasText:'Your draft has been kept'}).waitFor();assert.equal(await number.inputValue(),'7');assert.equal((await api(page,'/form-submission-counts/qa-live-pit?event_key=2026next')).data['254'],1);const stored=await page.evaluate(async()=>{const db=await new Promise((r,j)=>{const q=indexedDB.open('scout-device-v1');q.onsuccess=()=>r(q.result);q.onerror=j;});const read=name=>new Promise((r,j)=>{const q=db.transaction(name).objectStore(name).getAll();q.onsuccess=()=>r(q.result);q.onerror=j;});const [drafts,queue]=await Promise.all([read('drafts'),read('queue')]);db.close();return {draft:drafts.find(d=>d.key.endsWith(':qa-live-pit')),queued:queue.filter(q=>q.row.form_id==='qa-live-pit').length};});assert.equal(stored.draft.value.answers.cycles,7);assert.equal(stored.queued,0);
@@ -270,11 +299,12 @@ try {
   // Playwright page routing cannot intercept requests owned by a controlling SW.
   // Offline/PWA behavior is tested in the main context; this context mocks the feed.
   const liveContext=await browser.newContext({serviceWorkers:'block',viewport:{width:1440,height:1000}}),live=await liveContext.newPage();
-  let calls=0,announce=false;
-  await live.route('**/api/events/qa-next/refresh-live',async request=>{calls++;if(announce){const saved=await live.evaluate(async body=>{const response=await fetch('/api/scout_events/qa-next',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return response.status;},{matches:[{...original,actual_time:Math.floor(Date.now()/1000),alliances:{red:{...original.alliances.red,score:40},blue:{...original.alliances.blue,score:30}}}]});assert.equal(saved,200);}await request.fulfill({json:{status:'live',fetched_at:new Date().toISOString()}});});
+  let calls=0,announcedCalls=0,announce=false;
+  await live.route('**/api/events/qa-next/refresh-live',async request=>{calls++;if(announce){const saved=await live.evaluate(async body=>{const response=await fetch('/api/scout_events/qa-next',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return response.status;},{matches:[{...original,actual_time:Math.floor(Date.now()/1000),alliances:{red:{...original.alliances.red,score:40},blue:{...original.alliances.blue,score:30}}}]});assert.equal(saved,200);announcedCalls++;}await request.fulfill({json:{status:'live',fetched_at:new Date().toISOString()}});});
   try{
    await login(live,'qa_owner');await route('/matches',live);await live.getByRole('region',{name:'Match schedule',exact:true}).getByText('Upcoming',{exact:true}).waitFor();await live.waitForLoadState('networkidle');announce=true;
-   await live.getByRole('region',{name:'Match schedule',exact:true}).getByText('Completed',{exact:true}).waitFor({timeout:45000});assert.ok(calls>1);
+   await live.waitForFunction(async()=>{const event=await(await fetch('/api/scout_events/qa-next')).json();return event.matches?.some(match=>match.key==='2026next_qm1'&&match.actual_time>0);},null,{timeout:45000});
+   await live.getByRole('region',{name:'Match schedule',exact:true}).getByText('Completed',{exact:true}).waitFor({timeout:45000});assert.ok(calls>0&&announcedCalls>0,'An automatic official refresh, not an unrelated old Completed row, published the result');
   }finally{await liveContext.close();}
  });
  await check('account rename and recovery code reset work through the interface',async()=>{
@@ -282,6 +312,9 @@ try {
   try{
    await account.goto(`${baseURL}/#/login`);assert.equal((await api(account,'/auth/signup','POST',{username:'qa_security',password:'ArgusQA2026!'})).status,200);
    assert.equal((await api(account,'/auth/join-team','POST',{number:'6390',password:'QA6390'})).status,200);
+   // Signup already sets a session. Explicitly sign out before testing the
+   // sign-in UI; otherwise fast restoration can correctly skip that screen.
+   assert.equal((await api(account,'/auth/logout','POST',{})).status,200);
    await login(account,'qa_security');await route('/settings',account);
    const section=account.getByRole('region',{name:'Account security',exact:true});
    await section.getByLabel('Username',{exact:true}).fill('qa_security_renamed');await section.getByLabel('Current password',{exact:true}).fill('ArgusQA2026!');await section.getByRole('button',{name:'Change username',exact:true}).click();await section.getByText('Username changed. Your reports and assignments are unchanged.',{exact:true}).waitFor();
@@ -295,5 +328,6 @@ try {
   }finally{await accountContext.close();}
  });
  if(errors.length)results.push({name:'uncaught browser errors',status:'failed',errors});
-}finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({baseURL,results,errors},null,2));console.log(JSON.stringify({artifacts,results},null,2));}
+ if(policyErrors.length)results.push({name:'content security policy violations',status:'failed',errors:[...new Set(policyErrors)]});
+}finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({baseURL,qaBrowser,results,errors,policyErrors},null,2));console.log(JSON.stringify({artifacts,qaBrowser,results},null,2));}
 if(results.some(result=>result.status==='failed'))process.exitCode=1;

@@ -32,6 +32,7 @@ import { ReportLibrary } from "./report-library.jsx";
 import { SetupGuidance } from "./setup-guidance.jsx";
 import { MobileMore } from './workspace-navigation.jsx';
 import {watchLive} from './live-updates.js';
+import {readCurrent} from './current-read.js';
 import { PitDisplay, PitDisplaySettings } from "./restored-features.jsx";
 import { offline } from "../offline.js";
 import "./workspace.css";
@@ -280,7 +281,7 @@ export default function ArgusWorkspace({
   const refresh = useCallback(async () => {
     const version = ++request.current;
     const results = await Promise.allSettled(
-      stores.map((store) => api("GET", `/${store}`)),
+      stores.map((store) => readCurrent(api, `/${store}`)),
     );
     if (version !== request.current) return;
     const next = {
@@ -933,12 +934,13 @@ export default function ArgusWorkspace({
             </a>
             <button
               className="a-search-trigger"
-              aria-label="Search your team"
+              aria-labelledby="workspace-search-label workspace-search-shortcut"
+              aria-keyshortcuts="Control+k Meta+k"
               onClick={() => search.current.showModal()}
             >
               <RouteIcon name="search" />
-              <span>Search teams, matches…</span>
-              <kbd>Ctrl K</kbd>
+              <span id="workspace-search-label">Search teams, matches…</span>
+              <kbd id="workspace-search-shortcut">Ctrl K</kbd>
             </button>
           </div>
         </header>
