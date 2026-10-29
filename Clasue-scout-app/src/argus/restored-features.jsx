@@ -260,7 +260,7 @@ export function PitDisplay({ workspace, event, api }) {
               <tbody>
                 {matches.slice(0, 10).map((match) => (
                   <tr key={match.key}>
-                    <th>{matchLabel(match)}</th>
+                    <th><a href={`#/matches/${encodeURIComponent(match.key)}?from=display`}>{matchLabel(match)}</a></th>
                     <td>
                       {match.predicted_time || match.time
                         ? new Date(

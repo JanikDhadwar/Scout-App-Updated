@@ -1,5 +1,5 @@
 const CACHEABLE = new Set(['users', 'teams', 'memberships', 'forms', 'submissions', 'announcements', 'scout_events', 'pit_scouts', 'assignments', 'picklists', 'team_allocations']);
-const cacheablePath = (store, path) => CACHEABLE.has(store) || store === 'assignment-plan' || store === 'practice' || store === 'preferences' || store === 'events' && /\/analytics(?:\?|$)/.test(path);
+const cacheablePath = (store, path) => CACHEABLE.has(store) || store === 'assignment-plan' || store === 'practice' || store === 'preferences' || store === 'events' && /\/analytics(?:\?|$)/.test(path) || store==='match13'&&path.startsWith('/match13/predictions?');
 export class RequestError extends Error {
   constructor(message, status = 0) { super(message); this.status = status; }
 }
@@ -62,7 +62,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
       update({ connection:'online' });
       return data;
     } catch (error) {
-      if (!error.status || error.status >= 500&&!path.startsWith('/match13/')) update({ connection:'offline' });
+      if (!error.status || error.status >= 500&&!/^\/(match13|tba|statbotics)\//.test(path)) update({ connection:'offline' });
       if (error instanceof RequestError) throw error;
       throw new RequestError('Server unreachable. Your saved reports will upload when it reconnects.');
     } finally { clearTimeout(timer); }
@@ -114,7 +114,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
       requireCurrentRead(owner,version);
       return result;
     } catch (error) {
-      if (error.status && error.status < 500) throw error;
+      if (error.status && error.status < 500 && !(store==='match13'&&[404,429].includes(error.status))) throw error;
       if (!owner || !cacheablePath(store,normalized)) throw error;
       let cached = await storage.get('cache', key);
       if (!cached) {
@@ -126,7 +126,7 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
         }
       }
       if (!cached) throw new RequestError('This data is not downloaded yet. Connect to the server once to prepare this device.');
-      const result=await combine(normalized,cached.data,owner);
+      const result=store==='match13'?{...cached.data,cached:true,error:error.message}:await combine(normalized,cached.data,owner);
       requireCurrentRead(owner,version);
       return result;
     }
@@ -218,7 +218,17 @@ export function createOfflineClient({ storage, fetcher = globalThis.fetch.bind(g
     await storage.put('meta',{key:keyFor('prepared',owner),at});
     if (scope?.userId === owner.userId && scope?.teamId === owner.teamId) {update({storageError:''});await refresh();}
   }
-  return { api, enqueue, sync, prepare, pending, refresh, invalidateReadCache, invalidateForRelease, getState:()=>state,
+  async function clearDownloadedReadData() {
+    if(!scope)return;
+    const owner={...scope},prefix=`${owner.userId}:`;
+    releaseEpoch++;
+    for(const row of await storage.all('cache'))if(row.key.startsWith(prefix))await storage.remove('cache',row.key);
+    for(const row of await storage.all('meta'))if(row.key.startsWith(prefix)&&row.key.endsWith(':prepared'))await storage.remove('meta',row.key);
+    update({readyAt:null});
+    await refresh();
+    if(typeof window!=='undefined')window.dispatchEvent(new Event('argus-read-data-cleared'));
+  }
+  return { api, enqueue, sync, prepare, pending, refresh, invalidateReadCache, invalidateForRelease, clearDownloadedReadData, getState:()=>state,
     setScope: async value => { scope=value; await refresh(); },
   };
 }

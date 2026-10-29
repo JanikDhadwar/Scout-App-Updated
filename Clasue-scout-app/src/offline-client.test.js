@@ -13,6 +13,14 @@ test('Match13 service errors do not mark Argus offline, while a network failure 
  await assert.rejects(client.api('GET','/match13/rating?team=254&year=2026'),/Provider unavailable/);assert.equal(client.getState().connection,'online');
  networkFailure=true;await assert.rejects(client.api('GET','/match13/rating?team=254&year=2026'));assert.equal(client.getState().connection,'offline');
 });
+
+test('official-data provider failures do not prevent refreshing cached forecasts or submitting to Argus',async()=>{
+ const client=createOfflineClient({storage:createOfflineStore('tba-service-online',new IDBFactory()),fetcher:async url=>url.includes('/tba/')?response({error:'Official provider unavailable'},503):response({ok:true})});
+ await client.api('GET','/health');assert.equal(client.getState().connection,'online');
+ await assert.rejects(client.api('GET','/tba/event/2026qa/matches'),/Official provider/);
+ assert.equal(client.getState().connection,'online');
+ await client.api('POST','/submissions',{id:'fixture-only'});assert.equal(client.getState().connection,'online');
+});
 test('practice queue survives reload and can only upload to practice, never competition submissions',async()=>{
   const factory=new IDBFactory(),storage=createOfflineStore('practice-isolation',factory),sent=[];
   const offline=createOfflineClient({storage,fetcher:async()=>{throw new TypeError('Offline');}});

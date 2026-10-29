@@ -59,6 +59,7 @@ function readDB() {
 }
 function writeDB(db) {
   database.write(db);
+  require('./shared-analytics.cjs').clearAnalyticsCache();
   revisionCache.clear();
 }
 if(requirePrivilegedMfa){const initial=readDB(),privileged=rows(initial,'memberships').filter(member=>['owner','admin'].includes(member.role));if(!privileged.length)throw Error('ARGUS_REQUIRE_PRIVILEGED_MFA cannot be enabled before initial workspace setup.');if(privileged.some(member=>!mfa.enrolled(member.user_id)))throw Error('ARGUS_REQUIRE_PRIVILEGED_MFA cannot start until every Owner and Admin is enrolled.');}
@@ -122,7 +123,7 @@ app.post(['/api/auth/login','/api/auth/signup'],async(req,res)=>{
     const hash=await passwordHash(password),current=readDB();
     const capacityChanged=admission.signup(current);if(capacityChanged)return fail(res,503,capacityChanged);
     if(rows(current,'users').some(u=>typeof u?.username==='string'&&u.username.toLowerCase()===username.trim().toLowerCase()))return fail(res,409,'Username is already registered');
-    const user={id:crypto.randomUUID(),username:username.trim(),password_hash:hash,created_at:new Date().toISOString()};
+    const user={id:crypto.randomUUID(),username:username.trim(),password_hash:hash,created_at:new Date().toISOString(),onboarding_pending:true};
     current.users=[...rows(current,'users'),user];writeDB(current);return login(req,res,user);
   }
   if(!found||found.disabled||found.disabled_at||!await verifyPassword(password,found.password_hash))return fail(res,401,'Invalid username or password');
@@ -175,7 +176,9 @@ app.post('/api/auth/create-team',(req,res)=>{
   const db=readDB();if(rows(db,'teams').some(t=>String(t.number)===String(number)))return fail(res,409,'Team number is already registered');
   const joinPassword=typeof password==='string'&&password.trim()?password.trim().toUpperCase():crypto.randomBytes(6).toString('hex').toUpperCase();
   const team={id:crypto.randomUUID(),number:String(number),name:name.trim(),password:joinPassword,owner_id:req.user.id,created_at:new Date().toISOString()};
-  const mem={id:crypto.randomUUID(),team_id:team.id,user_id:req.user.id,username:req.user.username,role:'owner'};
+  const freshUser=rows(db,'users').find(user=>user.id===req.user.id);
+  const mem={id:crypto.randomUUID(),team_id:team.id,user_id:req.user.id,username:req.user.username,role:'owner',onboarding_eligible:freshUser?.onboarding_pending===true&&!rows(db,'memberships').some(row=>row.user_id===req.user.id)};
+  if(freshUser?.onboarding_pending===true)freshUser.onboarding_pending=false;
   db.teams=[...rows(db,'teams'),team];db.memberships=[...rows(db,'memberships'),mem];writeDB(db);res.json({team,mem});
 });
 app.post('/api/auth/join-team',(req,res)=>{
@@ -184,7 +187,7 @@ app.post('/api/auth/join-team',(req,res)=>{
   const team=rows(db,'teams').find(t=>String(t.number)===String(number));
   if(!team||typeof password!=='string'||!equal(password.trim().toUpperCase(),team.password))return fail(res,403,'Invalid team number or join password');
   let mem=membership(db,req.user.id,team.id);
-  if(!mem){mem={id:crypto.randomUUID(),team_id:team.id,user_id:req.user.id,username:req.user.username,role:'member'};db.memberships=[...rows(db,'memberships'),mem];writeDB(db);}
+  if(!mem){const freshUser=rows(db,'users').find(user=>user.id===req.user.id);mem={id:crypto.randomUUID(),team_id:team.id,user_id:req.user.id,username:req.user.username,role:'member',onboarding_eligible:freshUser?.onboarding_pending===true&&!rows(db,'memberships').some(row=>row.user_id===req.user.id)};if(freshUser?.onboarding_pending===true)freshUser.onboarding_pending=false;db.memberships=[...rows(db,'memberships'),mem];writeDB(db);}
   const {password:secret,...safe}=team;res.json({team:safe,mem});
 });
 app.post(['/api/auth/archive-team','/api/auth/restore-team'],(req,res)=>{
@@ -235,7 +238,7 @@ app.get('/api/match13/:resource',async(req,res)=>{
  try{
   if(req.params.resource==='rating')return res.json({rating:await match13.rating(team,year,key),source:'Match13',fetched_at:new Date().toISOString()});
   if(req.params.resource==='rankings')return res.json(await match13.rankings(req.query,key));
-  if(req.params.resource==='predictions')return res.json(await match13.predictions(event,key));
+  if(req.params.resource==='predictions')return res.json(await match13.predictions(event,key,rows(readDB(),'scout_events').find(row=>row.team_id===workspaceId&&row.event_key===event)?.matches||[]));
   if(req.params.resource==='regions')return res.json(await match13.regions(team,year,key,integrationKey(req,'TBA_API_KEY',workspaceId)));
   return fail(res,404,'Match13 resource not found.');
  }catch(error){return fail(res,error.status||502,error.status?error.message:'Match13 data is temporarily unavailable. Try again later.');}
@@ -373,6 +376,7 @@ app.all('/api/:store{/:id}',(req,res,next)=>{
       const expected=body.analytics_revision ?? 0,current=original?.analytics_revision ?? 0;
       if(!Number.isInteger(expected)||expected!==current)return fail(res,409,'Metric definitions changed. Reload the current definitions before saving; your edits were not overwritten.');
       if(!body.analytics_config||typeof body.analytics_config!=='object'||Array.isArray(body.analytics_config))return fail(res,400,'Metric definitions must be an object');
+      const invalid=require('./intelligence-validation.cjs').validateMetricConfig(body.analytics_config,rows(db,'forms').filter(form=>form.team_id===tid));if(invalid)return fail(res,400,invalid);
       row.analytics_revision=current+1;
     } else if(Object.hasOwn(body,'analytics_revision'))return fail(res,400,'Metric revision can only change with metric definitions');
   }

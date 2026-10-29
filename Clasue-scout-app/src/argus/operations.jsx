@@ -1,6 +1,7 @@
 import { LegacyTeamAssignments } from "./legacy-workflows.jsx";
 import { OfficialEventPicker } from './restored-features.jsx';
 import { useState } from "react";
+import {InsightFields} from './insight-fields.jsx';
 import {
   assignmentReports,
   matchLabel,
@@ -827,6 +828,7 @@ function MetricEditor({ analytics, event, role, api, onRefresh }) {
               </tbody>
             </table>
           </div>
+          {metrics.filter(metric=>['number','scale','boolean','select'].includes(metric.type)).map(metric=><InsightFields key={metric.id} metric={metric} config={config[metric.id]} disabled={saving||!canEdit} onChange={(rule,phase)=>{update(metric.id,'insight',rule);if(phase)update(metric.id,'phase',phase);}}/>)}
           <button className="a-button" disabled={saving || !canEdit}>
             {saving ? "Saving…" : "Save metric definitions"}
           </button>

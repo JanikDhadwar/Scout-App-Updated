@@ -40,7 +40,8 @@ test('match trends follow the official schedule instead of report upload order',
 test('snapshot questions remain usable after a template is removed and media stays out of analyst text',()=>{
  const a=build([report('photo',{n:4,photo:'data:image/png;base64,private',notes:'Check chain tension'},{questions_snapshot:[{id:'n',type:'number',text:'Pieces'},{id:'photo',type:'photo',text:'Robot photo'},{id:'notes',type:'text',text:'Scout notes'}]})],{forms:[]});
  assert.equal(a.teams[0].metrics['f:n'].mean,4);
- assert.ok(presentationSections(a,a.teams[0]).some(section=>section.lines.some(line=>line.includes('Check chain tension'))));
+ assert.ok(!presentationSections(a,a.teams[0]).some(section=>section.lines.some(line=>line.includes('Check chain tension'))));
+ assert.ok(presentationSections(a,{...a.teams[0],notesIncluded:true}).some(section=>section.lines.some(line=>line.includes('Check chain tension'))));
  assert.ok(!JSON.stringify(answerQuestion('Summarize team 254',a)).includes('base64'));
 });
 

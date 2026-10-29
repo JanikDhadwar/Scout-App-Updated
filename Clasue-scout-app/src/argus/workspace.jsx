@@ -60,11 +60,7 @@ const TeamProfile = lazy(() =>
 const TeamComparison = lazy(() =>
   import("./analytics-views.jsx").then((m) => ({ default: m.TeamComparison })),
 );
-const TeamPresentation = lazy(() =>
-  import("./analytics-views.jsx").then((m) => ({
-    default: m.TeamPresentation,
-  })),
-);
+const PresentationLauncher=lazy(()=>import('./presentation-queue.jsx'));
 const stores = [
   "teams",
   "forms",
@@ -511,14 +507,6 @@ export default function ArgusWorkspace({
       setNotice(e.message || "Could not update the picklist.");
     }
   }
-  async function exportTeam(format, number) {
-    const team = analytics.teams.find(
-      (row) => String(row.teamNumber) === String(number),
-    );
-    if (!team) throw new Error("Team not found.");
-    const { exportTeamPresentation } = await import("./exports.js");
-    await exportTeamPresentation(format, analytics, team);
-  }
   const activeGroup = navigationGroup(section);
   const pageTitle =
     destinations.find(([key]) => key === section)?.[1] ||
@@ -554,8 +542,8 @@ export default function ArgusWorkspace({
         analytics={analytics}
         onOpenTeam={openTeam}
         onCompare={compare}
-        onPresent={present}
-      />{section==='present'&&id&&<TeamPresentation analytics={analytics} teamNumber={id} onClose={()=>openTeam(id)} onExport={exportTeam}/>}</>
+        onPresent={present} onPresentAll={()=>navigate('/present/all')}
+      />{section==='present'&&id&&<PresentationLauncher key={`${summaryKey}:${id}`} analytics={analytics} event={event} data={scoped} role={role} teamNumber={id} onClose={()=>id==='all'?navigate('/teams'):openTeam(id)}/>}</>
     );
   else if (section === "matches")
     body = (

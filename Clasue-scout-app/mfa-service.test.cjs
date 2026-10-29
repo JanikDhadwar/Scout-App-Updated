@@ -40,9 +40,9 @@ test('MFA private data fails closed without the configured encryption key',()=>{
  assert.throws(()=>createMfaService(file(),'not-base64'),/32-byte/);
 });
 
-test('MFA private storage rejects symbolic links',()=>{
+test('MFA private storage rejects symbolic links',t=>{
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'argus-mfa-link-')),target=path.join(directory,'target.json'),linked=path.join(directory,'mfa.json');
- fs.writeFileSync(target,JSON.stringify({version:1,users:{}}));fs.symlinkSync(target,linked);
+ fs.writeFileSync(target,JSON.stringify({version:1,users:{}}));try{fs.symlinkSync(target,linked);}catch(error){if(error.code==='EPERM'){t.skip('Windows file symlink privilege is unavailable.');return;}throw error;}
  assert.throws(()=>createMfaService(linked,key),/symbolic link/);
  assert.deepEqual(JSON.parse(fs.readFileSync(target,'utf8')),{version:1,users:{}});
 });

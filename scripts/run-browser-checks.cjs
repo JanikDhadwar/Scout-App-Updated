@@ -8,9 +8,15 @@ const nodeEnv=process.env.QA_NODE_ENV||'test';
 if(!['test','production'].includes(nodeEnv))throw new Error('QA_NODE_ENV must be test or production.');
 const exited=child=>new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',(code,signal)=>resolve({code,signal}));});
 (async()=>{
- const args=process.argv.slice(2);if(args.length&&!(args.length===1&&args[0]==='--accessibility'))throw Error('Supported suite option: --accessibility');
- const runnerFile=args[0]==='--accessibility'?'accessibility-checks.mjs':'browser-checks.mjs';
+ const args=process.argv.slice(2);if(args.length&&!(args.length===1&&['--accessibility','--expansion'].includes(args[0])))throw Error('Supported suite options: --accessibility or --expansion');
+ const runnerFile=args[0]==='--accessibility'?'accessibility-checks.mjs':args[0]==='--expansion'?'expansion-browser-checks.mjs':'browser-checks.mjs';
  const fixture=createFixture();
+ if(args[0]==='--expansion'){
+  const db=JSON.parse(fs.readFileSync(fixture.dbFile,'utf8')),event=db.scout_events[0];
+  event.event_teams.push({team_number:111,nickname:'Fixture red robot'},{team_number:222,nickname:'Fixture blue robot'});
+  for(const match of event.matches){match.alliances.red.team_keys.push('frc111');match.alliances.blue.team_keys.push('frc222');}
+  fs.writeFileSync(fixture.dbFile,JSON.stringify(db));
+ }
  const envFile=path.join(fixture.directory,'argus-test.env');fs.writeFileSync(envFile,'',{mode:0o600});
  const reservation=net.createServer();await new Promise((resolve,reject)=>{reservation.once('error',reject);reservation.listen(0,'127.0.0.1',resolve);});const port=reservation.address().port;await new Promise(resolve=>reservation.close(resolve));
  if(!fs.existsSync(path.join(appDirectory,'dist/index.html')))throw new Error('Run npm run build before browser QA.');

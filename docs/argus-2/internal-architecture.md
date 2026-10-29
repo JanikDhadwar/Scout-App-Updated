@@ -12,4 +12,4 @@ IndexedDB scout-device-v1 retains cache/queue/drafts/meta/receipts. Practice que
 
 All profile/comparison/analyst/export calculations use analytics.js. Blue Alliance and Match13 keys are private server settings. Run npm test and npm run build in Clasue-scout-app. Browser tests run only against temporary local fixtures.
 
-[Back to contents](contents.md)
+

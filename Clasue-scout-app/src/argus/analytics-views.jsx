@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useMemo } from "react";
 import { formatValue, presentationSections } from "./analytics.js";
 import "./analytics-views.css";
 import {Match13Rating} from './match13.jsx';
+import {TeamIntelligenceSummary} from './match-intelligence.jsx';
 
 const phases = {
   auto: "Autonomous",
@@ -861,6 +862,7 @@ export function TeamProfile({
           <dd>{dateLabel(team.confidence.freshness)}</dd>
         </div>
       </dl>
+      <details className="a-panel"><summary>Match intelligence</summary><TeamIntelligenceSummary team={team}/></details>
       {!team.reportCount && (
         <p className="a-empty">
           No event-linked scouting reports for this team.{" "}
@@ -1429,7 +1431,7 @@ export function TeamComparison({
   );
 }
 
-export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
+export function TeamPresentation({ analytics, teamNumber, teamNumbers, onClose, onExport, toolbar, closeLabel='Back to team' }) {
   const [index, setIndex] = useState(0),
     [exporting, setExporting] = useState(""),
     [exportError, setExportError] = useState(""),
@@ -1437,11 +1439,11 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
   const dialogRef = useRef(null),
     closeRef = useRef(null),
     touchRef = useRef(null);
-  const team = findTeam(analytics, teamNumber),
-    sections = presentationSections(analytics, team),
+  const sections = useMemo(()=>(teamNumbers||[teamNumber]).flatMap(number=>presentationSections(analytics,findTeam(analytics,number)).map(section=>({...section,teamNumber:String(number)}))),[analytics,teamNumbers,teamNumber]),
     currentIndex = Math.min(index, Math.max(0, sections.length - 1));
   const titleId = useId(),
-    slide = sections[currentIndex],
+    slide = sections[currentIndex],team=findTeam(analytics,slide?.teamNumber||teamNumber),
+    localIndex=currentIndex-sections.findIndex(section=>section.teamNumber===slide?.teamNumber),
     metric =
       team &&
       Object.values(team.metrics).find((item) => isNumeric(item) && item.n > 0);
@@ -1537,10 +1539,12 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
     >
       <header className="av-presentation-toolbar">
         <span>
-          Team {teamNumber}
+          Team {team?.teamNumber||teamNumber}
           <small>{analytics?.event?.name || "No event selected"}</small>
         </span>
         <div className="av-actions">
+          {toolbar}
+          {teamNumbers?.length>1&&<label>Team<select className="a-input" value={slide?.teamNumber||teamNumber} onChange={e=>setIndex(sections.findIndex(section=>section.teamNumber===e.target.value))}>{teamNumbers.map(number=><option key={number} value={String(number)}>{number}</option>)}</select></label>}
           {onExport && (
             <>
               <button
@@ -1571,7 +1575,7 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
             className="a-button"
             onClick={() => onClose?.()}
           >
-            Back to team
+            {closeLabel}
           </button>
         </div>
       </header>
@@ -1615,7 +1619,7 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
                   <li key={lineIndex}>{line}</li>
                 ))}
               </ul>
-              {currentIndex === 0 && (
+              {sections.findIndex(section=>section.teamNumber===slide.teamNumber)===currentIndex && (
                 <dl className="av-facts">
                   <div>
                     <dt>Event reports</dt>
@@ -1631,21 +1635,21 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
                   </div>
                 </dl>
               )}
-              {currentIndex === 1 && metric && (
+              {localIndex === 1 && metric && (
                 <>
                   <MetricFacts metric={metric} />
                   <DistributionChart metric={metric} />
                   <SampleNote metric={metric} />
                 </>
               )}
-              {currentIndex === 2 && <PhaseMetrics team={team} />}
-              {currentIndex === 3 && metric && (
+              {localIndex === 2 && <PhaseMetrics team={team} />}
+              {localIndex === 3 && metric && (
                 <>
                   <TrendChart metric={metric} />
                   <SampleNote metric={metric} />
                 </>
               )}
-              {currentIndex === 6 && (
+              {localIndex === 6 && (
                 <p className="av-data-note">
                   {team.confidence.coverageDefinition}
                 </p>
@@ -1659,11 +1663,7 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
                 Calculated {dateLabel(analytics.generatedAt)}. Latest report:{" "}
                 {dateLabel(team.confidence.freshness)}.
               </p>
-              <p>
-                {slide.sourceIds.length
-                  ? slide.sourceIds.join(", ")
-                  : "No event-linked source reports."}
-              </p>
+              {slide.sourceIds.length?<ul>{slide.sourceIds.map(id=><li key={id}><a href={`#/evidence/${encodeURIComponent(id)}`}>Source report {id}</a></li>)}</ul>:<p>No event-linked source reports.</p>}
             </details>
           </section>
         ) : (
@@ -1682,9 +1682,9 @@ export function TeamPresentation({ analytics, teamNumber, onClose, onExport }) {
           Previous
         </button>
         <nav aria-label="Presentation sections" className="av-slide-progress">
-          {sections.map((section, slideIndex) => (
+          {sections.map((section, slideIndex) => section.teamNumber===slide?.teamNumber&&(
             <button
-              key={section.title}
+              key={`${section.teamNumber}:${section.title}`}
               type="button"
               aria-label={`Section ${slideIndex + 1}: ${section.title}`}
               aria-current={currentIndex === slideIndex ? "step" : undefined}

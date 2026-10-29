@@ -71,3 +71,18 @@ body{font-family:'Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-size:1
 @media(min-width:621px) and (max-width:960px){.a-sidebar{width:190px;padding:20px 12px}.a-sidebar nav{margin-top:20px;gap:4px}.a-sidebar nav a{font-size:13px;justify-content:flex-start;padding:11px 9px;gap:10px}.a-sidebar nav a svg{width:18px;height:18px;flex-shrink:0}.a-workspace{margin-left:190px}.a-wordmark{text-align:left;padding-left:9px}.a-sidebar-hidden .a-workspace{margin-left:0}}
 @media(max-width:620px){.a-mobile-nav a,.a-mobile-nav button{font-size:11px}.a-more-shortcuts>a{min-height:46px;padding:12px}.a-presentation-search{max-width:100%}}
 .a-presentation-teams .a-button{white-space:nowrap;min-width:72px}.a-presentation-teams th,.a-presentation-teams td{padding-inline:8px}
+/* Evidence and learning use the same workspace surfaces and spacing. */
+.a-opponent-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.a-opponent-grid>* { min-width:0; overflow-wrap:anywhere; }
+.a-forecast-strip { padding:16px; border-block:1px solid var(--a-border); gap:8px; }
+.a-forecast-strip h2,.a-forecast-strip p { margin-bottom:0; }
+.a-forecast-strip .a-prediction-values { flex-direction:row; flex-wrap:wrap; gap:12px 24px; font-variant-numeric:tabular-nums; }
+.a-opponent-grid details { border-top:1px solid var(--a-border,#263244); padding-block:12px; }
+.a-intelligence-chart { width:100%; max-height:100px; color:var(--a-text,#F2F5FA); }
+.a-question-hint { color:var(--a-muted,#A7B5C8); font-size:14px; margin-block:12px; }
+.a-question-hint p { margin-block:8px; }
+.a-training-illustration { width:120px; height:52px; color:var(--a-muted,#A7B5C8); margin-top:12px; }
+.a-presentation-order { padding-left:24px; }
+.a-presentation-order li { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding-block:8px; border-bottom:1px solid var(--a-border,#263244); }
+.a-presentation-order strong { flex:1; min-width:90px; }
+@media(max-width:1100px) { .a-opponent-grid { grid-template-columns:1fr; } }

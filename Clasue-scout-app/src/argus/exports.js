@@ -1,4 +1,5 @@
 import { presentationSections, formatValue } from './analytics.js';
+import {presentationSnapshot} from './presentation-model.js';
 
 const colors={background:'0B1018',text:'F2F5FA',muted:'A7B5C8',accent:'C83E4D'};
 // Exports use a portable font. Preserve all evidence while normalizing unsupported glyphs.
@@ -44,19 +45,24 @@ function download(blob,filename){
  const url=URL.createObjectURL(blob),anchor=document.createElement('a');anchor.href=url;anchor.download=filename;document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
 /** Builds the same evidence sections used by interactive presentation. Never fetches external data. */
-export async function exportTeamPresentation(format,analytics,team,{download:shouldDownload=true,generatedAt=new Date().toISOString()}={}){
+export async function exportTeamPresentation(format,analytics,team,{download:shouldDownload=true,generatedAt=new Date().toISOString(),teamNumbers,includeNotes=false,picklists,onProgress=()=>{}}={}){
  if(!['pdf','pptx'].includes(format))throw new Error('Unsupported presentation export format.');
  if(!team)throw new Error('Select a team to export.');
- const pages=pagesFor(analytics,team);
+ analytics=presentationSnapshot(analytics,{includeNotes,picklists});
+ team=analytics.teams.find(row=>row.teamNumber===String(team.teamNumber));
+ const chosen=teamNumbers||[team.teamNumber];
+ if(!chosen.length||chosen.length>1000||new Set(chosen.map(String)).size!==chosen.length)throw new Error('Choose between 1 and 1000 distinct event teams.');
+ const pages=chosen.flatMap(number=>{const item=analytics.teams.find(row=>row.teamNumber===String(number));if(!item)throw new Error('A presentation team is outside the snapshot.');return pagesFor(analytics,item).map(page=>({...page,team:item}));});
  const event=portable(analytics.event?.name || 'No event selected');
- const metadata=`Team ${team.teamNumber} / ${event} / ${team.reportCount} reports / ${team.matchCount} linked matches`;
- const freshness=`Latest report: ${team.confidence.freshness || 'Unavailable'} / Generated: ${generatedAt}`;
  let blob;
  if(format==='pdf'){
   const {jsPDF}=await import('jspdf');
   const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:[960,540],compress:false});
   pdf.setProperties({title:`ARGUS Team ${team.teamNumber}`,subject:event,author:'ARGUS'});
   pages.forEach((page,index)=>{
+   const metadata=`Team ${page.team.teamNumber} / ${event} / ${page.team.reportCount} reports / ${page.team.matchCount} linked matches`;
+   const freshness=`Latest report: ${page.team.confidence.freshness || 'Unavailable'} / Generated: ${generatedAt}`;
+   onProgress({completed:index,total:pages.length});
    if(index)pdf.addPage([960,540],'landscape');
    pdf.setFillColor(`#${colors.background}`);pdf.rect(0,0,960,540,'F');
    pdf.setTextColor(`#${colors.accent}`);pdf.setFontSize(13);pdf.text('ARGUS / TEAM INTELLIGENCE',48,40);
@@ -78,6 +84,9 @@ export async function exportTeamPresentation(format,analytics,team,{download:sho
   const pptx=new PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='ARGUS';pptx.subject=event;pptx.title=`Team ${team.teamNumber} scouting presentation`;pptx.company='ARGUS';pptx.lang='en-US';
   const text=(slide,value,x,y,w,h,size,color=colors.text)=>slide.addText(value,{x,y,w,h,fontFace:'Arial',fontSize:size,color,margin:0,breakLine:false,vertAlign:'top',paraSpaceAfter:0});
   pages.forEach((page,index)=>{
+   const metadata=`Team ${page.team.teamNumber} / ${event} / ${page.team.reportCount} reports / ${page.team.matchCount} linked matches`;
+   const freshness=`Latest report: ${page.team.confidence.freshness || 'Unavailable'} / Generated: ${generatedAt}`;
+   onProgress({completed:index,total:pages.length});
    const slide=pptx.addSlide();slide.background={color:colors.background};
    text(slide,'ARGUS / TEAM INTELLIGENCE',0.66,0.28,12,0.25,12,colors.accent);
    text(slide,page.title,0.66,0.77,12,0.56,30);
@@ -93,7 +102,8 @@ export async function exportTeamPresentation(format,analytics,team,{download:sho
   });
   const bytes=await pptx.write({outputType:'arraybuffer'});blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.presentationml.presentation'});
  }
- const filename=`argus-team-${String(team.teamNumber).replace(/[^a-z0-9-]/gi,'')}-${String(analytics.event?.key || 'unassigned').replace(/[^a-z0-9-]/gi,'')}.${format}`;
+ const filename=`argus-team-${String(teamNumbers?'all':team.teamNumber).replace(/[^a-z0-9-]/gi,'')}-${String(analytics.event?.key || 'unassigned').replace(/[^a-z0-9-]/gi,'')}.${format}`;
+ onProgress({completed:pages.length,total:pages.length});
  if(shouldDownload&&typeof document!=='undefined')download(blob,filename);
  return {blob,filename,pageCount:pages.length};
 }

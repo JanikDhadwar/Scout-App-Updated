@@ -1,0 +1,12 @@
+export const trainingScenarios=[
+ {id:'match-outcomes-v1',title:'Observe a match',kind:'match',description:'Read the observed moments. Record outcomes without guessing what happened out of view.',moments:['Autonomous: the robot attempts to score, but the gamepiece misses.','Teleoperated: the robot scores twice. Your view is blocked for the remaining time.','Endgame: the robot stays on the floor; it never attempts a climb.'],questions:[
+  {id:'auto',text:'Autonomous outcome',options:['Succeeded','Failed','Not observed'],answer:'Failed',explanation:'You saw an unsuccessful attempt. That is a failure, rather than an unknown.'},
+  {id:'count',text:'What scoring count can you support?',options:['Exactly two for the full match','At least two observed; the remainder is unknown','Zero'],answer:'At least two observed; the remainder is unknown',explanation:'A blocked view prevents a complete total. Preserve the partial observation rather than inventing a total.'},
+  {id:'end',text:'Endgame outcome',options:['Failed','Not attempted','Not observed'],answer:'Not attempted',explanation:'No attempt occurred. A non-attempt is not a failed attempt.'}]},
+ {id:'pit-capabilities-v1',title:'Interview a team',kind:'pit',description:'Distinguish reported capabilities from demonstrated performance.',moments:['A team says its robot can score in autonomous.','They do not know their success rate and have not provided match records.','A mechanism was recently repaired. The team says the robot is ready to play.'],questions:[
+  {id:'claim',text:'What should the report say?',options:['Reliable autonomous performance','Team reports autonomous scoring capability','100% autonomous success'],answer:'Team reports autonomous scoring capability',explanation:'An interview supports an attributed capability claim, not a measured success rate.'},
+  {id:'repair',text:'What does the repair establish?',options:['The robot will break next match','It is fully reliable','A reported recent repair; match reliability is unknown'],answer:'A reported recent repair; match reliability is unknown',explanation:'A repair provides context. Observed match evidence is needed to assess reliability.'}]}
+];
+export function trainingFeedback(scenario,answers) {
+ return scenario.questions.map(question=>({id:question.id,correct:answers[question.id]===question.answer,answered:answers[question.id]!=null,answer:question.answer,explanation:question.explanation}));
+}

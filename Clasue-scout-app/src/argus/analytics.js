@@ -1,4 +1,6 @@
 import { visibleQuestions, hasAnswer } from '../form-conditions.js';
+import { teamIntelligence, insightText } from './intelligence.js';
+export { evidenceConfidence, insightText } from './intelligence.js';
 
 const externalNumber=value=>typeof value==='number'&&Number.isFinite(value)?value:null;
 export function normalizeMatch13Team(row){
@@ -58,7 +60,7 @@ const completed = match => !!(match.actual_time || match.post_result_time || ['r
 export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=[],scope={},asOf=new Date().toISOString()}={}) {
  const teamId=scope.teamId,eventKey=scope.eventKey || event?.event_key;
  const scopedForms=forms.filter(form=>!teamId || form.team_id===teamId);
- const owned=reports.filter(report=>(!teamId || report.team_id===teamId)&&!report.quality_review_required);
+ const owned=reports.filter(report=>(!teamId || report.team_id===teamId)&&!report.quality_review_required&&!report.practice&&report.mode!=='practice'&&!report.pending&&!report.removed);
  const current=owned.filter(report=>eventKey && report.event_key===eventKey);
  const legacy=owned.filter(report=>!report.event_key);
  const directory=new Map((teams.length ? teams : event?.event_teams || []).map(team=>[String(team.team_number ?? team.number),team]));
@@ -66,7 +68,7 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
  const descriptors=new Map();
  const addQuestions=(formId,questions,title)=>questions.forEach(question=>{
    const id=`${formId}:${question.id}`, config=event?.analytics_config?.[id] || {};
-   if(!descriptors.has(id))descriptors.set(id,{id,formId,questionId:question.id,label:config.label || question.text,type:question.type,formTitle:title || '',category:['scoring','defense','support','reliability'].includes(config.category)?config.category:null,phase:['auto','teleop','endgame'].includes(config.phase)?config.phase:null,unit:config.unit || null,direction:['higher','lower'].includes(config.direction)?config.direction:null});
+   if(!descriptors.has(id))descriptors.set(id,{id,formId,questionId:question.id,label:config.label || question.text,type:question.type,formTitle:title || '',category:['scoring','defense','support','reliability'].includes(config.category)?config.category:null,phase:['auto','teleop','endgame'].includes(config.phase)?config.phase:null,unit:config.unit || null,direction:['higher','lower'].includes(config.direction)?config.direction:null,insight:config.insight||null,options:question.type==='boolean'?['Yes','No']:Array.isArray(question.options)?question.options:[],suggestedInsight:question.insightDefault||null,suggestedPhase:question.phase||null});
  });
  scopedForms.forEach(form=>addQuestions(form.id,form.questions || [],form.title));
  current.forEach(report=>addQuestions(report.form_id,questionsFor(report,scopedForms),report.form_title));
@@ -96,10 +98,10 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
    const metrics={},disagreements=[],notes=[];
    for(const descriptor of metricList) {
      const relevant=metricSource.filter(report=>report.form_id===descriptor.formId && visibleQuestions(questionsFor(report,scopedForms),report.answers || {}).some(q=>q.id===descriptor.questionId));
-     const observations=relevant.filter(report=>hasAnswer(report.answers?.[descriptor.questionId])).map(report=>({reportId:report.id,matchKey:kind==='pit'?null:report.match_key || null,reportKind:report.report_kind || 'unspecified',createdAt:report.created_at,value:report.answers[descriptor.questionId]}));
+     const observations=relevant.filter(report=>hasAnswer(report.answers?.[descriptor.questionId])).map(report=>{const question=questionsFor(report,scopedForms).find(q=>q.id===descriptor.questionId);return {reportId:report.id,matchKey:kind==='pit'?null:report.match_key || null,reportKind:report.report_kind || 'unspecified',createdAt:report.created_at,value:report.answers[descriptor.questionId],min:question?.min,max:question?.max};});
      const base={...descriptor,eligible:relevant.length,missing:relevant.length-observations.length,invalid:0,sourceIds:observations.map(value=>value.reportId),observations};
      if(['number','scale'].includes(descriptor.type)){
-       const valid=observations.filter(item=>finite(item.value) && (descriptor.type!=='scale' || Number(item.value)>=1 && Number(item.value)<=10));
+       const valid=observations.filter(item=>finite(item.value) && (descriptor.type!=='scale' || Number(item.value)>=1 && Number(item.value)<=10)&&(item.min==null||Number(item.value)>=Number(item.min))&&(item.max==null||Number(item.value)<=Number(item.max)));
        const groups=new Map();valid.forEach(item=>{const key=item.matchKey || `report:${item.reportId}`;groups.set(key,[...(groups.get(key) || []),item]);});
        const values=[...groups].map(([key,items])=>({key,matchKey:items[0].matchKey,createdAt:items[0].createdAt,value:median(items.map(item=>Number(item.value))),sourceIds:items.map(item=>item.reportId)})).sort(orderValues);
        for(const [key,items] of groups)if(items[0].matchKey && new Set(items.map(item=>Number(item.value))).size>1)disagreements.push({metricId:descriptor.id,label:descriptor.label,matchKey:key,values:items.map(item=>Number(item.value)),sourceIds:items.map(item=>item.reportId)});
@@ -126,6 +128,7 @@ export function buildAnalytics({forms=[],reports=[],event=null,teams=[],matches=
    const invalidObservations=allMetrics.reduce((sum,item)=>sum+item.invalid,0);
    return {teamNumber:number,nickname:identity.nickname || identity.name || '',reportCount:source.length,matchReportCount:matchSource.length,pitReportCount:pitSource.length,matchedReportCount:matchSource.filter(report=>report.match_key).length,unlinkedReportCount:unlinked.length,unlinkedReports:unlinked,matchCount:observedMatches.length,metrics,pitMetrics,notes,history:[...source].sort((a,b)=>stamp(a.created_at)-stamp(b.created_at)),confidence:{expectedMatches:expected.length || null,coveragePercent:expected.length ? covered.length/expected.length*100 : null,missingMatches,missingObservations,invalidObservations,disagreements,smallSamples:Object.values(metrics).filter(item=>['number','scale','boolean','select'].includes(item.type)&&item.n>0&&item.n<3).map(item=>item.id),freshness:newest?.created_at || null,coverageDefinition:'Distinct completed official matches containing this team, covered by at least one event-linked match report. Repeated reports count once. Pit reports never count toward match coverage.',limitations:[...(!expected.length?['No completed team schedule is available; match coverage is unknown.']:[]),...(matchSource.some(report=>!report.match_key)?['Some current-event reports lack match links; these remain separate observations.']:[]),...(pitSource.length?['Pit observations are shown separately and excluded from match performance.']:[]),...(unlinked.length?['Legacy reports have no event link and are excluded from current-event metrics.']:[])]}};
  });
+ for(const team of outputTeams)team.intelligence=teamIntelligence({team,reports:current.filter(row=>String(row.scouted_team)===team.teamNumber),forms:scopedForms,schedule,scheduleOrder});
  return {schemaVersion:1,generatedAt:asOf,event:event ? {key:eventKey,name:event.event_name || event.name || eventKey}:null,scope:{teamId,eventKey},metrics:metricList,teams:outputTeams,limitations:['No total points or phase points are calculated without a verified scoring model.','Form questions retain their own units; metrics from different forms are not merged.']};
 }
 
@@ -171,13 +174,15 @@ export function presentationSections(analytics,team){
  const meta=`${analytics.event?.name || 'No event selected'} · ${team.reportCount} reports · ${team.matchCount} linked matches`;
  const stats=numeric.map(metric=>`${metric.label}: ${formatValue(metric.mean)}${metric.unit?` ${metric.unit}`:''} average · n=${metric.n} · range ${formatValue(metric.min)}–${formatValue(metric.max)}`);
  const sources=team.history.map(report=>report.id);
+ const candidate=[...(team.intelligence?.lastMatch?[`Last recorded match: ${team.intelligence.lastMatch.matchKey}. Reported robot observations; official results remain separate.`]:[]),...(team.intelligence?.strengths||[]).map(row=>`Strength: ${insightText(row)}`),...(team.intelligence?.concerns||[]).map(row=>`Concern: ${insightText(row)}`),...(team.intelligence?.observations||[]).filter(row=>row.matchCount>0).slice(0,3).map(row=>`${insightText(row)}; ${row.disagreements} disagreements.`),...numeric.slice(0,3).map(row=>`${row.label}: population SD ${formatValue(row.stddev)} (n=${row.n}).`),...Object.values(team.pitMetrics||{}).filter(row=>row.n&&row.counts).slice(0,3).map(row=>`Reported pit capability — ${row.label}: ${row.counts.map(item=>`${item.value} (${item.count})`).join(', ')}. Not match-verified.`),...(team.picklistPositions||[]).map(row=>`${row.title}: position ${row.position}`)];
+ if(!team.reportCount)return [{title:`Team ${team.teamNumber}`,subtitle:team.nickname||'Alliance candidate',lines:['Insufficient scouting information.',...candidate],sourceIds:[]}];
  return [
-  {title:`Team ${team.teamNumber}`,subtitle:team.nickname || 'Scouting profile',lines:[meta,`${team.pitReportCount || 0} pit reports; pit observations are excluded from match performance.`,`Freshest report: ${team.confidence.freshness || 'Unavailable'}`,`${team.unlinkedReportCount} legacy reports excluded`],sourceIds:sources},
+  {title:`Team ${team.teamNumber}`,subtitle:team.nickname || 'Alliance candidate summary',lines:[meta,...candidate,`${team.pitReportCount || 0} pit reports; pit observations are excluded from match performance.`,`Freshest report: ${team.confidence.freshness || 'Unavailable'}`,`${team.unlinkedReportCount} legacy reports excluded`],sourceIds:sources},
   {title:'Performance overview',subtitle:'Verified calculations',lines:stats.length?stats:['No numeric scouting observations for this event.'],sourceIds:sources},
   {title:'Scoring breakdown',subtitle:'Explicit metric phase mappings; no inferred points',lines:['auto','teleop','endgame'].map(phase=>`${{auto:'Autonomous',teleop:'Teleoperated',endgame:'Endgame'}[phase]}: ${numeric.filter(metric=>metric.phase===phase).map(metric=>`${metric.label} ${formatValue(metric.mean)}${metric.unit?` ${metric.unit}`:''}`).join('; ') || 'No mapped observations'}`),sourceIds:sources},
   {title:'Performance trends',subtitle:'Official schedule order when available; otherwise report time',lines:numeric.length?numeric.map(metric=>`${metric.label}: ${metric.values.map(item=>`${item.matchKey || 'Unlinked report'} ${formatValue(item.value)}`).join(' → ')}. Population SD ${formatValue(metric.stddev)} (n=${metric.n}).`):['More numeric observations are needed to describe trends.'],sourceIds:sources},
-  {title:'Strengths and limitations',subtitle:'Scout observations and evidence gaps',lines:[...team.notes.slice(-5).map(note=>`${note.label}: “${String(note.value)}” [${note.reportId}]`),...team.confidence.limitations,...(!team.notes.length?['No written scout observations are available.']:[])],sourceIds:sources},
-  {title:'Match history',subtitle:'Scouting reports; official results remain separate',lines:team.history.length?team.history.map(report=>`${report.report_kind==='pit'?'Pit scouting':report.match_key || 'Match not linked'} · ${report.form_title || 'Scouting report'} · ${report.submitted_by || 'Scout'} · ${report.created_at || 'Time unknown'} [${report.id}]`):['No event-linked reports.'],sourceIds:sources},
+  {title:'Strengths and limitations',subtitle:'Scout observations and evidence gaps',lines:[...(team.notesIncluded?team.notes.slice(-5).map(note=>`${note.label}: “${String(note.value)}” [${note.reportId}]`):['Private notes omitted.']),...team.confidence.limitations],sourceIds:sources},
+  {title:'Match history',subtitle:'Scouting reports; official results remain separate',lines:team.history.length?team.history.map(report=>`${report.report_kind==='pit'?'Pit scouting':report.match_key || 'Match not linked'} · ${report.form_title || 'Scouting report'} · ${report.created_at || 'Time unknown'} [${report.id}]`):['No event-linked reports.'],sourceIds:sources},
   {title:'Strategy summary',subtitle:'Evidence to review before alliance decisions',lines:[`${team.confidence.coveragePercent==null?'Coverage unknown':`${formatValue(team.confidence.coveragePercent)}% match coverage`}. ${team.confidence.disagreements.length} conflicting observations.`,`${team.confidence.smallSamples.length} metrics have fewer than three samples.`,...(!numeric.length?['Collect numeric observations before comparing performance.']:['Compare the same question and units across candidate teams.']), 'Confirm robot capabilities with scouts; alliance role predictions are not calculated.'],sourceIds:sources},
  ];
 }

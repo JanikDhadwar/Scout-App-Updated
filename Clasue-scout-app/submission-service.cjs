@@ -31,8 +31,13 @@ function validateReport(db, form, report) {
   return null;
 }
 function validateForm(form) {
+  if(form.guidance_mode!=null&&!['quick','guided'].includes(form.guidance_mode))return 'Choose Quick or Guided guidance.';
   if (!Array.isArray(form.questions) || form.questions.length > 200) return 'Use a question list with at most 200 questions.';
   if (new Set(form.questions.map(q => q.id)).size !== form.questions.length || form.questions.some(q => !q.id || typeof q.text !== 'string')) return 'Questions require unique IDs and labels.';
+  for(const q of form.questions){
+    for(const field of ['hint','example'])if(q[field]!=null&&(typeof q[field]!=='string'||q[field].length>1200))return 'Question hints and examples must be short text.';
+    if(q.review_greater_than&&(!form.questions.slice(0,form.questions.indexOf(q)).some(other=>other.id===q.review_greater_than&&other.type==='number')||q.type!=='number'))return 'Review comparisons must reference an earlier numeric question.';
+  }
   return validateConditions(form.questions);
 }
 function changeReportState(db, { id, actorId, removed, reason, revision }) {

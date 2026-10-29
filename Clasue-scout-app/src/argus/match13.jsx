@@ -25,15 +25,25 @@ export function Match13Rating({api,workspaceId,team,year}){
  <a className="a-small" href={`https://www.match13.com/team/${team}?year=${year}`} target="_blank" rel="noreferrer">View team on Match13</a></section>;
 }
 
-export function Match13Predictions({api,workspaceId,eventKey,team,children}){
- const [result,setResult]=useState(null),refresh=useRef(null);
- useEffect(()=>{let active=true;async function load(){try{const value=await api('GET',`/match13/predictions?${new URLSearchParams({workspaceId,event:eventKey})}`);if(active)setResult({...value,workspaceId});}catch(e){if(active)setResult({event:eventKey,workspaceId,error:e.message});}}
-  refresh.current=load;if(eventKey)load();const timer=setInterval(()=>{if(document.visibilityState!=='hidden')load();},120000);return()=>{active=false;clearInterval(timer);refresh.current=null;};
+export function Match13Predictions({api,workspaceId,eventKey,team,children,compact=false}){
+ const [result,setResult]=useState(null),[now,setNow]=useState(Date.now),refresh=useRef(null);
+ useEffect(()=>{let active=true;
+  async function load(){if(!eventKey)return;try{const value=await api('GET',`/match13/predictions?${new URLSearchParams({workspaceId,event:eventKey})}`);if(active){setResult({...value,workspaceId});setNow(Date.now());}}catch(e){if(active)setResult(previous=>e.status===401||e.status===403?{event:eventKey,workspaceId,error:e.message}:({...((previous?.event===eventKey&&previous?.workspaceId===workspaceId)?previous:{}),event:eventKey,workspaceId,error:e.message,cached:true}));}}
+  refresh.current=load;load();const timer=setInterval(()=>{setNow(Date.now());if(document.visibilityState!=='hidden')load();},120000);
+  const cleared=()=>setResult(null);window.addEventListener('argus-read-data-cleared',cleared);
+  return()=>{active=false;clearInterval(timer);refresh.current=null;window.removeEventListener('argus-read-data-cleared',cleared);};
  },[api,workspaceId,eventKey]);
  const current=result?.event===eventKey&&result?.workspaceId===workspaceId?result:null;
- const prediction=match=>match13PredictionForMatch(current?.matches,match,team);
- return <section className="a-stack" aria-label="Match13 match predictions"><div className="a-row"><h2>Upcoming matches and predictions</h2><button className="a-button" onClick={()=>refresh.current?.()}>Refresh predictions</button></div><p className="a-muted a-small">Match13 estimates include offseason play. Win chance is for Team {team}’s alliance. These are predictions, not results.</p>{current?.error&&<p role="status">{current.error} <a href="#/settings">Connection settings</a></p>}{!current&&<p className="a-muted a-small">Loading predictions…</p>}{children(prediction)}{current?.fetched_at&&<p className="a-muted a-small">Predictions fetched {new Date(current.fetched_at).toLocaleString()}. Updates every two minutes. Official schedule supplies alliance colors; Match13 supplies match keys and participant sets.</p>}</section>;
+ const prediction=match=>{
+  const binding=current?.alliance_snapshot?.[match.key];
+  const actual=['red','blue'].map(color=>match.alliances?.[color]?.team_keys||[]);
+  if(current?.alliance_snapshot&&JSON.stringify(binding)!==JSON.stringify(actual))return null;
+  return match13PredictionForMatch(current?.matches,match,team);
+ };
+ const stale=current?.fetched_at&&now-Date.parse(current.fetched_at)>=120000;
+ const source=<p className="a-muted a-small">Official schedule supplies alliance colors; Match13 supplies match keys and participant sets. Participant sets cannot independently verify a provider alliance-color swap. Model update time is unavailable in this response. Estimates include offseason play and refresh every two minutes.</p>;
+ return <section className={`a-stack ${compact?'a-forecast-strip':''}`} aria-label="Match13 match predictions"><div className="a-row"><h2>{compact?'Match13 estimate':'Upcoming matches and predictions'}</h2><button className="a-button" onClick={()=>refresh.current?.()}>Refresh predictions</button></div><p className="a-muted a-small">{compact?`Estimate for Team ${team}’s alliance; not a result.`:`Match13 estimates include offseason play. Win chance is for Team ${team}’s alliance. These are predictions, not results.`}</p>{current?.error&&<p role="status">{current.error} <a href="#/settings">Connection settings</a></p>}{!current&&<p className="a-muted a-small">Loading predictions…</p>}{(current?.cached||stale)&&current?.matches&&<p role="status">Cached estimate{stale?' — stale (over two minutes old)':''}. Check its retrieval time before using it.</p>}{children(prediction)}{current?.fetched_at&&<p className="a-muted a-small">Predictions fetched {new Date(current.fetched_at).toLocaleString()}.</p>}{compact?<details><summary>Forecast source and freshness</summary>{source}</details>:source}</section>;
 }
 export function PredictionValue({prediction}){
- return prediction?<div className="a-stack a-small"><span className="a-alliance-red">Red: {formatValue(prediction.redScore)}</span><span className="a-alliance-blue">Blue: {formatValue(prediction.blueScore)}</span><strong>{prediction.winProbability==null?'Win chance unavailable':`${formatValue(prediction.winProbability*100)}% alliance win chance`}</strong></div>:<span className="a-muted a-small">Prediction unavailable</span>;
+ return prediction?<div className="a-stack a-small a-prediction-values"><span className="a-alliance-red">Red: {formatValue(prediction.redScore)}</span><span className="a-alliance-blue">Blue: {formatValue(prediction.blueScore)}</span><strong>{prediction.winProbability==null?'Win chance unavailable':`${formatValue(prediction.winProbability*100)}% alliance win chance`}</strong></div>:<span className="a-muted a-small">Prediction unavailable</span>;
 }

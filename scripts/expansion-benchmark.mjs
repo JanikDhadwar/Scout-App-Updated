@@ -1,0 +1,15 @@
+import {performance} from 'node:perf_hooks';
+import {createRequire} from 'node:module';
+import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url),{analyticsForUser,clearAnalyticsCache}=require('../Clasue-scout-app/shared-analytics.cjs');
+const questions=[{id:'count',text:'Measured actions',type:'number'},{id:'outcome',text:'Observed outcome',type:'select',options:['Yes','No','Unknown']}];
+const matches=Array.from({length:200},(_,index)=>({key:`2026qa_qm${index+1}`,comp_level:'qm',match_number:index+1,actual_time:1792324800+index*600,alliances:Object.fromEntries(['red','blue'].map((color,alliance)=>[color,{score:50,team_keys:Array.from({length:3},(_,slot)=>`frc${(index*6+alliance*3+slot)%100+1}`)}]))}));
+const event={id:'fixture',team_id:'w',event_key:'2026qa',event_teams:Array.from({length:100},(_,i)=>({team_number:i+1})),matches,analytics_config:{'f:count':{phase:'teleop',direction:'higher',insight:{kind:'mean',strength:7,concern:2}},'f:outcome':{phase:'auto',insight:{kind:'success_rate',outcomes:{Yes:'success',No:'failure',Unknown:'unknown'},strength:.8,concern:.5}}}};
+const submissions=matches.flatMap((match,index)=>['red','blue'].flatMap(color=>match.alliances[color].team_keys.flatMap(key=>Array.from({length:5},(_,observer)=>({id:`${match.key}:${key}:${observer}`,team_id:'w',event_key:'2026qa',form_id:'f',report_kind:'match',scouted_team:key.slice(3),match_key:match.key,created_at:new Date((match.actual_time+observer)*1000).toISOString(),questions_snapshot:questions,answers:{count:index%11,outcome:index%5===0?'No':'Yes'}})))));
+const db={memberships:[{user_id:'u',team_id:'w',role:'owner'}],forms:[{id:'f',team_id:'w',questions}],submissions};
+assert.equal(submissions.length,6000);clearAnalyticsCache();
+const start=performance.now(),first=await analyticsForUser(db,event,'u'),cold=performance.now()-start;
+const warmStart=performance.now(),second=await analyticsForUser(db,event,'u'),warm=performance.now()-warmStart;
+assert.ok(first===second,'Realistic structured event must fit the bounded analytics cache.');assert.equal(first.teams.length,100);assert.ok(first.teams.every(team=>team.intelligence.observations.length===2));
+assert.equal(first.teams.reduce((sum,team)=>sum+team.reportCount,0),6000);
+console.log(JSON.stringify({synthetic:true,teams:100,matches:200,reports:6000,coldMilliseconds:Number(cold.toFixed(2)),cachedMilliseconds:Number(warm.toFixed(2)),rssMiB:Number((process.memoryUsage().rss/1024/1024).toFixed(2)),node:process.version},null,2));

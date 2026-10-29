@@ -1,7 +1,7 @@
 const {createHash}=require('node:crypto');
 const {normalizeMatch13Team,normalizeMatch13Prediction,match13RegionalRanks}=require('./src/argus/analytics.js');
 function createMatch13Client({fetcher=fetch,clock=Date.now}={}){
- const cache=new Map(),pending=new Map(),cooldown=new Map();
+ const cache=new Map(),pending=new Map(),cooldown=new Map(),received=new WeakMap(),bindings=new WeakMap();
  const invalid=()=>{const e=new Error('Choose a valid team, season or event.');e.status=400;throw e;};
  const yearOk=year=>/^\d{4}$/.test(String(year))&&Number(year)>=2002&&Number(year)<=new Date(clock()).getUTCFullYear();
  const teamOk=team=>/^[1-9]\d{0,5}$/.test(String(team));
@@ -13,8 +13,17 @@ function createMatch13Client({fetcher=fetch,clock=Date.now}={}){
   const task=(async()=>{
    let response;try{response=await fetcher(`${tba?'https://www.thebluealliance.com/api/v3':'https://actions.match13.com/v1'}/${path}`,{headers:tba?{'X-TBA-Auth-Key':key}:{Authorization:`Bearer ${key}`},signal:AbortSignal.timeout(10000),redirect:'error'});}catch{throw new Error('The ratings service could not be reached. Try again later.');}
    if(!response.ok){const e=new Error(response.status===401||response.status===403?'The saved API key was rejected. Ask the owner to update it in Settings.':response.status===404?'No Match13 data is available for this team, season or event.':response.status===429?'Match13 usage limit reached. Try again later.':'Match13 is temporarily unavailable.');e.status=response.status===404?404:response.status===429?429:502;
-    if(response.status===429)cooldown.set(identity,clock()+Math.min(3600,Math.max(60,Number(response.headers?.get('retry-after'))||60))*1000);throw e;}
-   let data;try{data=await response.json();}catch{throw new Error('The ratings service returned an unexpected format.');}
+    if(response.status===429)cooldown.set(identity,clock()+Math.min(604800,Math.max(1,Number(response.headers?.get('retry-after'))||60))*1000);throw e;}
+   const remaining=String(response.headers?.get('x-ratelimit-remaining')||'').slice(0,200).split(',').map(value=>Number(value.trim())),resets=String(response.headers?.get('x-ratelimit-reset')||'').slice(0,200).split(',').map(value=>Number(value.trim()));
+   const exhausted=resets.filter((seconds,index)=>remaining[index]===0&&Number.isFinite(seconds)&&seconds>0);
+   if(exhausted.length)cooldown.set(identity,clock()+Math.min(604800,Math.max(...exhausted))*1000);
+   let data;try{
+    const limit=2*1024*1024;
+    if(Number(response.headers?.get('content-length'))>limit)throw Error();
+    if(response.body?.getReader){const reader=response.body.getReader(),parts=[];let bytes=0;for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>limit){await reader.cancel();throw Error();}parts.push(Buffer.from(value));}data=JSON.parse(Buffer.concat(parts).toString('utf8'));}
+    else {data=await response.json();if(Buffer.byteLength(JSON.stringify(data))>limit)throw Error();}
+   }catch{throw new Error('The ratings service returned an unexpected format.');}
+   if(data&&typeof data==='object')received.set(data,new Date(clock()).toISOString());
    if(cache.size>=300)cache.delete(cache.keys().next().value);cache.set(id,{data,until:clock()+ttl});return data;
   })();pending.set(id,task);try{return await task;}finally{pending.delete(id);}
  }
@@ -27,12 +36,13 @@ function createMatch13Client({fetcher=fetch,clock=Date.now}={}){
   const rows=team?[await rating(team,year,key)]:raw.teams.map(normalizeMatch13Team);if(rows.some(r=>!r||r.year!==Number(year)))throw new Error('Match13 returned an unexpected format.');
   return {source:'Match13',year:Number(year),offset:team?0:Number(offset),total:Number.isInteger(raw.total)?raw.total:null,rows,fetched_at:new Date(clock()).toISOString(),has_more:!team&&raw.nextPage!=null};
  }
- async function predictions(event,key){
+ async function predictions(event,key,officialMatches=[]){
   if(typeof event!=='string'||!/^\d{4}[a-z0-9_-]{1,30}$/.test(event)||!yearOk(event.slice(0,4)))invalid();
   const raw=await read(`events/${event}/matches?scope=all`,key,120000);
   if(raw?.eventKey!==event||!Array.isArray(raw.matches)||raw.matches.length>1000)throw new Error('Match13 returned an unexpected format.');
   const matches=raw.matches.map(normalizeMatch13Prediction);if(matches.some(m=>!m||!m.key.startsWith(`${event}_`)))throw new Error('Match13 returned an unexpected format.');
-  return {event,matches,fetched_at:new Date(clock()).toISOString(),source:'Match13'};
+  if(!bindings.has(raw))bindings.set(raw,Object.fromEntries(officialMatches.map(match=>[match.key,['red','blue'].map(color=>[...(match.alliances?.[color]?.team_keys||[])])])));
+  return {event,matches,fetched_at:received.get(raw),alliance_snapshot:bindings.get(raw),source:'Match13'};
  }
  async function regions(team,year,key,tbaKey){
   if(!teamOk(team)||!yearOk(year))invalid();let ratings=[],total=null;const deadline=clock()+30000;

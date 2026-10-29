@@ -17,4 +17,6 @@ Choose a topic:
 - [Reminders](reminders.md)
 - [Offline and sync](offline-and-sync.md)
 - [Troubleshooting](troubleshooting.md)
-- [Internal architecture](internals.md)
+- [Match intelligence](match-intelligence.md)
+- [Starter forms](starter-forms.md)
+- [Beginner scouting guide](beginner-guide.md)

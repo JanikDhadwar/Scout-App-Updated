@@ -19,7 +19,7 @@ export function SyncPanel({ state, shellReady, onClose }) {
     <p>{shellReady&&state.readyAt?'Your forms and app are downloaded for offline use.':!window.isSecureContext?'Open your server’s HTTPS address to enable offline reopening. Reports can still be saved while this page stays open.':'Connect once and let this device finish downloading the app and forms.'}</p>
     <p className="muted">Stay signed in on this browser. If Argus is closed, reopen it after reconnecting to finish uploads. Clearing browser data also clears unsynced reports.</p>
     {(error||state.error)&&<p role="alert" className="error-text">{error||state.error}</p>}
-    <div className="button-row"><button className="primary-button" disabled={working||state.syncing} onClick={retry}>{working?'Checking…':'Sync & prepare device'}</button>{state.pending>0&&<button className="quiet-button" onClick={()=>exportPending().catch(e=>setError(e.message))}>Download pending reports</button>}</div>
+    <div className="button-row"><button className="primary-button" disabled={working||state.syncing} onClick={retry}>{working?'Checking…':'Sync & prepare device'}</button>{state.pending>0&&<button className="quiet-button" onClick={()=>exportPending().catch(e=>setError(e.message))}>Download pending reports</button>}<button className="quiet-button" disabled={working||state.syncing} onClick={async()=>{setWorking(true);try{await offline.clearDownloadedReadData();window.location.reload();}catch(e){setError(e.message);}finally{setWorking(false);}}}>Clear downloaded read data</button></div><p className="muted">Clearing downloaded read data retains your drafts and queued reports. Reconnect to download views again. Use sign out before handing a device to someone else.</p>
   </section>;
 }
 

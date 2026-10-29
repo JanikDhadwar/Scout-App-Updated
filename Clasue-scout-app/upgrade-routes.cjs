@@ -161,7 +161,8 @@ function registerUpgradeRoutes(app, { readDB, writeDB, verifyPassword, sessions,
   });
   route('get', '/api/preferences', req => {
     const db = readDB(); requireMember(db, req.user.id, req.query.team_id);
-    return rows(db, 'user_preferences').find(p => p.team_id === req.query.team_id && p.user_id === req.user.id) || { team_id: req.query.team_id, user_id: req.user.id };
+    const preference=rows(db, 'user_preferences').find(p => p.team_id === req.query.team_id && p.user_id === req.user.id) || { team_id: req.query.team_id, user_id: req.user.id };
+    return {...preference,onboarding_eligible:rows(db,'memberships').some(member=>member.team_id===req.query.team_id&&member.user_id===req.user.id&&member.onboarding_eligible===true)&&!preference.guide_dismissed};
   });
   route('patch', '/api/preferences', req => {
     const db = readDB(), body = req.body || {}; requireMember(db, req.user.id, body.team_id);

@@ -13,6 +13,7 @@ const patterns=[
  ['aws-access-key',/AKIA[0-9A-Z]{16}/],
 ];
 for(const file of files){
+ if(!fs.existsSync(path.join(root,file)))continue;
  if(forbidden(file))failures.push({file,rule:'private-artifact'});
  if(!/\.(?:cjs|mjs|js|jsx|ts|tsx|json|md|ya?ml|toml|sh|html|example)$/.test(file)||file.endsWith('package-lock.json')||file.includes('license-notices/')||file.includes('third-party-notices'))continue;
  const value=fs.readFileSync(path.join(root,file),'utf8');

@@ -1,11 +1,12 @@
 {
   "name": "scout-app",
   "private": true,
-  "version": "5.12.0",
+  "version": "5.13.0",
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
     "test:browser": "node ../scripts/run-browser-checks.cjs",
+    "test:browser:expansion": "node ../scripts/run-browser-checks.cjs --expansion",
     "test": "node --test ../scripts/deploy-status.test.cjs *.test.cjs src/form-conditions.test.js src/offline-client.test.js src/argus/*.test.js",
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "vite build",

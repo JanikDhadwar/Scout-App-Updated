@@ -32,9 +32,16 @@ function dimensions(buffer, type) {
     if (declared !== buffer.length) return null;
     const chunk = buffer.toString('ascii', 12, 16);
     if (chunk === 'VP8X' && buffer.length >= 30) return [1 + buffer.readUIntLE(24, 3), 1 + buffer.readUIntLE(27, 3)];
-    // Older VP8/VP8L files retain strict container validation but browser decode
-    // remains the final dimension check before display.
-    if (chunk === 'VP8 ' || chunk === 'VP8L') return [1, 1];
+    const chunkLength = buffer.length >= 20 ? buffer.readUInt32LE(16) : 0;
+    if (!chunkLength || 20 + chunkLength > buffer.length) return null;
+    if (chunk === 'VP8 ' && chunkLength >= 10 && buffer.subarray(23, 26).equals(Buffer.from([0x9d, 0x01, 0x2a]))) {
+      return [buffer.readUInt16LE(26) & 0x3fff, buffer.readUInt16LE(28) & 0x3fff];
+    }
+    if (chunk === 'VP8L' && chunkLength >= 5 && buffer[20] === 0x2f) {
+      const bits = buffer.readUInt32LE(21);
+      if (bits >>> 29) return null;
+      return [(bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1];
+    }
     return null;
   }
   return null;

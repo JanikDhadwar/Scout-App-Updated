@@ -12,6 +12,7 @@ import { ReportDrawing, ReportPhoto } from './report-media.jsx';
 import { Icon } from './ui-primitives.jsx';
 import ArgusWorkspace from './argus/workspace.jsx';
 import WelcomeScreen from './argus/welcome.jsx';
+import {QuestionHint,ScoutingReview,TemplateLibrary} from './argus/scouting-guidance.jsx';
 
 // ─── SERVER-BACKED DATABASE (db.json via Express) ────────────────────────────
 // All data is saved to db.json on the hosting PC via a local Express server.
@@ -155,7 +156,7 @@ export default function App() {
   async function logout(){try{await apiCall('POST','/auth/logout',{});await clearSession();}catch(error){alert(`Could not sign out: ${error.message}`);}}
   async function switchWorkspace(){setTeam(null);setMem(null);await saveSession(user,null,null);}
   async function leaveWorkspace(){if(mem?.role==='owner'||!confirm('Leave this team? Your submitted reports remain with the team; drafts and pending reports stay scoped to this team.'))return;try{await apiCall('DELETE',`/memberships/${encodeURIComponent(mem.id)}`);await offline.invalidateReadCache();await offline.setScope({userId:user.id});await switchWorkspace();}catch(error){alert(error.message);}}
-  async function refreshMem(){try{const rows=await fbSelect('memberships',{team_id:team.id,user_id:user.id});if(rows[0]){setMem(rows[0]);await saveSession(user,team,rows[0]);}}catch{ /* Keep the last confirmed role while offline. */ }}
+  async function refreshMem(){try{const rows=await fbSelect('memberships',{team_id:team.id,user_id:user.id});if(rows[0]){if(rows[0].role!==mem.role)await offline.invalidateReadCache();setMem(rows[0]);await saveSession(user,team,rows[0]);}}catch{ /* Keep the last confirmed role while offline. */ }}
   useEffect(()=>{
     if(!user||!team||!mem)return;
     let active=true,running=false;
@@ -180,7 +181,7 @@ export default function App() {
   if(!user||!team)return <div className="scout-auth-shell" style={sx.page}><main id="account-main" tabIndex={-1} className="workspace-main">{!user?<AuthScreen key={publicRoute} initialMode={publicRoute==='#/signup'?'signup':'login'} onLogin={login}/>:<TeamScreen user={user} onJoin={joinTeam} onLogout={logout}/>}</main></div>;
   const role=mem?.role||'member';
   const renderLegacy=(view,context={})=>view==='match'||view==='pit'?<FormsTab key={`${view}:${context.match_key||''}:${context.scouted_team||''}`} team={team} user={user} role={role} syncState={syncState} reportKind={view} context={context} onPending={()=>{offline.refresh();window.dispatchEvent(new Event('scout-report-saved'));}}/>:view==='news'?<AnnouncementsTab team={team} user={user} role={role}/>:view==='myteam'?<MyTeamTab key={context.event_key} team={team} eventKey={context.event_key}/>:view==='manage'?<ManageTab team={team} user={user} onTeamUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} onRoleChange={refreshMem}/>:view==='sync'?<SyncPanel state={syncState} shellReady={shellReady} onClose={()=>{window.location.hash='/settings';}}/>:null;
-  return <ArgusWorkspace workspace={team} user={user} role={role} onUserUpdate={async u=>{setUser(u);await saveSession(u,team,mem?{...mem,username:u.username}:mem);await offline.invalidateReadCache();}} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={installUpdate}/>;
+  return <ArgusWorkspace key={`${user.id}:${team.id}:${role}`} workspace={team} user={user} role={role} onUserUpdate={async u=>{setUser(u);await saveSession(u,team,mem?{...mem,username:u.username}:mem);await offline.invalidateReadCache();}} onWorkspaceUpdate={t=>{setTeam(t);saveSession(user,t,mem);}} api={apiCall} syncState={syncState} shellReady={shellReady} renderLegacy={renderLegacy} onLogout={logout} onSwitchWorkspace={switchWorkspace} onLeaveWorkspace={leaveWorkspace} onArchive={archiveTeam} onDeactivate={deactivate} needRefresh={needRefresh} onUpdate={installUpdate}/>;
 }
 
 // ─── Auth Screen ──────────────────────────────────────────────────────────────
@@ -465,6 +466,7 @@ function FormsTab({ team, user, role, syncState, onPending, reportKind, context=
     catch { alert("Error archiving form."); }
   }
 
+  if (view==='templates') return <TemplateLibrary kind={reportKind} workspaceId={team.id} onClose={()=>setView('list')} onCopy={form=>{setActive(form);setView('edit');}}/>;
   if (view==="create") return <FormBuilder reportKind={reportKind} team={team} user={user} onSave={()=>{setView("list");load();}} onCancel={()=>setView("list")}/>;
   if (view==="edit"&&active) return <FormBuilder reportKind={reportKind} team={team} user={user} editing={active} onSave={()=>{setView("list");load();}} onCancel={()=>setView("list")}/>;
   if (view==="fill"&&active) return <FormFiller key={active.id} context={context} reportKind={reportKind} form={active} user={user} team={team} onDone={()=>{setView("list");load();onPending();}} onCancel={()=>{setView("list");load();}}/>;
@@ -473,7 +475,7 @@ function FormsTab({ team, user, role, syncState, onPending, reportKind, context=
     <div className="page-enter">
       <div className="section-heading page-heading">
         <div><h1 className="page-title">{reportKind==='pit'?'Pit scouting':reportKind==='match'?'Match scouting':'Scouting forms'}</h1><p className="page-subtitle">Legacy forms stay available until explicitly categorized.</p></div>
-        {(role==="owner"||role==="admin")&&<button style={{...sx.btn(),width:'auto'}} disabled={!canEdit} onClick={()=>setView("create")}>New form</button>}
+        {(role==="owner"||role==="admin")&&<div className="a-row"><button style={{...sx.btn(),width:'auto'}} disabled={!canEdit} onClick={()=>setView("create")}>New form</button><button className="a-button" disabled={!canEdit} onClick={()=>setView('templates')}>Use a template</button></div>}
       </div>
       <div className="forms-toolbar"><input aria-label="Search forms" placeholder="Find a scouting form…" value={search} onChange={e=>setSearch(e.target.value)}/><span className="outline-tag">{scopedForms.length} {scopedForms.length===1?'form':'forms'} on this device</span></div>
       {!canEdit&&<div className="notice">Downloaded forms are ready to fill out offline. Creating and editing form templates needs a server connection.</div>}
@@ -498,6 +500,7 @@ function FormsTab({ team, user, role, syncState, onPending, reportKind, context=
               </div>
             </div>
             <div className="form-tile-actions">
+              {f.template_origin&&['owner','admin'].includes(role)&&<a className="a-button" href="#/analytics">Set up season measurements</a>}
               <button className="primary-button" onClick={()=>{setActive(f);setView("fill");}}>{drafts.some(d=>d.key===draftKey(user.id,team.id,f.id))?'Resume draft':'Open form'}<Icon name="arrow" size={16}/></button>
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit||f.archived} aria-label={`Edit ${f.title}`} onClick={e=>{e.stopPropagation();setActive(f);setView("edit");}}>Edit</button>}
               {(role==="owner"||role==="admin")&&<button style={sx.sm(C.muted)} disabled={!canEdit||f.archived} aria-label={`Archive ${f.title}`} onClick={e=>deleteForm(f,e)}>Archive</button>}
@@ -520,6 +523,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
   const [qs,setQs]=useState(editing?.questions||[]);
   const [allowTeamSelect,setAllowTeamSelect]=useState(editing?.allow_team_select??true);
   const [maxPerTeam,setMaxPerTeam]=useState(editing?.max_submissions_per_team||"");
+  const [guidanceMode,setGuidanceMode]=useState(editing?.guidance_mode||'quick');
   const [err,setErr]=useState(""); const [busy,setBusy]=useState(false);
 
   function addQ()       { setQs(q=>[...q,{id:uid(),text:"",type:"text",required:false,options:[]}]); }
@@ -542,6 +546,7 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
       team_id:team.id,
       title:title.trim(),
       questions:qs,
+      guidance_mode:guidanceMode,
       allow_team_select:allowTeamSelect,
       max_submissions_per_team:allowTeamSelect&&maxPerTeam?Number(maxPerTeam):null,
       created_by: editing?.created_by||user.username,
@@ -562,7 +567,8 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
       <div style={sx.card}>
         <label style={sx.lbl}>Report type</label><select aria-label="Report type" style={sx.inp} value={kind} onChange={e=>setKind(e.target.value)}><option value="match">Match scouting</option><option value="pit">Pit scouting</option></select>
         <label style={sx.lbl}>Form title</label>
-        <input style={sx.inp} placeholder="e.g. Qual Match Scout" value={title} onChange={e=>setTitle(e.target.value)}/>
+        <label style={sx.lbl}>Scouting guidance<select aria-label="Scouting guidance" style={sx.inp} value={guidanceMode} onChange={e=>setGuidanceMode(e.target.value)}><option value="quick">Quick — on-demand hints</option><option value="guided">Guided — inline hints and examples</option></select></label>
+        <input aria-label="Form title" style={sx.inp} placeholder="e.g. Qual Match Scout" value={title} onChange={e=>setTitle(e.target.value)}/>
         <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:10}}>
           <label style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:C.text,cursor:"pointer"}}>
             <input type="checkbox" checked={allowTeamSelect} onChange={e=>setAllowTeamSelect(e.target.checked)}/>
@@ -594,6 +600,9 @@ function FormBuilder({ team, user, editing, onSave, onCancel, reportKind }) {
           <label style={sx.lbl}>Question</label>
           <input style={sx.inp} placeholder="e.g. Auto pieces scored?" value={q.text} onChange={e=>upd(i,"text",e.target.value)}/>
           <label style={sx.lbl}>Type</label>
+          <label style={sx.lbl}>Question hint<input style={sx.inp} value={q.hint||''} onChange={e=>upd(i,'hint',e.target.value)} maxLength={1200}/></label>
+          <label style={sx.lbl}>Example<input style={sx.inp} value={q.example||''} onChange={e=>upd(i,'example',e.target.value)} maxLength={1200}/></label>
+          {q.type==='number'&&<label style={sx.lbl}>Review warning if greater than<select style={sx.inp} value={q.review_greater_than||''} onChange={e=>upd(i,'review_greater_than',e.target.value||null)}><option value="">No comparison</option>{qs.slice(0,i).filter(other=>other.type==='number').map(other=><option key={other.id} value={other.id}>{other.text}</option>)}</select></label>}
           <select style={sx.inp} value={q.type} onChange={e=>upd(i,"type",e.target.value)}>
             {QTYPES.map(t=><option key={t.id} value={t.id}>{t.l}</option>)}
           </select>
@@ -787,8 +796,10 @@ export function FormFiller({ form, user, team, onDone, onCancel, reportKind, con
           {['auto','teleop','endgame'].includes(q.phase)&&shownQuestions[i-1]?.phase!==q.phase&&<h2 style={{fontSize:18,margin:'0 0 16px'}}>{{auto:'Autonomous',teleop:'Teleoperated',endgame:'Endgame'}[q.phase]}</h2>}
           <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>{i+1}. {q.text}{q.required&&<span style={{color:C.red,marginLeft:4}}>*</span>}</div>
           <QInput q={q} value={ans[q.id]} onChange={v=>set(q.id,v)}/>
+          <QuestionHint question={q} mode={form.guidance_mode||'quick'}/>
         </div>
       ))}
+      <ScoutingReview questions={questions} answers={ans}/>
       {err&&<div role="alert" style={{...sx.err,marginBottom:10}}>{err}</div>}
       <button style={sx.btn()} onClick={submit} disabled={busy}>{busy?"Saving report…":"Submit scouting report"}</button>
       </div>

@@ -1,6 +1,6 @@
 # Practice and training
 
-Open Practice from More or Help. Choose a pit or match form and practice using Sample Team 9999.
+Open Practice from More or Help. Guided illustrated scenarios work without any workspace forms and give private explanatory feedback on this device. Choose a pit or match form and practice using Sample Team 9999.
 
 The form controls, autosave and offline queue are the same mechanisms used for real scouting. Practice uses separate draft keys and a separate server collection. A visible Practice banner remains present.
 
