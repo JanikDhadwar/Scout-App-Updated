@@ -5,16 +5,17 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 const require=createRequire(new URL('../Clasue-scout-app/package.json',import.meta.url));
 const {chromium}=require('playwright');
+const {default:AxeBuilder}=require('@axe-core/playwright');
 const baseURL=process.env.QA_BASE_URL;
 assert.ok(baseURL&&['127.0.0.1','localhost'].includes(new URL(baseURL).hostname),'An isolated fixture URL is required.');
-const artifacts=fs.mkdtempSync(path.join(os.tmpdir(),'argus-expansion-qa-')),results=[],errors=[],timings={};
+const artifacts=fs.mkdtempSync(path.join(os.tmpdir(),'argus-expansion-qa-')),results=[],errors=[],timings={},accessibility=[];
 const browser=await chromium.launch({headless:true,channel:'msedge'});
 const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true,serviceWorkers:'block'}),page=await context.newPage();
 page.on('pageerror',error=>errors.push(error.message));
 const route=async value=>{await page.evaluate(value=>{location.hash=value;},value);await page.waitForTimeout(250);};
 const api=async(url,body,method=body?'POST':'GET')=>page.evaluate(async({url,body,method})=>{const r=await fetch('/api'+url,{method,headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});return{status:r.status,data:await r.json()};},{url,body,method});
 const check=async(name,run)=>{try{await run();results.push({name,status:'passed'});}catch(error){results.push({name,status:'failed',error:error.stack});await page.screenshot({path:path.join(artifacts,`failure-${results.length}.png`),fullPage:true});}};
-const shots=async name=>{for(const width of [1440,1280,1024,768,390,360]){await page.setViewportSize({width,height:1000});await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${name} overflow at ${width}`);await page.screenshot({path:path.join(artifacts,`${name}-${width}.png`),fullPage:true});}await page.setViewportSize({width:1440,height:1000});};
+const shots=async name=>{for(const width of [1440,1280,1024,768,390,360]){await page.setViewportSize({width,height:1000});await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${name} overflow at ${width}`);await page.screenshot({path:path.join(artifacts,`${name}-${width}.png`),fullPage:true});if([1440,390].includes(width)){const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22a','wcag22aa']).analyze();accessibility.push({name,width,violations:audit.violations,incomplete:audit.incomplete});assert.deepEqual(audit.violations,[],`${name} accessibility at ${width}`);}}await page.setViewportSize({width:1440,height:1000});};
 try{
  await page.goto(baseURL+'/#/login');await page.getByLabel('Username',{exact:true}).fill('qa_owner');await page.getByLabel('Password',{exact:true}).fill('ArgusQA2026!');await page.locator('.auth-submit').click();await page.locator('.argus-app').waitFor();
  const event=(await api('/scout_events/qa-event')).data;
@@ -35,7 +36,7 @@ try{
   await shots('present-all');await dialog.getByRole('button',{name:'Next',exact:true}).focus();await page.keyboard.press('ArrowRight');await page.getByRole('status').filter({hasText:'Section 2 of'}).waitFor();
   let cancelledDownload=false;const cancelledHandler=()=>{cancelledDownload=true;};page.on('download',cancelledHandler);
   const workerDelay=async route=>{await new Promise(resolve=>setTimeout(resolve,500));await route.continue();};await page.route('**/assets/presentation-export.worker-*.js',workerDelay);
-  await page.getByRole('button',{name:'Export PDF',exact:true}).click();await page.getByRole('button',{name:'Cancel export',exact:true}).click();await page.getByRole('alert').filter({hasText:'Export cancelled'}).waitFor();await page.waitForTimeout(700);assert.equal(cancelledDownload,false);page.off('download',cancelledHandler);await page.unroute('**/assets/presentation-export.worker-*.js',workerDelay);
+  for(const label of ['Export PDF','Export PowerPoint']){await page.getByRole('button',{name:label,exact:true}).click();await page.getByRole('button',{name:'Cancel export',exact:true}).click();await page.getByRole('alert').filter({hasText:'Export cancelled'}).waitFor();await page.waitForTimeout(700);assert.equal(cancelledDownload,false,`${label} cancellation must not download a late file`);}page.off('download',cancelledHandler);await page.unroute('**/assets/presentation-export.worker-*.js',workerDelay);
   for(const [label,extension] of [['Export PDF','pdf'],['Export PowerPoint','pptx']]){const [file]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:label,exact:true}).click()]);const destination=path.join(artifacts,`all-teams.${extension}`);await file.saveAs(destination);assert.ok(fs.statSync(destination).size>1000);}
   const pdf=fs.readFileSync(path.join(artifacts,'all-teams.pdf')).toString('latin1');assert.ok(pdf.indexOf('Team 1678')<pdf.indexOf('Team 111'));assert.ok(!pdf.includes('qa_owner'));assert.ok(!pdf.includes('Autonomous zero observed'));
   const list=(await api('/picklists/qa-picklist')).data;assert.equal((await api('/picklists/qa-picklist',{name:list.name,entries:[...list.entries].reverse(),revision:list.revision},'PATCH')).status,200);
@@ -55,5 +56,5 @@ try{
   await route('/help');await page.getByLabel('Search instructions',{exact:true}).fill('internal architecture');assert.equal(await page.getByRole('link',{name:'Internal architecture',exact:true}).count(),0);await page.getByLabel('Search instructions',{exact:true}).fill('');await shots('help');
  });
  assert.deepEqual(errors,[]);
-}finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({results,errors,timings},null,2));console.log(JSON.stringify({artifacts,results,errors,timings},null,2));}
+}finally{await browser.close();fs.writeFileSync(path.join(artifacts,'results.json'),JSON.stringify({results,errors,timings,accessibility},null,2));console.log(JSON.stringify({artifacts,results,errors,timings,accessibilityStates:accessibility.length},null,2));}
 if(results.some(result=>result.status==='failed')||errors.length)process.exitCode=1;
